@@ -1,19 +1,64 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { BsTrash, BsCheck2, BsAirplane } from 'react-icons/bs';
 import { MdOutlineLocationOn } from 'react-icons/md';
 import { LuCalendarDays, LuClock3 } from 'react-icons/lu';
 import PrimaryButton from './PrimaryButton';
+import group from "../assets/groupofpop.png";
 
 export default function BookingForm() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('point'); // 'point' | 'hourly'
   const [stops, setStops] = useState([{ value: 'New York street Bay Four' }]);
   const [stopLocations, setStopLocations] = useState([{ value: '' }]);
+  const [showSwitchPopup, setShowSwitchPopup] = useState(false);
 
-  const addStop = () => setStops([...stops, { value: '' }]);
+  const addStop = () => {
+    if (stops.length >= 4) {
+      setShowSwitchPopup(true);
+    } else {
+      setStops([...stops, { value: '' }]);
+    }
+  };
   const removeStop = (i) => setStops(stops.filter((_, idx) => idx !== i));
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-sm">
+    <>
+      {/* ── Switch to Hourly Popup ── */}
+      {showSwitchPopup && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
+          <div className="bg-white rounded-3xl shadow-2xl px-10 py-10 flex flex-col items-center max-w-sm w-full mx-4 relative">
+            {/* Decorative dots */}
+            {/* Icon */}
+            <div className="mb-5">
+              <img src={group} alt="Group of People" className="w-36 h-24 object-contain" />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-bold text-gray-900 mb-3 text-center">Switch to Hourly Ride</h2>
+
+            {/* Description */}
+            <p className="text-gray-400 text-sm text-center leading-relaxed mb-7">
+              You've added more than 4 stops. An hourly ride may be more suitable and cost-effective for your journey.
+            </p>
+
+            {/* Switch button */}
+            <button
+              onClick={() => {
+                setActiveTab('hourly');
+                setShowSwitchPopup(false);
+              }}
+              className="w-full bg-[#1a2b5e] text-white font-semibold py-4 rounded-full text-base hover:bg-[#253576] transition-colors"
+            >
+              Switch to Hourly
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-sm">
       {/* ── Tab Header ── */}
       <div className="flex">
         <button
@@ -239,11 +284,12 @@ export default function BookingForm() {
 
         {/* ── Get Quote Button ── */}
         <div className="mt-2">
-          <PrimaryButton fullWidth size="lg" className="tracking-wide mb-1 mt-5 bg-primary">
+          <PrimaryButton fullWidth size="lg" className="tracking-wide mb-1 mt-5 bg-primary" onClick={() => navigate('/select-vehicle')}>
             Get Quote
           </PrimaryButton>
         </div>
       </div>
     </div>
+    </>
   );
 }
