@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { TbAlertTriangle } from 'react-icons/tb';
 import { TbArrowRight } from 'react-icons/tb';
@@ -18,8 +18,9 @@ const tripDetails = [
   { label: 'Stop 1', value: 'Telegraph Road, Southfield, MI, USA' },
   { label: 'Drop-Off', value: 'Eight Mile West, Southfield, MI, USA' },
   { label: 'Date & Time', value: 'Wed, Feb 18th, 2026 11:00 PM' },
-  { label: 'Vichicle', value: 'Business Sedan' },
-  { label: 'Breakdown', value: '30 mint' },
+  { label: 'No. of Hours', value: '3' },
+  { label: 'Vehicle', value: 'Business Sedan' },
+  { label: 'Breakdown', value: '30 mins' },
   { label: 'Passenger', value: '3' },
   { label: 'Luggage', value: '3' },
   { label: 'Child Seats', value: '1 Toddler' },
@@ -38,7 +39,7 @@ const COUNTRIES = [
 
 function FloatingInput({ icon, placeholder, value, onChange, type = 'text' }) {
   return (
-    <div className="relative flex items-center border border-gray-200 rounded-xl px-3 py-3 gap-2 bg-white focus-within:border-[#1a2b5e] transition-colors">
+    <div className="relative flex items-center border rounded-full px-3 py-3 gap-2 bg-white focus-within:border-[#1a2b5e] transition-colors">
       {icon && <span className="text-gray-400 flex-shrink-0">{icon}</span>}
       <input
         type={type}
@@ -53,11 +54,12 @@ function FloatingInput({ icon, placeholder, value, onChange, type = 'text' }) {
 
 function PhoneInput({ value, onChange, dialCode, onDialChange }) {
   return (
-    <div className="relative flex items-center border border-gray-200 rounded-xl overflow-hidden bg-white focus-within:border-[#1a2b5e] transition-colors">
+    <div className="relative flex items-center border border-gray-200 rounded-3xl overflow-hidden bg-white focus-within:border-[#1a2b5e] transition-colors">
       {/* Country selector */}
-      <div className="flex items-center gap-1 px-3 py-3 border-r border-gray-200 bg-white flex-shrink-0">
-        <img src={usflag} alt="US" className="w-5 h-3.5 object-cover rounded-sm" />
-        <select
+      <div className="flex items-center gap-1 px-2 py-1 border rounded-full bg-gray-200  flex-shrink-0 ml-2">
+        <img src={usflag} alt="US" className="w-5 h-4.5 object-cover" />
+        <FiChevronDown size={12} className="text-gray-400" />
+        {/* <select
           value={dialCode}
           onChange={e => onDialChange(e.target.value)}
           className="text-sm text-gray-700 outline-none bg-transparent cursor-pointer appearance-none pr-1"
@@ -65,8 +67,7 @@ function PhoneInput({ value, onChange, dialCode, onDialChange }) {
           {COUNTRIES.map(c => (
             <option key={c.code} value={c.dial}>{c.code} {c.dial}</option>
           ))}
-        </select>
-        <FiChevronDown size={12} className="text-gray-400" />
+        </select> */}
       </div>
       <input
         type="tel"
@@ -81,6 +82,21 @@ function PhoneInput({ value, onChange, dialCode, onDialChange }) {
 
 export default function PassengerDetailsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const storedBookingContext = (() => {
+    const raw = sessionStorage.getItem('bookingContext');
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  })();
+
+  const bookingContext = location.state ?? storedBookingContext ?? {};
+  const isHourlyRide = bookingContext.rideType === 'hourly';
 
   // Booking summary accordion
   const [summaryOpen, setSummaryOpen] = useState(true);
@@ -119,7 +135,7 @@ export default function PassengerDetailsPage() {
       <StepperNavbar currentStep={2} />
 
       {/* Page header */}
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 bg-gray-100 border-b border-gray-200">
+      <div className="flex items-center justify-between px-8 md:px-16 py-4 bg-[#EAEAEA] border-b border-gray-200">
         <h1 className="text-lg font-bold text-gray-900">Passenger Information</h1>
         <button
           onClick={() => navigate('/additional-details')}
@@ -142,29 +158,37 @@ export default function PassengerDetailsPage() {
               onClick={() => setSummaryOpen(v => !v)}
               className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
             >
-              <span className="text-base font-bold text-gray-900">Booking summary</span>
+              <span className="text-xl font-bold text-gray-900">Booking summary</span>
               {summaryOpen ? <FiChevronUp size={18} className="text-gray-500" /> : <FiChevronDown size={18} className="text-gray-500" />}
             </button>
 
             {/* Always visible row */}
             <div className="flex items-center justify-between px-5 pb-4">
-              <div className="flex items-center gap-2 text-sm text-gray-700">
+              <div className="flex items-center gap-2 font-semibold text-gray-900">
                 <TbArrowRight size={15} className="text-[#1a2b5e]" />
                 <span>Pickup Trip Details</span>
               </div>
-              <span className="text-sm font-bold text-gray-900">$110</span>
+              <span className="text-lg font-bold text-gray-900">$110</span>
             </div>
 
             {/* Expanded trip details */}
             {summaryOpen && (
               <div className="border-t border-gray-100 px-5 py-4">
                 <div className="flex flex-col gap-2">
-                  {tripDetails.map((row, i) => (
-                    <div key={i} className="flex items-start justify-start gap-4">
-                      <span className="text-xs font-bold text-black w-24 flex-shrink-0">{row.label}</span>
-                      <span className="text-xs text-gray-700 text-left">{row.value}</span>
-                    </div>
-                  ))}
+                  {tripDetails.map((row, i) => {
+                    if (row.label === 'No. of Hours' && !isHourlyRide) {
+                      return null;
+                    }
+
+                    return (
+                      <div key={i} className="flex items-start justify-start gap-4 mt-1">
+                        <span className="text-xs font-bold text-black w-24 flex-shrink-0">{row.label}</span>
+                        <span className="text-xs text-gray-700 text-left">
+                          {isHourlyRide && row.label === 'No. of Hours' ? '3 hours' : row.value}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -172,37 +196,37 @@ export default function PassengerDetailsPage() {
 
           {/* Price Breakdown */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
-            <h2 className="text-base font-bold text-gray-900 mb-4">Price Breakdown</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Price Breakdown</h2>
 
             {/* Pickup */}
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <div className="flex items-center gap-2 text-sm text-gray-700">
+              <div className="flex items-center gap-2 text-md text-gray-900 font-semibold">
                 <TbArrowRight size={15} className="text-[#1a2b5e]" />
                 <span>Pickup</span>
               </div>
-              <span className="text-sm font-semibold text-gray-800">$110</span>
+              <span className="text-lg font-bold text-gray-900">$110</span>
             </div>
 
             {/* Child Seat */}
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+            <div className="flex items-center justify-between py-4 border-b border-gray-100">
               <div className="flex items-center gap-2 text-sm text-gray-700">
                 <img src={childSeatIcon} className="w-4 h-4" alt="child seat" />
                 <span>Child Seat x 1</span>
                 <button onClick={() => setShowDeleteConfirm(true)} className="ml-1 text-red-400 hover:text-red-600 transition-colors">
-                  <MdDeleteOutline size={16} />
+                  <MdDeleteOutline size={20} />
                 </button>
               </div>
-              <span className="text-sm font-semibold text-gray-800">$15</span>
+              <span className="text-md  text-gray-400">$15</span>
             </div>
 
             {/* Tolls */}
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+            <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-700">Tolls Charges</span>
-              <span className="text-sm font-semibold text-gray-800">$15</span>
+              <span className="text-md  text-gray-400">$15</span>
             </div>
 
             {/* Total */}
-            <div className="flex items-center justify-between pt-3 mt-1">
+            <div className="flex items-center justify-between pt-3 mt-1 border-b pb-2">
               <span className="text-sm text-gray-700">Total Price</span>
               <span className="text-2xl font-bold text-gray-900">
                 <span className="text-base font-semibold mr-0.5">$</span>160.64
@@ -210,7 +234,7 @@ export default function PassengerDetailsPage() {
             </div>
 
             {/* All-inclusive note */}
-            <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-500">
+            <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-500 ">
               <BsInfoCircle size={13} />
               <span>All-inclusive price</span>
             </div>
@@ -218,12 +242,12 @@ export default function PassengerDetailsPage() {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-full md:w-[62%] flex flex-col gap-5">
+        <div className="w-full md:w-[62%] flex flex-col gap-5 rounded-2xl ">
 
           {/* Continue as Guest */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
+          <div className="bg-white/50 rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
 
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Continue as Guest</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Continue as Guest</h2>
 
             {/* Book for someone else toggle */}
             <div className="flex items-center gap-3 mb-5">
@@ -239,7 +263,7 @@ export default function PassengerDetailsPage() {
             </div>
 
             {/* Passenger Details */}
-            <h3 className="text-sm font-bold text-gray-800 mb-3">Passenger Details</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-3">Passenger Details</h3>
 
             <div className="flex flex-col gap-3">
               {/* First & Last name */}
@@ -258,7 +282,7 @@ export default function PassengerDetailsPage() {
             {/* Booker Details — only when toggle is on */}
             {bookForSomeoneElse && (
               <>
-                <h3 className="text-sm font-bold text-gray-800 mb-3 mt-5">Booker Details</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-3 mt-5">Booker Details</h3>
                 <div className="flex flex-col gap-3">
                   <div className="grid grid-cols-2 gap-3">
                     <FloatingInput icon={<LuUser size={16} />} placeholder="First Name" value={bFirstName} onChange={e => setBFirstName(e.target.value)} />
@@ -322,7 +346,7 @@ export default function PassengerDetailsPage() {
             </div>
 
             {/* Trip Notes */}
-            <h3 className="text-sm font-bold text-gray-800 mt-5 mb-2">Trip Notes</h3>
+            <h3 className="text-lg font-bold text-gray-800 mt-5 mb-2">Trip Notes</h3>
             <textarea
               rows={3}
               placeholder="Any special requests or notes for the driver..."
@@ -348,7 +372,7 @@ export default function PassengerDetailsPage() {
 
       {/* Delete child seat confirmation modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
           <div className="bg-white rounded-3xl shadow-2xl mx-4 w-full max-w-sm px-8 py-8 flex flex-col items-center">
 
             {/* Warning icon with decorative dots */}

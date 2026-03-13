@@ -8,6 +8,7 @@ import { TbArrowRight } from 'react-icons/tb';
 import StepperNavbar from '../../components/StepperNavbar';
 import Footer from '../../components/Footer';
 import childSeatIcon from '../../assets/childicon.png';
+import wallet from '../../assets/wallet.png';
 
 const tripDetails = [
   { label: 'Pick Up', value: 'Beck Road, Plymouth, MI, USA' },
@@ -23,7 +24,7 @@ const tripDetails = [
 
 function FormInput({ icon, placeholder, type = 'text', value, onChange }) {
   return (
-    <div className="flex items-center border border-gray-200 rounded-xl px-3 py-3 gap-2 bg-white focus-within:border-[#1a2b5e] transition-colors">
+    <div className="flex items-center border border-gray-200 rounded-full px-3 py-3 gap-2 bg-white focus-within:border-[#1a2b5e] transition-colors">
       {icon && <span className="text-gray-400 flex-shrink-0">{icon}</span>}
       <input
         type={type}
@@ -38,6 +39,21 @@ function FormInput({ icon, placeholder, type = 'text', value, onChange }) {
 
 export default function PaymentPage() {
   const navigate = useNavigate();
+
+  const storedBookingContext = (() => {
+    const raw = sessionStorage.getItem('bookingContext');
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  })();
+
+  const bookingContext = location.state ?? storedBookingContext ?? {};
+  const isHourlyRide = bookingContext.rideType === 'hourly';
+
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [bookingDone, setBookingDone] = useState(false);
   const [cardName, setCardName] = useState('');
@@ -67,73 +83,98 @@ export default function PaymentPage() {
         <div className="w-full md:w-[38%] flex flex-col gap-4">
 
           {/* Booking Summary */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <button
-              onClick={() => setSummaryOpen(v => !v)}
-              className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
-            >
-              <span className="text-base font-bold text-gray-900">Booking summary</span>
-              {summaryOpen ? <FiChevronUp size={18} className="text-gray-500" /> : <FiChevronDown size={18} className="text-gray-500" />}
-            </button>
-            <div className="flex items-center justify-between px-5 pb-4">
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <TbArrowRight size={15} className="text-[#1a2b5e]" />
-                <span>Pickup Trip Details</span>
-              </div>
-              <span className="text-sm font-bold text-gray-900">$110</span>
-            </div>
-            {summaryOpen && (
-              <div className="border-t border-gray-100 px-5 py-4">
-                <div className="flex flex-col gap-2">
-                  {tripDetails.map((row, i) => (
-                    <div key={i} className="flex items-start gap-4">
-                      <span className="text-xs font-bold text-black w-24 flex-shrink-0">{row.label}</span>
-                      <span className="text-xs text-gray-700">{row.value}</span>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                      {/* Header */}
+                      <button
+                        onClick={() => setSummaryOpen(v => !v)}
+                        className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+                      >
+                        <span className="text-xl font-bold text-gray-900">Booking summary</span>
+                        {summaryOpen ? <FiChevronUp size={18} className="text-gray-500" /> : <FiChevronDown size={18} className="text-gray-500" />}
+                      </button>
+          
+                      {/* Always visible row */}
+                      <div className="flex items-center justify-between px-5 pb-4">
+                        <div className="flex items-center gap-2 font-semibold text-gray-900">
+                          <TbArrowRight size={15} className="text-[#1a2b5e]" />
+                          <span>Pickup Trip Details</span>
+                        </div>
+                        <span className="text-lg font-bold text-gray-900">$110</span>
+                      </div>
+          
+                      {/* Expanded trip details */}
+                      {summaryOpen && (
+                        <div className="border-t border-gray-100 px-5 py-4">
+                          <div className="flex flex-col gap-2">
+                            {tripDetails.map((row, i) => {
+                              if (row.label === 'No. of Hours' && !isHourlyRide) {
+                                return null;
+                              }
+          
+                              return (
+                                <div key={i} className="flex items-start justify-start gap-4 mt-1">
+                                  <span className="text-xs font-bold text-black w-24 flex-shrink-0">{row.label}</span>
+                                  <span className="text-xs text-gray-700 text-left">
+                                    {isHourlyRide && row.label === 'No. of Hours' ? '3 hours' : row.value}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Price Breakdown */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
-            <h2 className="text-base font-bold text-gray-900 mb-4">Price Breakdown</h2>
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <TbArrowRight size={15} className="text-[#1a2b5e]" />
-                <span>Pickup</span>
-              </div>
-              <span className="text-sm font-semibold text-gray-800">$110</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <img src={childSeatIcon} className="w-4 h-4" alt="child seat" />
-                <span>Child Seat x 1</span>
-                <MdDeleteOutline size={16} className="ml-1 text-red-400" />
-              </div>
-              <span className="text-sm font-semibold text-gray-800">$15</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-700">Tolls Charges</span>
-              <span className="text-sm font-semibold text-gray-800">$15</span>
-            </div>
-            <div className="flex items-center justify-between pt-3 mt-1">
-              <span className="text-sm text-gray-700">Total Price</span>
-              <span className="text-2xl font-bold text-gray-900">
-                <span className="text-base font-semibold mr-0.5">$</span>160.64
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-500">
-              <BsInfoCircle size={13} />
-              <span>All-inclusive price</span>
-            </div>
-          </div>
+          
+                    {/* Price Breakdown */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-4">
+                      <h2 className="text-xl font-bold text-gray-900 mb-4">Price Breakdown</h2>
+          
+                      {/* Pickup */}
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                        <div className="flex items-center gap-2 text-md text-gray-900 font-semibold">
+                          <TbArrowRight size={15} className="text-[#1a2b5e]" />
+                          <span>Pickup</span>
+                        </div>
+                        <span className="text-lg font-bold text-gray-900">$110</span>
+                      </div>
+          
+                      {/* Child Seat */}
+                      <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <img src={childSeatIcon} className="w-4 h-4" alt="child seat" />
+                          <span>Child Seat x 1</span>
+                          <button onClick={() => setShowDeleteConfirm(true)} className="ml-1 text-red-400 hover:text-red-600 transition-colors">
+                            <MdDeleteOutline size={20} />
+                          </button>
+                        </div>
+                        <span className="text-md  text-gray-400">$15</span>
+                      </div>
+          
+                      {/* Tolls */}
+                      <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                        <span className="text-sm text-gray-700">Tolls Charges</span>
+                        <span className="text-md  text-gray-400">$15</span>
+                      </div>
+          
+                      {/* Total */}
+                      <div className="flex items-center justify-between pt-3 mt-1 border-b pb-2">
+                        <span className="text-sm text-gray-700">Total Price</span>
+                        <span className="text-2xl font-bold text-gray-900">
+                          <span className="text-base font-semibold mr-0.5">$</span>160.64
+                        </span>
+                      </div>
+          
+                      {/* All-inclusive note */}
+                      <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-500 ">
+                        <BsInfoCircle size={13} />
+                        <span>All-inclusive price</span>
+                      </div>
+                    </div>
         </div>
 
         {/* RIGHT PANEL */}
         <div className="w-full md:w-[62%]">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
+          <div className="bg-white/70 rounded-2xl shadow-sm border border-gray-100 px-6 py-5">
 
             <h2 className="text-xl font-bold text-gray-900 mb-3">Payment Information</h2>
 
@@ -144,7 +185,7 @@ export default function PaymentPage() {
             </div>
 
             {/* Debit Card option (selected) */}
-            <div className="border-2 border-[#1a2b5e] rounded-xl px-4 py-3 flex items-center gap-3 mb-5 bg-blue-50/30">
+            <div className="border-2 border-[#1a2b5e] rounded-xl px-4 py-3 flex  gap-3 mb-5 bg-blue-50/30">
               <div className="w-9 h-9 bg-[#1a2b5e] rounded-lg flex items-center justify-center flex-shrink-0">
                 <BsCreditCard size={17} className="text-white" />
               </div>
@@ -171,14 +212,14 @@ export default function PaymentPage() {
             <div className="border-t border-gray-100 mb-5" />
 
             {/* Save card info */}
-            <div className="flex items-start gap-3 mb-5">
-              <div className="w-9 h-9 bg-[#1a2b5e] rounded-lg flex items-center justify-center flex-shrink-0">
-                <MdLockOutline size={17} className="text-white" />
+            <div className="flex bg-white items-center gap-3 mb-5 border border-gray-100 rounded-lg px-2 py-1">
+              <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                <img src={wallet} alt="Wallet" className="text-white" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-900">Created card</p>
                 <p className="text-xs text-gray-400 mt-0.5">Save your info for faster booking</p>
-                <div className="flex items-center gap-1 mt-1">
+                <div className="flex items-center gap-1 mt-1 bg-gray-200 px-2 py-1 rounded-lg w-[50%]">
                   <BsInfoCircle size={11} className="text-[#1a2b5e] flex-shrink-0" />
                   <p className="text-xs text-[#1a2b5e]">ID verification required for credit card payments.</p>
                 </div>
@@ -186,7 +227,7 @@ export default function PaymentPage() {
             </div>
 
             {/* Billing note */}
-            <p className="text-xs text-gray-400 italic mb-4">Billing address is used to verify the credit or debit card</p>
+            <p className="text-md text-gray-800 mb-4">Billing address is used to verify the credit or debit card</p>
 
             {/* Policy checkboxes */}
             <div className="flex flex-col gap-2 mb-6">
@@ -235,7 +276,7 @@ export default function PaymentPage() {
             </div>
 
             <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Booking completed</h1>
-            <p className="text-sm text-gray-400 text-center mb-6 max-w-md mx-auto leading-relaxed">
+            <p className="text-sm text-gray-800 text-center mb-6 max-w-md mx-auto leading-relaxed">
               Your request has been submitted. Our customer service representative will get back to you shortly. Thank you for choosing prestige and have a safe trip.
             </p>
 
@@ -244,12 +285,12 @@ export default function PaymentPage() {
             {/* Booking details */}
             <div className="flex gap-4">
               {/* Left column */}
-              <div className="flex flex-col gap-5 w-36 flex-shrink-0 border-r border-gray-100 pr-4">
+              <div className="flex flex-col gap-3 w-32 flex-shrink-0 border-r border-gray-100 pr-4">
                 <div>
                   <p className="text-xs text-gray-400 mb-0.5">Passenger Name</p>
                   <p className="text-sm font-bold text-gray-900">Jayson Smith</p>
                 </div>
-                <div>
+                <div className='mt-[95%]'>
                   <p className="text-xs text-gray-400 mb-0.5">Vehicle</p>
                   <p className="text-sm font-bold text-gray-900">Business Sedan</p>
                 </div>
@@ -296,7 +337,7 @@ export default function PaymentPage() {
               </div>
 
               {/* Right column — QR code */}
-              <div className="flex flex-col items-center gap-2 flex-shrink-0 pl-2">
+              <div className="flex flex-col items-center gap-2 flex-shrink-0 pl-2 pt-5">
                 <div className="border border-gray-200 rounded-lg p-1.5 bg-white">
                   <svg viewBox="0 0 21 21" width="110" height="110" xmlns="http://www.w3.org/2000/svg">
                     {[

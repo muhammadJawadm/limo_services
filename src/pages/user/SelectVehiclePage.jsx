@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { BsCheck2, BsWifi, BsBriefcase, BsPeopleFill, BsLightningCharge } from 'react-icons/bs';
 import { MdAcUnit } from 'react-icons/md';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
@@ -8,7 +8,7 @@ import { MdOutlineLocationOn, MdCircle } from 'react-icons/md';
 import { TbArrowRight } from 'react-icons/tb';
 import StepperNavbar from '../../components/StepperNavbar';
 import Footer from '../../components/Footer';
-import mapImg from '../../assets/map.png';
+import RouteMap from '../../components/RouteMap';
 import usericon from "../../assets/profileuser.png"
 import briefcase from "../../assets/briefcase.png"
 import usericonblack from "../../assets/profile2userblack.png"
@@ -76,24 +76,24 @@ const FeatureIcons = ({ passengers, luggage, Selected }) => {
   if (Selected) {
     return (
       <div className="flex items-center gap-2 mt-2">
-        <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5">
+        <div className="flex items-center gap-3 bg-white/10 rounded-full px-3 py-1.5">
           <span className="flex items-center gap-1 text-xs text-white">
-            <img src={usericon} alt="User" className="w-4 h-4" /> {passengers}
+            <img src={usericon} alt="User" className="w-5 h-5" /> {passengers}
           </span>
           <span className="flex items-center gap-1 text-xs text-white">
-            <img src={briefcase} alt="Luggage" className="w-4 h-4" /> {luggage}
+            <img src={briefcase} alt="Luggage" className="w-5 h-5" /> {luggage}
           </span>
         </div>
-        <img src={seat} alt="Features" className="w-5 h-5" />
-        <img src={wifi} alt="Features" className="w-5 h-5" />
-        <img src={drink} alt="Features" className="w-5 h-5" />
-        <img src={plane} alt="Features" className="w-5 h-5" />
+        <img src={seat} alt="Features" className="w-6 h-6" />
+        <img src={wifi} alt="Features" className="w-6 h-6" />
+        <img src={drink} alt="Features" className="w-6 h-6" />
+        <img src={plane} alt="Features" className="w-6 h-6" />
       </div>
     );
   }
   return (
     <div className="flex items-center gap-2 mt-2">
-      <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1.5">
+      <div className="flex items-center gap-3  border rounded-full px-3 py-1.5">
         <span className="flex items-center gap-1 text-xs text-gray-500">
           <img src={usericonblack} alt="User" className="w-4 h-4" /> {passengers}
         </span>
@@ -101,26 +101,41 @@ const FeatureIcons = ({ passengers, luggage, Selected }) => {
           <img src={briefcaseblack} alt="Luggage" className="w-4 h-4" /> {luggage}
         </span>
       </div>
-      <img src={seatblack} alt="Features" className="w-5 h-5" />
-      <img src={wifiblack} alt="Features" className="w-5 h-5" />
-      <img src={drinkblack} alt="Features" className="w-5 h-5" />
-      <img src={planeblack} alt="Features" className="w-5 h-5" />
+      <img src={seatblack} alt="Features" className="w-6 h-6" />
+      <img src={wifiblack} alt="Features" className="w-6 h-6" />
+      <img src={drinkblack} alt="Features" className="w-6 h-6" />
+      <img src={planeblack} alt="Features" className="w-6 h-6" />
     </div>
   );
 };
 
 export default function SelectVehiclePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selectedId, setSelectedId] = useState('business');
   const [passengerCount, setPassengerCount] = useState(3);
   const [luggageCount, setLuggageCount] = useState(3);
 
+  const storedBookingContext = (() => {
+    const raw = sessionStorage.getItem('bookingContext');
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  })();
+
+  const bookingContext = location.state ?? storedBookingContext ?? {};
+  const isHourlyRide = bookingContext.rideType === 'hourly';
+
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#F9F9F9]">
       <StepperNavbar currentStep={1} />
 
       {/* Page header */}
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between px-8 md:px-16 py-4 border-b bg-[#EAEAEA] max=w-7xl">
         <h1 className="text-lg font-bold text-gray-900">Select Your Vehicle</h1>
         <button
           onClick={() => navigate('/')}
@@ -137,32 +152,37 @@ export default function SelectVehiclePage() {
         <div className="w-full md:w-[42%] flex flex-col gap-4">
           {/* Map */}
           <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-            <img src={mapImg} alt="Route Map" className="w-full h-80 object-cover" />
+            <RouteMap />
 
             {/* Route summary bar */}
-            <div className="flex items-center gap-2 px-4 py-3 bg-white border-t border-gray-100 text-xs text-gray-500">
+            <div className="flex items-center gap-2 px-4 py-3 bg-white border-t border-gray-100 text-sm text-gray-900">
               <img src={arowswap} alt="Arrow Swap" className="w-5 h-5" />
-              <span className="font-semibold text-gray-700">100.2 mi</span>
+              <span className="font-semibold">16.2 km</span>
               <span></span>
-              <LuClock3 size={13} />
-              <span>1 hours 26 mints</span>
+              <LuClock3 size={18} />
+              <span>35 mins</span>
             </div>
           </div>
 
           {/* Trip details card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="bg-white/60 rounded-2xl shadow-sm border border-gray-100 p-5">
             <div className="flex items-center gap-2 mb-4">
               <TbArrowRight size={16} className="text-[#1a2b5e]" />
               <span className="text-sm font-bold text-gray-800">Pickup Trip Details</span>
             </div>
 
             {/* Stops list */}
-            <div className="flex flex-col gap-3 mb-5">
+            <div className="flex flex-col gap-3 mb-3 border-t pt-2 border-gray-300 ">
               {stops.map((stop, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  {stop.type === 'pickup' && <MdOutlineLocationOn size={18} className="text-green-500 flex-shrink-0 mt-0.5" />}
-                  {stop.type === 'stop' && <MdCircle size={10} className="text-gray-400 flex-shrink-0 mt-1.5 ml-1" />}
-                  {stop.type === 'dropoff' && <MdOutlineLocationOn size={18} className="text-red-400 flex-shrink-0 mt-0.5" />}
+                  <div className="relative w-5 flex justify-center flex-shrink-0">
+                    {stop.type === 'pickup' && <MdOutlineLocationOn size={18} className="text-green-500 mt-0.5" />}
+                    {stop.type === 'stop' && <MdCircle size={10} className="text-gray-400 mt-1.5" />}
+                    {stop.type === 'dropoff' && <MdOutlineLocationOn size={18} className="text-red-400 mt-0.5" />}
+                    {i < stops.length - 1 && (
+                      <span className="absolute left-1/2 -translate-x-1/2 top-6 h-[calc(100%+12px)] border-l border-dashed border-gray-300" />
+                    )}
+                  </div>
                   <div>
                     <p className="text-xs font-semibold text-gray-800">{stop.label}</p>
                     <p className="text-xs text-gray-400">{stop.address}</p>
@@ -172,21 +192,30 @@ export default function SelectVehiclePage() {
             </div>
 
             {/* Date & time */}
-            <div className="flex items-center gap-6 pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <LuCalendarDays size={14} className="text-gray-400" />
+            <div className="flex items-center gap-3 border-gray-100 pb-2">
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-6 py-2.5">
+                <LuCalendarDays size={16} className="text-gray-400" />
                 <span>Wed, Feb 18th 2026</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <LuClock3 size={14} className="text-gray-400" />
-                <span>12:11 pm</span>
+              <div className="flex items-center gap-2 text-sm text-gray-500  rounded-full bg-white px-6 py-2.5">
+                <LuClock3 size={16} className="text-gray-400" />
+                <span>03:20</span>
+                
               </div>
             </div>
+            <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5 w-32">
+              <LuClock3 size={16} className="text-gray-400" />
+            {isHourlyRide ? (
+                  <span>3 hours</span>
+                ) : (
+                  <span>12:11 pm</span>
+                )}
+                </div>
           </div>
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-full md:w-[50%] flex flex-col gap-3">
+        <div className="w-full md:w-[55%] flex flex-col gap-3">
           {vehicles.map((v) => {
             const isSelected = selectedId === v.id;
             return (

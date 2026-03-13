@@ -5,6 +5,7 @@ import AdditionalDetailsPage from './pages/user/AdditionalDetailsPage';
 import PassengerDetailsPage from './pages/user/PassengerDetailsPage';
 import PaymentPage from './pages/user/PaymentPage';
 import BookingCompletedPage from './pages/user/BookingCompletedPage';
+import CreateAccountPage from './pages/user/CreateAccountPage';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/passenger-details" element={<PassengerDetailsPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/booking-completed" element={<BookingCompletedPage />} />
+        <Route path="/create-account" element={<CreateAccountPage />} />
       </Routes>
     </BrowserRouter>
   );

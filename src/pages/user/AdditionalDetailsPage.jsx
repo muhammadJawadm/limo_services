@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { BsCheck2 } from 'react-icons/bs';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { LuCalendarDays, LuClock3 } from 'react-icons/lu';
@@ -7,12 +7,15 @@ import { MdOutlineLocationOn, MdCircle } from 'react-icons/md';
 import { TbArrowRight } from 'react-icons/tb';
 import StepperNavbar from '../../components/StepperNavbar';
 import Footer from '../../components/Footer';
+import usericonblack from "../../assets/profile2userblack.png";
+import briefcaseblack from "../../assets/briefcaseblack.png";
 import usericon from "../../assets/profileuser.png";
 import briefcase from "../../assets/briefcase.png";
 import seat from "../../assets/seat.png";
 import wifi from "../../assets/wifi.png";
 import drink from "../../assets/drink.png";
 import plane from "../../assets/plane.png";
+
 import businessSedanImg from '../../assets/business-class-car.png';
 import childSeatIcon from '../../assets/childicon.png';
 
@@ -26,17 +29,32 @@ const countOptions = [0, 1, 2, 3, 4];
 
 export default function AdditionalDetailsPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [childSeats, setChildSeats] = useState(false);
   const [infant, setInfant] = useState(0);
   const [toddler, setToddler] = useState(1);
   const [booster, setBooster] = useState(0);
+
+  const storedBookingContext = (() => {
+    const raw = sessionStorage.getItem('bookingContext');
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  })();
+
+  const bookingContext = location.state ?? storedBookingContext ?? {};
+  const isHourlyRide = bookingContext.rideType === 'hourly';
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <StepperNavbar currentStep={1} />
 
       {/* Page header */}
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 bg-gray-100 border-b border-gray-200">
+      <div className="flex items-center justify-between px-8 md:px-16 py-4 bg-[#EAEAEA] border-b border-gray-200">
         <h1 className="text-lg font-bold text-gray-900">Additional Details</h1>
         <button
           onClick={() => navigate('/select-vehicle')}
@@ -51,19 +69,24 @@ export default function AdditionalDetailsPage() {
 
         {/* LEFT PANEL — Trip details */}
         <div className="w-full md:w-[42%]">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="bg-white/10 rounded-2xl shadow-sm border border-gray-100 p-5">
             <div className="flex items-center gap-2 mb-4">
               <TbArrowRight size={16} className="text-[#1a2b5e]" />
               <span className="text-sm font-bold text-gray-800">Pickup Trip Details</span>
             </div>
 
             {/* Stops */}
-            <div className="flex flex-col gap-3 mb-5">
+            <div className="flex flex-col gap-3 mb-3 border-t pt-2 border-gray-300 ">
               {stops.map((stop, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  {stop.type === 'pickup' && <MdOutlineLocationOn size={18} className="text-green-500 flex-shrink-0 mt-0.5" />}
-                  {stop.type === 'stop' && <MdCircle size={10} className="text-gray-400 flex-shrink-0 mt-1.5 ml-1" />}
-                  {stop.type === 'dropoff' && <MdOutlineLocationOn size={18} className="text-red-400 flex-shrink-0 mt-0.5" />}
+                  <div className="relative w-5 flex justify-center flex-shrink-0">
+                    {stop.type === 'pickup' && <MdOutlineLocationOn size={18} className="text-green-500 mt-0.5" />}
+                    {stop.type === 'stop' && <MdCircle size={10} className="text-gray-400 mt-1.5" />}
+                    {stop.type === 'dropoff' && <MdOutlineLocationOn size={18} className="text-red-400 mt-0.5" />}
+                    {i < stops.length - 1 && (
+                      <span className="absolute left-1/2 -translate-x-1/2 top-6 h-[calc(100%+12px)] border-l border-dashed border-gray-300" />
+                    )}
+                  </div>
                   <div>
                     <p className="text-xs font-semibold text-gray-800">{stop.label}</p>
                     <p className="text-xs text-gray-400">{stop.address}</p>
@@ -73,26 +96,34 @@ export default function AdditionalDetailsPage() {
             </div>
 
             {/* Date & time */}
-            <div className="flex items-center gap-6 pt-3 border-t border-gray-100 mb-4">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <LuCalendarDays size={14} className="text-gray-400" />
+            <div className="flex items-center gap-6 ">
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <LuCalendarDays size={16} className="text-gray-400" />
                 <span>Wed, Feb 18th 2026</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <LuClock3 size={14} className="text-gray-400" />
-                <span>12:11 pm</span>
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <LuClock3 size={16} className="text-gray-400" />
+                <span>12:11</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <LuClock3 size={16} className="text-gray-400" />
+                {isHourlyRide ? <span>3 hours</span> : <span></span>}
               </div>
             </div>
 
             {/* Passengers & luggage */}
-            <div className="flex items-center gap-6 pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <img src={usericon} className="w-4 h-4" alt="passengers" />
+            <div className="flex items-center gap-6 mt-2">
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <img src={usericonblack} className="w-4 h-4" alt="passengers" />
                 <span>3 Passengers</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <img src={briefcase} className="w-4 h-4" alt="luggage" />
-                <span>3 Luggest</span>
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <img src={briefcaseblack} className="w-4 h-4" alt="luggage" />
+                <span>3 Luggage</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <img src={childSeatIcon} className="w-5 h-5" alt="luggage" />
+                <span>1 Toddler</span>
               </div>
             </div>
           </div>
@@ -118,17 +149,19 @@ export default function AdditionalDetailsPage() {
                 <p className="text-blue-200 text-xs">Cadillac CT6, Lyric or similar</p>
                 {/* Feature icons row + price */}
                 <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 ">
+                    <div className='flex items-center gap-3 border rounded-full px-3 py-1 bg-white/10'>
                     <span className="flex items-center gap-1 text-xs text-white">
                       <img src={usericon} className="w-4 h-4" alt="passengers" /> 3
                     </span>
                     <span className="flex items-center gap-1 text-xs text-white">
                       <img src={briefcase} className="w-4 h-4" alt="luggage" /> 3
                     </span>
-                    <img src={seat} className="w-5 h-5" alt="seat" />
-                    <img src={wifi} className="w-5 h-5" alt="wifi" />
-                    <img src={drink} className="w-5 h-5" alt="drink" />
-                    <img src={plane} className="w-5 h-5" alt="plane" />
+                    </div>
+                    <img src={seat} className="w-6 h-6" alt="seat" />
+                    <img src={wifi} className="w-6 h-6" alt="wifi" />
+                    <img src={drink} className="w-6 h-6" alt="drink" />
+                    <img src={plane} className="w-6 h-6" alt="plane" />
                   </div>
                   <p className="text-white font-bold text-lg">$95.00</p>
                 </div>
@@ -143,7 +176,7 @@ export default function AdditionalDetailsPage() {
               <div className="flex items-start gap-3">
                 {/* Child seat icon circle */}
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  <img src={childSeatIcon} className="w-5 h-5" alt="child seat" />
+                  <img src={childSeatIcon} className="w-6 h-6" alt="child seat" />
                 </div>
                 <span className="text-sm font-semibold text-gray-800">Do you want Child Seats?</span>
                 {/* Toggle switch */}

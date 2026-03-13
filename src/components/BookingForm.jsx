@@ -13,6 +13,17 @@ export default function BookingForm() {
   const [stops, setStops] = useState([{ value: 'New York street Bay Four' }]);
   const [stopLocations, setStopLocations] = useState([{ value: '' }]);
   const [showSwitchPopup, setShowSwitchPopup] = useState(false);
+  const [hourlyDuration, setHourlyDuration] = useState('');
+
+  const handleGetQuote = () => {
+    const bookingContext = {
+      rideType: activeTab,
+      hourlyDuration: activeTab === 'hourly' ? hourlyDuration.trim() : '',
+    };
+
+    sessionStorage.setItem('bookingContext', JSON.stringify(bookingContext));
+    navigate('/select-vehicle', { state: bookingContext });
+  };
 
   const addStop = () => {
     if (stops.length >= 4) {
@@ -233,6 +244,8 @@ export default function BookingForm() {
               <input
                 type="text"
                 placeholder="Duration"
+                value={hourlyDuration}
+                onChange={(e) => setHourlyDuration(e.target.value)}
                 className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
               />
             </div>
@@ -284,7 +297,7 @@ export default function BookingForm() {
 
         {/* ── Get Quote Button ── */}
         <div className="mt-2">
-          <PrimaryButton fullWidth size="lg" className="tracking-wide mb-1 mt-5 bg-primary" onClick={() => navigate('/select-vehicle')}>
+          <PrimaryButton fullWidth size="lg" className="tracking-wide mb-1 mt-5 bg-primary" onClick={handleGetQuote}>
             Get Quote
           </PrimaryButton>
         </div>
