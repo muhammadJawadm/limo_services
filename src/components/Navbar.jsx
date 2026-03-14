@@ -85,11 +85,20 @@ export default function Navbar() {
               </div>
             </div>
 
-            <button className="mt-5 w-full rounded-full bg-black py-3.5 text-xl font-medium text-white">
+            <button 
+            onClick={()=>{setShowLoginModal(false);
+              navigate('/login')
+            }}
+            className="mt-5 w-full rounded-full bg-black py-3.5 text-xl font-medium text-white">
               Login
             </button>
 
-            <button className="mt-4 w-full text-center text-xl text-gray-500 hover:text-gray-700 transition-colors">
+            <button
+            onClick={()=>{setShowLoginModal(false);
+              navigate('/forget-password')
+            }}
+            
+            className="mt-4 w-full text-center text-xl text-gray-500 hover:text-gray-700 transition-colors">
               Forgot password?
             </button>
 
