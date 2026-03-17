@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { FiChevronDown, FiChevronUp, FiTrash2, FiClock, FiMapPin, FiCalendar, FiUsers, FiBriefcase } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiTrash2, FiClock, FiMapPin, FiCalendar, FiUser, FiUsers, FiBriefcase, FiCreditCard, FiActivity } from 'react-icons/fi';
 import { LuPlane } from 'react-icons/lu';
 import BookingSuccessModal from './BookingSuccessModal';
+import briefcaseicon from '../../assets/briefcaseblack.png';
 
 export default function NewReservationModal({ isOpen, onClose }) {
   const [isReturnTrip, setIsReturnTrip] = useState(false);
@@ -73,7 +74,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
                     {openSections.tripDetails ? <FiChevronUp /> : <FiChevronDown />}
                   </button>
                   {openSections.tripDetails && (
-                    <div className="p-5 bg-gray-100">
+                    <div className="p-5 bg-gray-50">
                       <div className="mb-6 flex overflow-hidden rounded-xl border border-[#1b2d5d] bg-white text-[#111]">
                         <button
                           onClick={() => setTripType('point-to-point')}
@@ -133,27 +134,34 @@ export default function NewReservationModal({ isOpen, onClose }) {
                           </button>
                         </div>
                         {tripType === 'hourly' ? (
-                          <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                            <FiClock className="text-gray-400 shrink-0" size={18} />
-                            <input type="text" placeholder="Duration" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
-                          </div>
-                        ) : (
+                          <> 
                           <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
                             <FiMapPin className="text-[#ff4a40] shrink-0" size={18} />
                             <input type="text" placeholder="Drop-off Location" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                             <button className="absolute right-2 rounded-full bg-[#1b2d5d] px-4 py-1.5 text-xs text-white hover:bg-[#132042] transition-colors">Same as pickup</button>
+                          </div>
+                          <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
+                            <FiClock className="text-gray-400 shrink-0" size={18} />
+                            <input type="text" placeholder="Duration" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
+                          </div>
+                          </>
+                        ) : (
+                          <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
+                            <FiMapPin className="text-[#ff4a40] shrink-0" size={18} />
+                            <input type="text" placeholder="Drop-off Location" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
+                            {/* <button className="absolute right-2 rounded-full bg-[#1b2d5d] px-4 py-1.5 text-xs text-white hover:bg-[#132042] transition-colors">Same as pickup</button> */}
                           </div>
                         )}
 
                         {/* Date / Time */}
                         <div className="flex gap-4">
                           <div className="relative flex flex-1 items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                            <FiCalendar className="text-gray-400 shrink-0" size={18} />
-                            <input type="text" placeholder="dd----YYYY" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
+                            {/* <FiCalendar className="text-gray-400 shrink-0" size={18} /> */}
+                            <input type="date" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                           </div>
                           <div className="relative flex flex-1 items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                            <FiClock className="text-gray-400 shrink-0" size={18} />
-                            <input type="text" placeholder="12:11 pm" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
+                            {/* <FiClock className="text-gray-400 shrink-0" size={18} /> */}
+                            <input type="time" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                           </div>
                         </div>
 
@@ -184,7 +192,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
                     {openSections.additionalInfo ? <FiChevronUp /> : <FiChevronDown />}
                   </button>
                   {openSections.additionalInfo && (
-                    <div className="p-5 space-y-4">
+                    <div className="p-5 space-y-4 bg-gray-50">
                       <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
                         <LuPlane className="text-gray-400 shrink-0" size={18} />
                         <input type="text" placeholder="Airline Name or Code" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
@@ -213,29 +221,30 @@ export default function NewReservationModal({ isOpen, onClose }) {
                       <div className="pt-2">
                         <label className="block text-[15px] font-semibold text-[#111] mb-3">Child Seats:</label>
                         <div className="flex flex-wrap gap-3">
-                          <div className="flex flex-1 items-center justify-between rounded-full border border-gray-200 px-4 py-3 bg-white hover:border-[#1b2d5d] transition-colors cursor-pointer">
-                            <select className="w-full bg-transparent outline-none text-[#666] text-[15px] appearance-none cursor-pointer">
+                          <div className="relative flex flex-1 items-center rounded-full border border-gray-200 bg-white hover:border-[#1b2d5d] transition-colors">
+                            <select className="w-full bg-transparent outline-none text-[#666] text-[15px] appearance-none cursor-pointer py-3 pl-4 pr-10 rounded-full h-full">
                               <option>0 Infant</option>
                               <option>1 Infant</option>
                               <option>2 Infant</option>
                             </select>
-                            <FiChevronDown className="text-gray-400 pointer-events-none" />
+                            <FiChevronDown className="absolute right-4 text-gray-400 pointer-events-none" />
                           </div>
-                          <div className="flex flex-1 items-center justify-between rounded-full border border-gray-200 px-4 py-3 bg-white hover:border-[#1b2d5d] transition-colors cursor-pointer">
-                            <select className="w-full bg-transparent outline-none text-[#666] text-[15px] appearance-none cursor-pointer">
+                          <div className="relative flex flex-1 items-center rounded-full border border-gray-200 bg-white hover:border-[#1b2d5d] transition-colors">
+                            <select className="w-full bg-transparent outline-none text-[#666] text-[15px] appearance-none cursor-pointer py-3 pl-4 pr-10 rounded-full h-full">
+                              <option>0 Toddler</option>
                               <option>1 Toddler</option>
                               <option>2 Toddler</option>
                               <option>3 Toddler</option>
                             </select>
-                            <FiChevronDown className="text-gray-400 pointer-events-none" />
+                            <FiChevronDown className="absolute right-4 text-gray-400 pointer-events-none" />
                           </div>
-                          <div className="flex flex-1 items-center justify-between rounded-full border border-gray-200 px-4 py-3 bg-white hover:border-[#1b2d5d] transition-colors cursor-pointer">
-                            <select className="w-full bg-transparent outline-none text-[#666] text-[15px] appearance-none cursor-pointer">
+                          <div className="relative flex flex-1 items-center rounded-full border border-gray-200 bg-white hover:border-[#1b2d5d] transition-colors">
+                            <select className="w-full bg-transparent outline-none text-[#666] text-[15px] appearance-none cursor-pointer py-3 pl-4 pr-10 rounded-full h-full">
                               <option>0 Booster</option>
                               <option>1 Booster</option>
                               <option>2 Booster</option>
                             </select>
-                            <FiChevronDown className="text-gray-400 pointer-events-none" />
+                            <FiChevronDown className="absolute right-4 text-gray-400 pointer-events-none" />
                           </div>
                         </div>
                       </div>
@@ -257,7 +266,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
                     {openSections.vehicleInfo ? <FiChevronUp /> : <FiChevronDown />}
                   </button>
                   {openSections.vehicleInfo && (
-                    <div className="p-5 space-y-3">
+                    <div className="p-5 space-y-3 bg-gray-50">
                       {['Business Sedan', 'Premium Sedan', 'Luxury SUV', 'Premium SUV'].map((type, i) => (
                         <div
                           key={type}
@@ -266,8 +275,8 @@ export default function NewReservationModal({ isOpen, onClose }) {
                         >
                           <span className={`text-[15px] font-medium ${selectedVehicle === type ? 'text-[#111]' : 'text-[#8c8c8c]'}`}>{type}</span>
                           <div className="flex items-center gap-4 text-[15px] text-[#8c8c8c]">
-                            <span className="flex items-center gap-1.5"><FiUsers size={18} /> {i > 1 ? '6' : '3'}</span>
-                            <span className="flex items-center gap-1.5"><FiBriefcase size={18} /> {i > 1 ? '4' : '3'}</span>
+                            <span className="flex items-center gap-1.5"><FiUsers size={18} className='text-black' /> {i > 1 ? '6' : '3'}</span>
+                            <span className="flex items-center gap-1.5"><img src= {briefcaseicon} alt="" /> {i > 1 ? '4' : '3'}</span>
                           </div>
                         </div>
                       ))}
@@ -285,13 +294,13 @@ export default function NewReservationModal({ isOpen, onClose }) {
                     {openSections.passengerInfo ? <FiChevronUp /> : <FiChevronDown />}
                   </button>
                   {openSections.passengerInfo && (
-                    <div className="p-5 space-y-4">
+                    <div className="p-5 space-y-4 bg-gray-50">
                       <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                        <FiUsers className="text-gray-400 shrink-0" size={18} />
+                        <FiUser className="text-gray-400 shrink-0" size={18} />
                         <input type="text" placeholder="First Name" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                       </div>
                       <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                        <FiUsers className="text-gray-400 shrink-0" size={18} />
+                        <FiUser className="text-gray-400 shrink-0" size={18} />
                         <input type="text" placeholder="Last Name" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                       </div>
                       <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
@@ -320,39 +329,39 @@ export default function NewReservationModal({ isOpen, onClose }) {
                     {openSections.cardInfo ? <FiChevronUp /> : <FiChevronDown />}
                   </button>
                   {openSections.cardInfo && (
-                    <div className="p-5 space-y-4">
-                      <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                        <FiUsers className="text-gray-400 shrink-0" size={18} />
+                    <div className="p-5 space-y-4 bg-gray-50">
+                      <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white focus-within:border-[#1b2d5d] transition-colors">
+                        <FiUser className="text-gray-400 shrink-0" size={18} />
                         <input type="text" placeholder="Card Holder Name" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                       </div>
-                      <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                        <FiBriefcase className="text-gray-400 shrink-0" size={18} />
+                      <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white focus-within:border-[#1b2d5d] transition-colors">
+                        <FiCreditCard className="text-gray-400 shrink-0" size={18} />
                         <input type="text" placeholder="Card Number" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                       </div>
                       <div className="flex gap-4">
-                        <div className="relative flex flex-1 items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
+                        <div className="relative flex flex-1 items-center rounded-full border border-gray-200 px-4 py-3 bg-white focus-within:border-[#1b2d5d] transition-colors">
                           <FiCalendar className="text-gray-400 shrink-0" size={18} />
-                          <input type="text" placeholder="Date Expiry" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
+                          <input type="text" placeholder="MM/YY Expiry" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                         </div>
-                        <div className="relative flex flex-1 items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
-                          <FiBriefcase className="text-gray-400 shrink-0" size={18} />
+                        <div className="relative flex flex-1 items-center rounded-full border border-gray-200 px-4 py-3 bg-white focus-within:border-[#1b2d5d] transition-colors">
+                          <FiCreditCard className="text-gray-400 shrink-0" size={18} />
                           <input type="text" placeholder="CVC" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                         </div>
                       </div>
-                      <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white">
+                      <div className="relative flex items-center rounded-full border border-gray-200 px-4 py-3 bg-white focus-within:border-[#1b2d5d] transition-colors">
                         <FiMapPin className="text-gray-400 shrink-0" size={18} />
                         <input type="text" placeholder="Billing Address" className="ml-3 w-full bg-transparent text-[15px] text-[#111] outline-none placeholder:text-[#8c8c8c]" />
                       </div>
-                      <div className="relative flex items-center justify-between rounded-full border border-gray-200 px-4 py-3 bg-white cursor-pointer hover:border-[#1b2d5d] transition-colors">
-                        <div className="flex items-center w-full">
-                          <FiBriefcase className="text-gray-400 shrink-0" size={18} />
-                          <select className="ml-3 w-full bg-transparent outline-none text-[#8c8c8c] text-[15px] appearance-none cursor-pointer">
-                            <option value="" disabled selected hidden>Card Status:</option>
+                      <div className="relative flex items-center justify-between rounded-full border border-gray-200 bg-white hover:border-[#1b2d5d] focus-within:border-[#1b2d5d] transition-colors">
+                        <div className="flex items-center w-full relative">
+                          <FiCreditCard className="absolute left-4 text-gray-400 pointer-events-none" size={18} />
+                          <select className="w-full bg-transparent outline-none text-[#8c8c8c] text-[15px] appearance-none cursor-pointer py-3 pl-11 pr-10 rounded-full h-full">
+                            <option value=""defaultValue >Card Status:</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                           </select>
+                          <FiChevronDown className="absolute right-4 text-gray-400 pointer-events-none" />
                         </div>
-                        <FiChevronDown className="text-gray-400 pointer-events-none" />
                       </div>
                     </div>
                   )}

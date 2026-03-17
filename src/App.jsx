@@ -12,6 +12,14 @@ import ResetPasswordPage from './pages/user/ResetPasswordPage';
 import ForgetPasswordPage from './pages/user/ForgetPasswordPage';
 import UserDashboardPage from './pages/user/UserDashboardPage';
 
+// Driver Pages
+import DriverRegisterPage from './pages/driver/DriverRegisterPage';
+import DriverRegisterDetailsPage from './pages/driver/DriverRegisterDetailsPage';
+import DriverLoginPage from './pages/driver/DriverLoginPage';
+import DriverForgetPasswordPage from './pages/driver/DriverForgetPasswordPage';
+import DriverOTPVerificationPage from './pages/driver/DriverOTPVerificationPage';
+import DriverResetPasswordPage from './pages/driver/DriverResetPasswordPage';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -28,6 +36,14 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/forget-password" element={<ForgetPasswordPage />} />
         <Route path="/dashboard" element={<UserDashboardPage />} />
+
+        {/* Driver Routes */}
+        <Route path="/driver/register" element={<DriverRegisterPage />} />
+        <Route path="/driver/register/details" element={<DriverRegisterDetailsPage />} />
+        <Route path="/driver/login" element={<DriverLoginPage />} />
+        <Route path="/driver/forget-password" element={<DriverForgetPasswordPage />} />
+        <Route path="/driver/otp-verification" element={<DriverOTPVerificationPage />} />
+        <Route path="/driver/reset-password" element={<DriverResetPasswordPage />} />
       </Routes>
     </BrowserRouter>
   );
