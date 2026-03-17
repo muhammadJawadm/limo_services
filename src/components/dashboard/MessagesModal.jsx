@@ -12,7 +12,7 @@ export default function MessagesModal({ isOpen, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 sm:px-8">
           <div className="flex items-center gap-4">
-            <div className="relative h-12 w-12 shrink-0 rounded-full bg-gray-200 shadow-sm overflow-hidden">
+            <div className="relative h-12 w-12 shrink-0 rounded-2xl bg-gray-200 shadow-sm overflow-hidden">
               <img
                 src={driverAvatar}
                 onError={(e) => { e.target.src = driverAvatarFallback; }}
@@ -47,7 +47,7 @@ export default function MessagesModal({ isOpen, onClose }) {
             <div className="h-10 w-10 shrink-0 rounded-full bg-gray-200 overflow-hidden shadow-sm">
               <img src={driverAvatar} onError={(e) => { e.target.src = driverAvatarFallback; }} alt="avatar" className="h-full w-full object-cover" />
             </div>
-            <div className="flex flex-col gap-2 max-w-[70%]">
+            <div className="flex flex-col gap-2 max-w-[80%]">
               <div className="rounded-[20px] rounded-bl-sm bg-[#f2f2f2] px-5 py-3 text-[15px] text-[#111]">
                 omg, this is amazing
               </div>
@@ -65,7 +65,7 @@ export default function MessagesModal({ isOpen, onClose }) {
             <div className="h-10 w-10 shrink-0 rounded-full bg-gray-200 overflow-hidden shadow-sm relative border border-gray-100">
               <svg className="absolute w-full h-full text-gray-400 p-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
             </div>
-            <div className="flex flex-col gap-2 max-w-[70%] items-end">
+            <div className="flex flex-col gap-2 max-w-[80%] items-end">
               <div className="rounded-[20px] rounded-br-sm bg-[#6b5cd4] px-5 py-3 text-[15px] text-white">
                 How are you?
               </div>
@@ -92,7 +92,7 @@ export default function MessagesModal({ isOpen, onClose }) {
             <div className="h-10 w-10 shrink-0 rounded-full bg-gray-200 overflow-hidden shadow-sm relative border border-gray-100">
               <svg className="absolute w-full h-full text-gray-400 p-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
             </div>
-            <div className="flex flex-col gap-2 max-w-[70%] items-end">
+            <div className="flex flex-col gap-2 max-w-[80%] items-end">
               <div className="rounded-[20px] rounded-br-sm bg-[#6b5cd4] px-5 py-3 text-[15px] text-white">
                 woohoooo
               </div>
@@ -109,17 +109,17 @@ export default function MessagesModal({ isOpen, onClose }) {
 
         {/* Input Area */}
         <div className="shrink-0 px-6 py-6 sm:px-8 bg-white">
-          <div className="flex w-full overflow-hidden rounded-[25px] border border-gray-200 shadow-sm focus-within:border-[#1b2d5d] focus-within:ring-1 focus-within:ring-[#1b2d5d] transition-all">
-            <div className="flex items-center pl-4 text-gray-400">
-              <FiPaperclip size={20} className="cursor-pointer hover:text-gray-600 transition" />
+          <div className="flex w-full h-[150px] overflow-hidden rounded-[25px] border border-gray-200 shadow-sm focus-within:border-[#1b2d5d] focus-within:ring-1 focus-within:ring-[#1b2d5d] transition-all">
+            <div className="flex items-start pt-4 pl-4 text-gray-400">
+              <FiPaperclip size={20} className="cursor-pointer text-gray-600 hover:text-gray-900 transition" />
             </div>
-            <input
+            <textarea
               type="text"
               placeholder="Send a message..."
-              className="flex-1 px-4 py-4 text-[15px] text-[#111] outline-none placeholder:text-gray-400"
+              className="resize-none flex-1 px-4 py-4 text-[15px] text-[#111] outline-none placeholder:text-gray-400"
             />
-            <div className="flex items-center pr-3 gap-3 text-gray-400">
-              <FiSmile size={20} className="cursor-pointer hover:text-gray-600 transition" />
+            <div className="flex items-end pr-3 gap-3 text-gray-400 pb-2">
+              <FiSmile size={20} className="cursor-pointer text-gray-600 hover:text-gray-600 transition mb-2" />
               <button className="flex h-[42px] items-center gap-2 rounded-full bg-[#1b2d5d] px-5 text-sm font-medium text-white transition-colors hover:bg-[#132042]">
                 Send
                 <FiSend size={15} />

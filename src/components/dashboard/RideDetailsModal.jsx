@@ -4,12 +4,15 @@ import { useState } from 'react';
 import CancelTripModal from './CancelTripModal';
 import { FaArrowLeft } from "react-icons/fa6";
 import blackcaricon from '../../assets/blackcaricon.png'
-
+import { AiOutlineDollarCircle } from "react-icons/ai";
+import { CiLocationOn } from "react-icons/ci";
+import { MdOutlinePayment } from "react-icons/md";
+import { FiFileText } from "react-icons/fi";
 export default function RideDetailsModal({
   isOpen,
   onClose,
   isReturnTrip = false,
-  hasFlightInfo = false,
+  hasFlightInfo = true,
   onOpenMessage,
 }) {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -49,12 +52,12 @@ export default function RideDetailsModal({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
 
             {/* Row 1 */}
 
             {/* Booking Details Card */}
-            <div className="rounded-2xl border border-gray-200 p-5 col-span-1">
+            <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-4">
               <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
                 Booking Details
               </h3>
@@ -74,7 +77,7 @@ export default function RideDetailsModal({
             </div>
 
             {/* Passenger / Guest Info Card */}
-            <div className="rounded-2xl border border-gray-200 p-5 col-span-1">
+            <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-4">
               <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 {isReturnTrip ? 'Guest Info' : 'Passenger Info'}
@@ -95,12 +98,12 @@ export default function RideDetailsModal({
             </div>
 
             {/* Vehicle Info Card */}
-            <div className="rounded-2xl border border-gray-200 bg-[#fbfbfb] p-5 col-span-1 border-t-2 border-t-[#dfdfdf]">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5 col-span-1 md:col-span-4 border-t-2 border-t-[#dfdfdf]">
               <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
                 <img src={blackcaricon} alt="" className='w-7 h-7' />
                 Vehicle Info
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[14px] text-[#111]">Vehicle Type:</span>
                   <div className="flex items-center justify-between rounded-full border border-gray-200 bg-white px-3 py-1.5 w-[160px] text-[13px] text-[#666]">
@@ -112,14 +115,14 @@ export default function RideDetailsModal({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-[14px] text-[#111] whitespace-nowrap">No. of Pax:</span>
-                    <div className="flex items-center justify-between rounded-full border border-gray-200 bg-white px-3 py-1.5 w-[65px] text-[13px] text-[#666]">
+                    <div className="flex items-center justify-between rounded-full border border-gray-200 bg-white px-3 py-1 w-[65px] text-[13px] text-[#666]">
                       <span>3</span>
                       <FiChevronDown />
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[14px] text-[#111]">Luggage</span>
-                    <div className="flex items-center justify-between rounded-full border border-gray-200 bg-white px-3 py-1.5 w-[65px] text-[13px] text-[#666]">
+                    <div className="flex items-center justify-between rounded-full border border-gray-200 bg-white px-3 py-1 w-[65px] text-[13px] text-[#666]">
                       <span>3</span>
                       <FiChevronDown />
                     </div>
@@ -149,9 +152,9 @@ export default function RideDetailsModal({
             {/* Row 2 */}
 
             {/* Trip Info Card (Spans 2 columns) */}
-            <div className="rounded-2xl border border-gray-200 p-5 md:col-span-2">
+            <div className="rounded-2xl border border-gray-200 p-5 md:col-span-8">
               <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <CiLocationOn className='w-7 h-7' />
                 Trip Info
               </h3>
 
@@ -162,7 +165,7 @@ export default function RideDetailsModal({
                 <div className="font-medium text-[#111]">Stop:</div>
                 <div className="text-[#666]">USA Vein Clinics, Telegraph Road, USA</div>
 
-                <div className="font-medium text-[#111] opacity-0 -translate-y-[10px]">Stop:</div>
+                <div className="font-medium text-[#111] opacity-100 ">Stop:</div>
                 <div className="flex items-center justify-end -mt-6">
                   <button className="text-[#8c8c8c] hover:text-[#111] text-sm">+ Add Stop</button>
                 </div>
@@ -179,9 +182,9 @@ export default function RideDetailsModal({
             </div>
 
             {/* Charges & Fees Card */}
-            <div className="rounded-2xl border border-gray-200 p-5 col-span-1">
+            <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-4">
               <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                <AiOutlineDollarCircle className='w-7 h-7' />
                 Charges & Fees
               </h3>
               <div className="space-y-4 text-[14px]">
@@ -211,9 +214,9 @@ export default function RideDetailsModal({
               // Variation with Flight Information
               <>
                 {/* Payment Info Card */}
-                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-1">
+                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-5">
                   <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                    <MdOutlinePayment className='w-6 h-6' />
                     Payment Info
                   </h3>
                   <div className="grid grid-cols-[125px_1fr] gap-y-3 text-[14px]">
@@ -235,7 +238,7 @@ export default function RideDetailsModal({
                 </div>
 
                 {/* Flight Information Card */}
-                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-2">
+                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-7">
                   <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     Flight Information
@@ -259,9 +262,9 @@ export default function RideDetailsModal({
                 </div>
 
                 {/* Chauffeur / Trip Notes (Spans all 3 columns) */}
-                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-3">
+                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-12">
                   <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <FiFileText className='w-6 h-6' />
                     Chauffeur / Trip Notes
                   </h3>
                   <div className="text-[#8c8c8c] text-[14px] min-h-[50px]">
@@ -273,9 +276,9 @@ export default function RideDetailsModal({
               // Variation WITHOUT Flight Information
               <>
                 {/* Payment Info Card */}
-                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-1">
+                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-5">
                   <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                    <MdOutlinePayment className='w-6 h-6' />
                     Payment Info
                   </h3>
                   <div className="grid grid-cols-[125px_1fr] gap-y-3 text-[14px]">
@@ -297,9 +300,9 @@ export default function RideDetailsModal({
                 </div>
 
                 {/* Chauffeur / Trip Notes */}
-                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-2">
+                <div className="rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-7">
                   <h3 className="mb-4 text-lg font-bold flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <FiFileText className='w-6 h-6' />
                     Chauffeur / Trip Notes
                   </h3>
                   <div className="text-[#8c8c8c] text-[14px] min-h-[50px]">

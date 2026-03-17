@@ -92,6 +92,7 @@ export default function UserDashboardPage() {
   const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
   const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
   const [isAccountEditModalOpen, setIsAccountEditModalOpen] = useState(false);
+  const [accountEditType, setAccountEditType] = useState('passenger');
   const [isNewReservationModalOpen, setIsNewReservationModalOpen] = useState(false);
   const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
   const [selectedRideConfig, setSelectedRideConfig] = useState({ isReturnTrip: false, hasFlightInfo: false });
@@ -337,7 +338,10 @@ export default function UserDashboardPage() {
               {activeTopNavTab === 'Account Info' && (
                 <div className="px-4 sm:px-6 lg:px-8 pb-6">
                   <AccountInfoView
-                    onEditAccount={() => setIsAccountEditModalOpen(true)}
+                    onEditAccount={(type) => {
+                      setAccountEditType(type);
+                      setIsAccountEditModalOpen(true);
+                    }}
                     onNewReservation={() => setIsNewReservationModalOpen(true)}
                   />
                 </div>
@@ -374,6 +378,7 @@ export default function UserDashboardPage() {
       <AccountEditModal
         isOpen={isAccountEditModalOpen}
         onClose={() => setIsAccountEditModalOpen(false)}
+        editType={accountEditType}
       />
       <NewReservationModal
         isOpen={isNewReservationModalOpen}

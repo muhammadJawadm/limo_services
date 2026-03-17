@@ -5,9 +5,10 @@ export default function CancelTripModal({ isOpen, onClose, onConfirm }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-[500px] rounded-[30px] bg-white p-8 text-center shadow-2xl">
-        <img src={cancelicon} alt="" className='w-32 h-32 mx-auto' />
+    <div className="fixed inset-0 z-[70] overflow-y-auto bg-black/50 p-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="min-h-full grid place-items-center py-8">
+        <div className="w-full max-w-[500px] rounded-[30px] bg-white p-6 sm:p-8 text-center shadow-2xl">
+        <img src={cancelicon} alt="" className='w-36 h-32 mx-auto' />
 
         <h3 className="mb-4 text-[22px] font-bold text-[#111111]">Cancel this trip?</h3>
 
@@ -48,6 +49,7 @@ export default function CancelTripModal({ isOpen, onClose, onConfirm }) {
           >
             Go Back
           </button>
+        </div>
         </div>
       </div>
     </div>

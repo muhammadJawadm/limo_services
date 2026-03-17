@@ -1,11 +1,29 @@
 import { FiX, FiChevronDown } from 'react-icons/fi';
+import { useState, useRef, useEffect } from 'react';
 
 export default function PassengerEditModal({ isOpen, onClose }) {
+  const [priority, setPriority] = useState('VIP');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-[650px] rounded-[30px] bg-white p-8 text-[#111111] shadow-2xl relative">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="min-h-full grid place-items-center py-8">
+        <div className="w-full max-w-[650px] rounded-[30px] bg-white p-6 sm:p-8 text-[#111111] shadow-2xl relative">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
           {/* Column 1 */}
           <div className="space-y-4">
@@ -48,19 +66,40 @@ export default function PassengerEditModal({ isOpen, onClose }) {
              <div>
                <label className="mb-2 block text-sm text-[#666]">Priority</label>
                {/* Concept dropdown visual - to behave functionally state would be needed, keeping simple for UI matching */}
-               <div className="relative">
-                 <div className="flex w-full items-center justify-between rounded-full border border-gray-200 px-4 py-3 text-[15px] text-[#111] outline-none cursor-pointer">
-                   <span>VIP</span>
-                   <FiChevronDown className="text-gray-400" />
+               <div className="relative" ref={dropdownRef}>
+                 <div 
+                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                   className="flex w-full items-center justify-between rounded-full border border-gray-200 px-4 py-3 text-[15px] text-[#111] outline-none cursor-pointer transition-colors hover:border-[#1b2d5d]"
+                 >
+                   <span>{priority}</span>
+                   <FiChevronDown className={`text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                  </div>
-                 {/* 
-                   // Dropdown menu mock. Typically conditionally rendered via state:
-                   <div className="absolute right-0 top-full mt-2 w-[160px] rounded-xl bg-white shadow-lg border border-gray-100 z-10 py-2">
-                      <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer">Normal <div className="h-4 w-4 rounded-full border border-gray-300"></div></div>
-                      <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer text-[#1b2d5d]">VIP <div className="h-4 w-4 rounded-full bg-[#1b2d5d]"></div></div>
-                      <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer">VVIP <div className="h-4 w-4 rounded-full border border-gray-300"></div></div>
+                 
+                 {isDropdownOpen && (
+                   <div className="absolute right-0 top-full mt-2 w-full rounded-xl bg-white shadow-lg border border-gray-100 z-10 py-2">
+                      <div 
+                        onClick={() => { setPriority('Normal'); setIsDropdownOpen(false); }}
+                        className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer text-[#4d4d4d]"
+                      >
+                        Normal 
+                        <div className={`h-4 w-4 rounded-full ${priority === 'Normal' ? 'bg-[#1b2d5d]' : 'border border-gray-300'}`}></div>
+                      </div>
+                      <div 
+                        onClick={() => { setPriority('VIP'); setIsDropdownOpen(false); }}
+                        className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer text-[#4d4d4d]"
+                      >
+                        VIP 
+                        <div className={`h-4 w-4 rounded-full ${priority === 'VIP' ? 'bg-[#1b2d5d]' : 'border border-gray-300'}`}></div>
+                      </div>
+                      <div 
+                        onClick={() => { setPriority('VVIP'); setIsDropdownOpen(false); }}
+                        className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 cursor-pointer text-[#4d4d4d]"
+                      >
+                        VVIP 
+                        <div className={`h-4 w-4 rounded-full ${priority === 'VVIP' ? 'bg-[#1b2d5d]' : 'border border-gray-300'}`}></div>
+                      </div>
                    </div>
-                 */}
+                 )}
                </div>
              </div>
              <div>
@@ -112,6 +151,7 @@ export default function PassengerEditModal({ isOpen, onClose }) {
             Save Passenger
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

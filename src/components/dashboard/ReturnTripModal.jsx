@@ -7,15 +7,15 @@ export default function ReturnTripModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="relative w-full max-w-[700px] rounded-[30px] bg-white text-[#111111] shadow-2xl h-[80vh] overflow-y-auto">
+      <div className="relative flex max-h-[90vh] w-full max-w-[700px] flex-col rounded-[30px] bg-white text-[#111111] shadow-2xl">
         {/* Header */}
-        <div className="flex items-center gap-4 border-b border-gray-100 px-8 py-6">
+        <div className="flex shrink-0 items-center gap-4 border-b border-gray-100 px-8 py-6">
           <FaArrowRightArrowLeft size={24} className="text-[#111]" />
           <h2 className="text-[26px] font-bold">Return Trip</h2>
         </div>
 
         {/* Content */}
-        <div className="px-8 py-6">
+        <div className="flex-1 overflow-y-auto px-8 py-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#111] [&::-webkit-scrollbar-thumb]:rounded-full">
           <div className="grid grid-cols-[140px_1fr] gap-y-5 text-[15px]">
             {/* Row: Pickup Time */}
             <div className="font-medium text-[#111]">Pickup Time:</div>
@@ -110,7 +110,7 @@ export default function ReturnTripModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end px-8 pb-8 pt-2">
+        <div className="flex shrink-0 justify-end px-8 pb-8 pt-2">
           <button
             onClick={onClose}
             className="rounded-full bg-[#1b2d5d] px-10 py-3 text-base font-medium text-white transition-colors hover:bg-[#132042]"
