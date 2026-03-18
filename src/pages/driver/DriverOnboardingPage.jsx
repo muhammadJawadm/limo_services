@@ -6,6 +6,7 @@ import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 import { FaLinkedin, FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import logoImg from '../../assets/navbarlogo.png';
 import usFlag from '../../assets/us.png';
+import testpdf from '../../assets/testpdf.pdf';
 
 // Dummy list of countries and states
 const countries = ['USA', 'Canada', 'UK', 'Australia'];
@@ -254,8 +255,8 @@ const Step9 = ({ formData, updateDoc }) => (
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-[#1b2d5d] flex items-center justify-center text-white">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <div>
@@ -269,20 +270,20 @@ const Step9 = ({ formData, updateDoc }) => (
       </div>
 
       <div className="pt-2" />
-      
+
       <InputField label="" icon={<LuUser className="text-gray-400" size={18} />} placeholder="Card Holder Name" value={formData.cardHolderName} onChange={(e) => updateDoc('cardHolderName', e.target.value)} />
-      <InputField label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>} placeholder="Card Number" value={formData.cardNumber} onChange={(e) => updateDoc('cardNumber', e.target.value)} />
-      
+      <InputField label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} placeholder="Card Number" value={formData.cardNumber} onChange={(e) => updateDoc('cardNumber', e.target.value)} />
+
       <div className="grid grid-cols-2 gap-4">
-        <InputField label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>} placeholder="Date Expiry" value={formData.cardExpiry} onChange={(e) => updateDoc('cardExpiry', e.target.value)} />
-        <InputField label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>} placeholder="CVC" value={formData.cardCvc} onChange={(e) => updateDoc('cardCvc', e.target.value)} />
+        <InputField label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} placeholder="Date Expiry" value={formData.cardExpiry} onChange={(e) => updateDoc('cardExpiry', e.target.value)} />
+        <InputField label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} placeholder="CVC" value={formData.cardCvc} onChange={(e) => updateDoc('cardCvc', e.target.value)} />
       </div>
 
       <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-100 flex items-start gap-4">
         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mt-1">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
         <div className="flex-1">
@@ -313,7 +314,7 @@ const ToggleSwitch = ({ checked, onChange }) => (
 
 const Step10 = ({ formData, updateDoc }) => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sun']; // Assuming Sat is omitted based on screenshot or just standard
-  
+
   return (
     <div className="space-y-6">
       <div className="mb-6">
@@ -327,13 +328,13 @@ const Step10 = ({ formData, updateDoc }) => {
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="text-[16px] font-semibold text-[#111]">Weekly Schedule</h3>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-gray-400">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        
+
         <div className="p-5 space-y-5">
           {days.map(day => (
             <div key={day} className="flex items-center justify-between">
@@ -365,7 +366,7 @@ const Step5 = () => (
 
     <div className="text-[15px] text-gray-600 leading-relaxed font-light space-y-6 max-w-4xl">
       <p>Thanks you fo providing your company details. We are excited to have you drive with us soon. As a Lime Services partner, you'll get:</p>
-      
+
       <ul className="list-disc pl-5 space-y-2 text-gray-500">
         <li>Quality-based bonus opportunities and the chance to join out partner prestige Club</li>
         <li>Regular, reliable payment for all rides</li>
@@ -472,7 +473,7 @@ const Step6 = () => {
           {vehicleDocs.map((doc, i) => <DocRow key={i} {...doc} />)}
         </div>
       </div>
-      
+
       <div className="flex items-center justify-start text-gray-400 mt-6 pb-4">
         <div className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-[12px]">i</div>
       </div>
@@ -504,7 +505,7 @@ const Step7 = () => {
       <div className="mb-6">
         <h2 className="text-[18px] font-bold text-[#111] mb-4">Partner Training</h2>
         <p className="text-[14px] text-gray-500 mt-2 max-w-3xl leading-relaxed">
-          Welcome to Limo Services Training. In order to be able to perform rides with limo, please complete the following 15 modules. <br/>They can be accessed individually using the links below.
+          Welcome to Limo Services Training. In order to be able to perform rides with limo, please complete the following 15 modules. <br />They can be accessed individually using the links below.
         </p>
         <p className="text-[14px] text-[#111] font-medium mt-6">You have competed out of 15 modules</p>
       </div>
@@ -515,7 +516,7 @@ const Step7 = () => {
           <div className="flex-1">Training Modules</div>
           <div className="w-48 text-right">Progress Percentage</div>
         </div>
-        
+
         <div className="divide-y divide-gray-100">
           {modules.map((mod) => (
             <div key={mod.num} className="flex flex-col md:flex-row md:items-center px-6 py-5 hover:bg-gray-50 transition-colors">
@@ -539,68 +540,16 @@ const Step8 = ({ formData, updateDoc }) => (
       </p>
     </div>
 
-    {/* PDF Viewer Mockup */}
+    {/* Actual PDF Viewer */}
     <div className="w-full bg-[#323639] rounded-lg overflow-hidden flex flex-col h-[600px] border border-gray-200">
-      <div className="h-12 bg-[#323639] border-b border-gray-600 flex items-center justify-between px-4">
-        <div className="flex items-center gap-4 text-white text-sm">
-          <span>≡</span>
-          <span className="font-medium truncate max-w-[150px] md:max-w-none">Secretary of War Memorandum</span>
-        </div>
-        <div className="flex items-center gap-4 text-white text-sm bg-black/30 px-3 py-1.5 rounded disabled:opacity-50">
-          <span className="font-medium px-2">1 / 5</span>
-          <span className="text-gray-400">|</span>
-          <span className="cursor-pointer hover:bg-white/10 px-2 rounded">-</span>
-          <span className="font-medium bg-black/40 px-2 py-0.5 rounded">80%</span>
-          <span className="cursor-pointer hover:bg-white/10 px-2 rounded">+</span>
-        </div>
-        <div className="flex items-center gap-4 text-white">
-          <span className="cursor-pointer hover:text-gray-300">↓</span>
-          <span className="cursor-pointer hover:text-gray-300">🖨️</span>
-          <span className="cursor-pointer hover:text-gray-300">⋮</span>
-        </div>
-      </div>
-      <div className="flex-1 flex overflow-hidden">
-        {/* Sidebar thumbnails */}
-        <div className="hidden md:flex w-56 bg-[#242424] border-r border-gray-700 flex-col items-center py-4 gap-4 overflow-y-auto">
-          {[1,2,3,4].map(num => (
-            <div key={num} className="flex flex-col items-center gap-2 w-full px-4">
-              <div className={`w-full aspect-[1/1.4] bg-white rounded flex flex-col items-center justify-center text-gray-300 shadow-xl ${num===1 ? 'ring-2 ring-blue-500' : ''}`}>
-                <div className="w-[80%] h-4 bg-gray-200 mb-2"></div>
-                <div className="w-[80%] h-1 bg-gray-200 mb-1"></div>
-                <div className="w-[80%] h-1 bg-gray-200 mb-1"></div>
-                <div className="w-[60%] h-1 bg-gray-200"></div>
-                {num===1 && <div className="mt-4 w-12 h-12 border border-gray-200 flex flex-col"><div className="w-full h-3 bg-blue-100 mb-1"></div></div>}
-              </div>
-              <span className="text-xs text-white font-medium">{num}</span>
-            </div>
-          ))}
-        </div>
-        {/* Main Document Area */}
-        <div className="flex-1 bg-[#525659] overflow-y-auto p-4 md:p-8 flex justify-center custom-scrollbar">
-          <div className="w-full max-w-3xl bg-white min-h-[800px] shadow-2xl p-8 md:p-14 relative group">
-            <h1 className="text-xl font-bold mb-6 text-center pb-4">Secretary of War Memorandum</h1>
-            <h3 className="font-bold text-sm mb-4">Fitness Testing Requirements</h3>
-            <p className="text-sm mb-4">Active Component Service members will execute two fitness tests annually:</p>
-            <ul className="list-disc pl-8 text-sm space-y-3 mb-6">
-              <li>One will be the existing Service Fitness Test.</li>
-              <li>A Combat Field Test for combat arms personnel (see attached list).</li>
-              <li>A Combat Readiness Test for non-combat arms personnel or the Service Fitness Test.</li>
-              <li>Service members will perform physical fitness training every duty day.</li>
-            </ul>
-            <p className="text-sm mb-4">National Guard and Reserve Component members will:</p>
-            <ul className="list-disc pl-8 text-sm space-y-3 mb-6">
-              <li>Take personal responsibility to maintain an appropriate physical fitness regimen, regardless of duty status.</li>
-              <li><span className="bg-blue-200/50">Complete one fitness test annually, aligned to their combat or non-combat arms designation.</span></li>
-            </ul>
-            {/* Scrollbar UI overlay */}
-            <div className="absolute right-0 top-0 w-4 h-full bg-gray-100 border-l border-gray-200 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="w-full h-8 bg-gray-200 flex items-center justify-center text-[10px]">▲</div>
-              <div className="w-3 mx-0.5 mt-1 h-32 bg-gray-400 rounded-full"></div>
-              <div className="absolute bottom-0 w-full h-8 bg-gray-200 flex items-center justify-center text-[10px]">▼</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <iframe
+        src={testpdf}
+        title="Partner Contract"
+        className="w-full h-full"
+        style={{ border: 'none' }}
+      >
+        <p>Your browser does not support PDFs. <a href={testpdf}>Download the PDF</a>.</p>
+      </iframe>
     </div>
 
     <div className="pt-2">
@@ -726,7 +675,7 @@ export default function DriverOnboardingPage() {
       // If valid, and want to go to next step
       updateDoc('showErrors', false);
     }
-    
+
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
@@ -905,22 +854,22 @@ export default function DriverOnboardingPage() {
           <div className="bg-white rounded-[24px] p-8 max-w-md w-full text-center relative shadow-2xl animate-fade-in-up">
             <div className="w-14 h-14 bg-gray-100 text-[#1b2d5d] rounded-full flex items-center justify-center mx-auto mb-5">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M10 9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="15" cy="15" r="4" fill="white" stroke="currentColor" strokeWidth="1.5"/>
-                <path d="M17.5 17.5L19.5 19.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M10 9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="15" cy="15" r="4" fill="white" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M17.5 17.5L19.5 19.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
             </div>
-            
+
             <h3 className="text-[22px] font-bold text-[#111] mb-3">Under Admin Review</h3>
             <p className="text-[14px] text-gray-500 mb-8 leading-relaxed px-2">
               Your application has been submitted. Our team will review your documents and get back to you within 24-48 hours.
             </p>
-            
-            <button 
+
+            <button
               onClick={() => {
                 setShowReviewModal(false);
                 navigate('/driver/profile');
@@ -929,7 +878,7 @@ export default function DriverOnboardingPage() {
             >
               Simulate Approval
             </button>
-            <button 
+            <button
               onClick={() => setShowReviewModal(false)}
               className="w-full border border-gray-200 text-gray-700 rounded-full py-3.5 font-medium text-[15px] hover:bg-gray-50 transition-colors"
             >

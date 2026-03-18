@@ -21,6 +21,7 @@ import DriverOTPVerificationPage from './pages/driver/DriverOTPVerificationPage'
 import DriverResetPasswordPage from './pages/driver/DriverResetPasswordPage';
 import DriverOnboardingPage from './pages/driver/DriverOnboardingPage';
 import DriverProfilePage from './pages/driver/DriverProfilePage';
+import DriverDashboardPage from './pages/driver/DriverDashboardPage';
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/driver/forget-password" element={<DriverForgetPasswordPage />} />
         <Route path="/driver/otp-verification" element={<DriverOTPVerificationPage />} />
         <Route path="/driver/reset-password" element={<DriverResetPasswordPage />} />
+        <Route path="/driver/dashboard" element={<DriverDashboardPage />} />
       </Routes>
     </BrowserRouter>
   );
