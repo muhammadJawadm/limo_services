@@ -19,6 +19,8 @@ import DriverLoginPage from './pages/driver/DriverLoginPage';
 import DriverForgetPasswordPage from './pages/driver/DriverForgetPasswordPage';
 import DriverOTPVerificationPage from './pages/driver/DriverOTPVerificationPage';
 import DriverResetPasswordPage from './pages/driver/DriverResetPasswordPage';
+import DriverOnboardingPage from './pages/driver/DriverOnboardingPage';
+import DriverProfilePage from './pages/driver/DriverProfilePage';
 
 export default function App() {
   return (
@@ -40,6 +42,8 @@ export default function App() {
         {/* Driver Routes */}
         <Route path="/driver/register" element={<DriverRegisterPage />} />
         <Route path="/driver/register/details" element={<DriverRegisterDetailsPage />} />
+        <Route path="/driver/onboarding" element={<DriverOnboardingPage />} />
+        <Route path="/driver/profile" element={<DriverProfilePage />} />
         <Route path="/driver/login" element={<DriverLoginPage />} />
         <Route path="/driver/forget-password" element={<DriverForgetPasswordPage />} />
         <Route path="/driver/otp-verification" element={<DriverOTPVerificationPage />} />

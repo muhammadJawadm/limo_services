@@ -18,7 +18,7 @@ export default function DriverForgetPasswordPage() {
       <div className="w-full max-w-[1400px] h-[calc(100vh-3rem)] min-h-[600px] grid grid-cols-1 lg:grid-cols-2 bg-[#Fcfcfc] rounded-3xl overflow-hidden shadow-sm border border-gray-100">
 
         {/* Left Section - Form */}
-        <section className="p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col justify-center max-w-2xl w-full mx-auto relative overflow-y-auto">
+        <section className="p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col justify-start max-w-2xl w-full mx-auto relative overflow-y-auto">
           {/* Logo */}
           <div className="absolute top-8 left-8 md:top-12 md:left-12 lg:top-12 lg:left-16 xl:top-16 xl:left-20">
             <img src={logoImg} alt="Prvyn Services" className="h-10 md:h-12 object-contain" />

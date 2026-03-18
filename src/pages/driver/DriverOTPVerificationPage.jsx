@@ -36,15 +36,15 @@ export default function DriverOTPVerificationPage() {
       <div className="w-full max-w-[1400px] h-[calc(100vh-3rem)] min-h-[600px] grid grid-cols-1 lg:grid-cols-2 bg-[#Fcfcfc] rounded-3xl overflow-hidden shadow-sm border border-gray-100">
 
         {/* Left Section - Form */}
-        <section className="p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col justify-center max-w-2xl w-full mx-auto relative overflow-y-auto">
+        <section className="p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col justify-start max-w-2xl w-full mx-auto relative overflow-y-auto">
           {/* Logo */}
           <div className="absolute top-8 left-8 md:top-12 md:left-12 lg:top-12 lg:left-16 xl:top-16 xl:left-20">
             <img src={logoImg} alt="Prvyn Services" className="h-10 md:h-12 object-contain" />
           </div>
 
           <div className="mt-16 w-full">
-            <button 
-              onClick={() => navigate(-1)} 
+            <button
+              onClick={() => navigate(-1)}
               className="flex items-center text-[18px] font-medium text-[#111] mb-6 hover:text-gray-600 transition-colors"
             >
               <FiChevronLeft className="mr-1" size={24} /> Back
@@ -78,7 +78,7 @@ export default function DriverOTPVerificationPage() {
                   We have sent code to <span className="text-[#1b2d5d] font-medium">limeservice@gmail.com</span>
                 </p>
                 <p className="text-gray-500">
-                  Didn't receive code? <span className="text-[#1b2d5d] font-medium mr-1">00:54</span> 
+                  Didn't receive code? <span className="text-[#1b2d5d] font-medium mr-1">00:54</span>
                   <button className="text-gray-600 underline font-medium hover:text-[#111]">Re-send code</button>
                 </p>
               </div>
