@@ -15,7 +15,7 @@ export default function HeroSection() {
       </div>
 
       {/* Hero Content */}
-      <div className="relative z-10 flex items-center mt-[2%]  px-8 md:px-16">
+      <div className="relative z-10 flex items-center mt-[2%]  px-1 md:px-8 md:px-16">
         <div className="flex flex-col md:flex-row items-center justify-between w-[95%] max-w-7xl mx-auto gap-10">
           {/* Left text */}
           <div className="text-white max-w-md ">

@@ -135,8 +135,8 @@ export default function PassengerDetailsPage() {
       <StepperNavbar currentStep={2} />
 
       {/* Page header */}
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 bg-[#EAEAEA] border-b border-gray-200">
-        <h1 className="text-lg font-bold text-gray-900">Passenger Information</h1>
+      <div className="flex items-center justify-between px-4 md:px-16 py-4 bg-[#EAEAEA] border-b border-gray-200">
+        <h1 className="text-base md:text-lg font-bold text-gray-900">Passenger Information</h1>
         <button
           onClick={() => navigate('/additional-details')}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-[#1a2b5e] font-medium transition-colors"
@@ -146,7 +146,7 @@ export default function PassengerDetailsPage() {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 gap-6 px-8 md:px-16 py-6 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col md:flex-row flex-1 gap-6 px-4 md:px-16 py-6 max-w-7xl mx-auto w-full">
 
         {/* LEFT PANEL */}
         <div className="w-full md:w-[38%] flex flex-col gap-4">
@@ -267,13 +267,13 @@ export default function PassengerDetailsPage() {
 
             <div className="flex flex-col gap-3">
               {/* First & Last name */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <FloatingInput icon={<LuUser size={16} />} placeholder="First Name" value={pFirstName} onChange={e => setPFirstName(e.target.value)} />
                 <FloatingInput icon={<LuUser size={16} />} placeholder="Last Name" value={pLastName} onChange={e => setPLastName(e.target.value)} />
               </div>
 
               {/* Email & Phone */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <FloatingInput icon={<MdOutlineEmail size={17} />} placeholder="jaysonsmith@gmail.com" type="email" value={pEmail} onChange={e => setPEmail(e.target.value)} />
                 <PhoneInput value={pPhone} onChange={e => setPPhone(e.target.value)} dialCode={pDial} onDialChange={setPDial} />
               </div>
@@ -284,11 +284,11 @@ export default function PassengerDetailsPage() {
               <>
                 <h3 className="text-lg font-bold text-gray-800 mb-3 mt-5">Booker Details</h3>
                 <div className="flex flex-col gap-3">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <FloatingInput icon={<LuUser size={16} />} placeholder="First Name" value={bFirstName} onChange={e => setBFirstName(e.target.value)} />
                     <FloatingInput icon={<LuUser size={16} />} placeholder="Last Name" value={bLastName} onChange={e => setBLastName(e.target.value)} />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <FloatingInput icon={<MdOutlineEmail size={17} />} placeholder="jaysonsmith@gmail.com" type="email" value={bEmail} onChange={e => setBEmail(e.target.value)} />
                     <PhoneInput value={bPhone} onChange={e => setBPhone(e.target.value)} dialCode={bDial} onDialChange={setBDial} />
                   </div>
@@ -315,7 +315,7 @@ export default function PassengerDetailsPage() {
                   <BsInfoCircle size={14} />
                 </button>
                 {showAccountInfo && (
-                  <div className="absolute left-6 top-0 z-50 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 p-5">
+                  <div className="absolute left-auto right-0 sm:left-6 sm:right-auto top-0 z-50 w-72 sm:w-80 bg-white rounded-2xl shadow-xl border border-gray-100 p-5">
                     {/* Close button */}
                     <button
                       onClick={() => setShowAccountInfo(false)}

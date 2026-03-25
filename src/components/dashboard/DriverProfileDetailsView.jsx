@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import usFlag from '../../assets/us.png';
 import testpdf from '../../assets/testpdf.pdf';
+import { TbWorld, TbLockPassword } from "react-icons/tb";
+import { FaCity, FaRegEnvelope } from "react-icons/fa";
+import { CiUser } from "react-icons/ci";
 import { FiEdit, FiCheck } from 'react-icons/fi';
 import { LuUser } from 'react-icons/lu';
+import { MdEdit } from "react-icons/md";
+import whitewallet from '../../assets/whitewallet.png'
 
 const TABS = ['Personal Info', 'Company Info', 'Fleet Info', 'Chauffeur Info', 'Vehicle Info', 'Required Document', 'Partner Training', 'Partner Contract', 'Payment Details', 'Weekly Schedule'];
 
-const InputDiv = ({ label, value, type="text", icon }) => (
+const InputDiv = ({ label, value, type = "text", icon }) => (
     <div className="w-full">
         <label className="block text-[14px] text-gray-700 mb-2">{label}</label>
         <div className="relative">
             {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 {icon}
-                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" className="text-gray-500"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg width="10" height="6" viewBox="0 0 12 8" fill="none" className="text-gray-500"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>}
             <input
                 type={type}
@@ -24,19 +29,24 @@ const InputDiv = ({ label, value, type="text", icon }) => (
     </div>
 )
 
-const SelectDiv = ({ label, value }) => (
+const SelectDiv = ({ label, value, icon }) => (
     <div className="w-full relative">
         <label className="block text-[14px] text-gray-700 mb-2">{label}</label>
         <div className="relative">
+            {icon && (
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none z-10 text-gray-500">
+                    {icon}
+                </div>
+            )}
             <select
                 value={value}
                 readOnly
-                className="w-full appearance-none rounded-full border border-gray-100 bg-white py-3.5 pl-5 pr-10 text-[14px] text-gray-800 outline-none"
+                className={`w-full appearance-none rounded-full border border-gray-100 bg-white py-3.5 pr-10 text-[14px] text-gray-800 outline-none ${icon ? 'pl-10' : 'pl-5'}`}
             >
                 <option value={value}>{value}</option>
             </select>
             <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" className="text-gray-500"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" className="text-gray-500"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
         </div>
     </div>
@@ -91,11 +101,11 @@ export default function DriverProfileDetailsView() {
     const [activeTab, setActiveTab] = useState('Personal Info');
 
     return (
-        <section className="bg-[#efefef] flex-1 flex flex-col">
+        <section className="bg-gray-50/50 flex-1 flex flex-col">
             <div className="mb-3 flex flex-col gap-3 bg-[#EAEAEA] px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-10">
                 <h2 className="text-2xl font-semibold">View Details</h2>
             </div>
-            
+
             <div className="px-4 pb-12 sm:px-8 flex-1">
                 {/* Tabs */}
                 <div className="mb-8 flex overflow-x-auto overflow-y-hidden bg-white rounded-xl shadow-sm hide-scrollbar sticky top-0 z-10 w-full max-w-full">
@@ -117,18 +127,18 @@ export default function DriverProfileDetailsView() {
                     {activeTab === 'Personal Info' && (
                         <div className="animate-fade-in">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-7">
-                                <SelectDiv label="Select Country" value="USA" />
+                                <SelectDiv label="Select Country" value="USA" icon={<TbWorld className="w-5 h-5 object-contain" />} />
                                 <div className="hidden sm:block"></div>
-                                <SelectDiv label="Select City" value="New York" />
+                                <SelectDiv label="Select City" value="New York" icon={<FaCity className="w-5 h-5 object-contain" />} />
                                 <div className="hidden sm:block"></div>
-                                <InputDiv label="Fast Name" value="Jayson Smi" />
-                                <InputDiv label="Last Name" value="Jayson Smi" />
-                                <InputDiv label="Address" value="jayson@gmail.com" />
+                                <InputDiv label="Fast Name" value="Jayson Smi" icon={<CiUser className="w-5 h-5 object-contain" />} />
+                                <InputDiv label="Last Name" value="Jayson Smi" icon={<CiUser className="w-5 h-5 object-contain" />} />
+                                <InputDiv label="Address" value="jayson@gmail.com" icon={<FaRegEnvelope className="w-5 h-5 object-contain opacity-60" />} />
                                 <InputDiv label="Phone Number" value="+1" icon={<img src={usFlag} alt="US" className="w-6 h-4 object-cover rounded-[2px]" />} />
-                                <InputDiv label="Password" value="........." type="password" />
+                                <InputDiv label="Password" value="........." type="password" icon={<TbLockPassword className="w-5 h-5 object-contain opacity-60" />} />
                             </div>
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -151,8 +161,8 @@ export default function DriverProfileDetailsView() {
                                 <InputDiv label="Tax Identification Number" value="7784" />
                                 <InputDiv label="Business Registration Number" value="Please enter your registration number" />
                             </div>
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -195,8 +205,8 @@ export default function DriverProfileDetailsView() {
                                     <textarea className="w-full rounded-[24px] border border-gray-100 bg-white p-5 text-[14px] text-gray-800 outline-none min-h-[140px] resize-none" readOnly value="Lorem ipsum.." />
                                 </div>
                             </div>
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -210,8 +220,8 @@ export default function DriverProfileDetailsView() {
                                 <InputDiv label="Chauffeur Mobile Phone" value="+1" icon={<img src={usFlag} alt="US" className="w-6 h-4 object-cover rounded-[2px]" />} />
                                 <InputDiv label="Driver License Id" value="121 454 789" />
                             </div>
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -232,7 +242,7 @@ export default function DriverProfileDetailsView() {
                             </div>
                             <div className="mt-10 text-[13px] text-gray-500 leading-relaxed max-w-2xl">
                                 <p className="mb-2">Upon clicking "Next" the following information will be submitted for review:</p>
-                                <ul className="list-disc pl-5 space-y-1.5 mb-6">
+                                <ul className="list-disc pl-5 space-y-1.5 mb-6 marker:text-gray-800">
                                     <li>Company Information</li>
                                     <li>Fleet Information</li>
                                     <li>First Chauffeur Information</li>
@@ -240,8 +250,8 @@ export default function DriverProfileDetailsView() {
                                 </ul>
                                 <p className="font-semibold text-[#111] text-[14px] leading-snug">Please confirm the above provided information is accurate as you will not be able to updated it once submitted</p>
                             </div>
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -289,8 +299,8 @@ export default function DriverProfileDetailsView() {
                                 ].map((doc, i) => <DocRow key={i} {...doc} />)}
                             </div>
 
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -300,7 +310,7 @@ export default function DriverProfileDetailsView() {
                         <div className="animate-fade-in mt-6">
                             <h3 className="text-[18px] text-[#111] font-medium mb-1">Vehicle Documents</h3>
                             <p className="text-[13px] text-gray-400 mb-6">Vehicle documents required for Premium Sedan (TYR45454):</p>
-                            
+
                             <p className="text-[14px] text-[#111] font-medium mb-4">You have competed out of 15 modules</p>
 
                             <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
@@ -336,8 +346,8 @@ export default function DriverProfileDetailsView() {
                                     ))}
                                 </div>
                             </div>
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -347,7 +357,7 @@ export default function DriverProfileDetailsView() {
                         <div className="animate-fade-in mt-6">
                             <h3 className="text-[18px] text-[#111] font-medium mb-1">Partner Contract</h3>
                             <p className="text-[13px] text-gray-400 mb-6">Please review our contract below and accept your contractual agreement.</p>
-                            
+
                             <div className="w-full bg-[#323639] rounded-lg overflow-hidden flex flex-col h-[600px] border border-gray-200">
                                 <iframe
                                     src={testpdf}
@@ -385,8 +395,8 @@ export default function DriverProfileDetailsView() {
                                 <p className="text-[14px] text-[#111] font-medium">By clicking Agree, you hereby accept the terms of the pertner agreement and have provided a digital signature for the contract.</p>
                             </div>
 
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -395,20 +405,17 @@ export default function DriverProfileDetailsView() {
                     {activeTab === 'Payment Details' && (
                         <div className="animate-fade-in mt-6">
                             <h3 className="text-[18px] text-[#111] font-medium mb-6">Payment Details</h3>
-                            
+
                             <div className="bg-white rounded-xl p-4 border border-gray-100 flex items-start gap-4 mb-3 shadow-sm max-w-xl">
                                 <div className="w-10 h-10 rounded-full bg-[#1b2d5d] flex items-center justify-center text-white mt-0.5">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
+                                    <img src={whitewallet} alt="whitewallet" className='w-6 h-6' />
                                 </div>
                                 <div className="flex-1">
                                     <div className="text-[15px] font-medium text-[#111]">Dabit Cart</div>
                                     <div className="text-[13px] text-gray-400">Pay directly form your bank</div>
                                 </div>
                             </div>
-                            
+
                             <div className="flex flex-col gap-y-3 max-w-xl">
                                 <InputDiv label="" icon={<LuUser className="text-gray-400" size={18} />} value="Card Holder Name" />
                                 <InputDiv label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} value="Card Number" />
@@ -418,8 +425,8 @@ export default function DriverProfileDetailsView() {
                                 </div>
                             </div>
 
-                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}
@@ -451,15 +458,15 @@ export default function DriverProfileDetailsView() {
                                             </div>
                                             <ToggleSwitch
                                                 checked={day !== 'Tue'}
-                                                onChange={() => {}}
+                                                onChange={() => { }}
                                             />
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
-                            <button className="bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-10 py-3.5 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
-                                Edit <FiEdit size={14} />
+                            <button className="bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
+                                Edit <MdEdit size={14} />
                             </button>
                         </div>
                     )}

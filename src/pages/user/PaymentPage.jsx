@@ -66,8 +66,8 @@ export default function PaymentPage() {
       <StepperNavbar currentStep={3} />
 
       {/* Page header */}
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 bg-gray-100 border-b border-gray-200">
-        <h1 className="text-lg font-bold text-gray-900">Payment Information</h1>
+      <div className="flex items-center justify-between px-4 md:px-16 py-4 bg-gray-100 border-b border-gray-200">
+        <h1 className="text-base md:text-lg font-bold text-gray-900">Payment Information</h1>
         <button
           onClick={() => navigate('/passenger-details')}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-[#1a2b5e] font-medium transition-colors"
@@ -77,7 +77,7 @@ export default function PaymentPage() {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 gap-6 px-8 md:px-16 py-6 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col md:flex-row flex-1 gap-6 px-4 md:px-16 py-6 max-w-7xl mx-auto w-full">
 
         {/* LEFT PANEL */}
         <div className="w-full md:w-[38%] flex flex-col gap-4">
@@ -202,7 +202,7 @@ export default function PaymentPage() {
             <div className="flex flex-col gap-3 mb-5">
               <FormInput icon={<LuUser size={16} />} placeholder="Card Holder Name" value={cardName} onChange={e => setCardName(e.target.value)} />
               <FormInput icon={<BsCreditCard size={16} />} placeholder="Card Number" value={cardNumber} onChange={e => setCardNumber(e.target.value)} />
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <FormInput icon={<LuCalendarDays size={16} />} placeholder="Date Expiry" value={expiry} onChange={e => setExpiry(e.target.value)} />
                 <FormInput icon={<BsShieldCheck size={16} />} placeholder="CVC" value={cvc} onChange={e => setCvc(e.target.value)} />
               </div>
@@ -283,9 +283,9 @@ export default function PaymentPage() {
             <div className="border-t border-gray-100 mb-6" />
 
             {/* Booking details */}
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               {/* Left column */}
-              <div className="flex flex-col gap-3 w-32 flex-shrink-0 border-r border-gray-100 pr-4">
+              <div className="flex flex-col gap-3 sm:w-32 sm:flex-shrink-0 sm:border-r border-gray-100 sm:pr-4">
                 <div>
                   <p className="text-xs text-gray-400 mb-0.5">Passenger Name</p>
                   <p className="text-sm font-bold text-gray-900">Jayson Smith</p>
@@ -301,7 +301,7 @@ export default function PaymentPage() {
               </div>
 
               {/* Middle column */}
-              <div className="flex-1 flex flex-col gap-3 border-r border-gray-100 pr-4">
+              <div className="flex-1 flex flex-col gap-3 sm:border-r border-gray-100 sm:pr-4">
                 <div>
                   <p className="text-xs text-gray-400 mb-0.5">Pick Up</p>
                   <p className="text-sm font-semibold text-gray-900">Beck Road, Plymouth, MI, USA</p>
@@ -337,7 +337,7 @@ export default function PaymentPage() {
               </div>
 
               {/* Right column — QR code */}
-              <div className="flex flex-col items-center gap-2 flex-shrink-0 pl-2 pt-5">
+              <div className="hidden sm:flex flex-col items-center gap-2 flex-shrink-0 pl-2 pt-5">
                 <div className="border border-gray-200 rounded-lg p-1.5 bg-white">
                   <svg viewBox="0 0 21 21" width="110" height="110" xmlns="http://www.w3.org/2000/svg">
                     {[

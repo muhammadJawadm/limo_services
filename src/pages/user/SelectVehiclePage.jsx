@@ -135,8 +135,8 @@ export default function SelectVehiclePage() {
       <StepperNavbar currentStep={1} />
 
       {/* Page header */}
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 border-b bg-[#EAEAEA] max=w-7xl">
-        <h1 className="text-lg font-bold text-gray-900">Select Your Vehicle</h1>
+      <div className="flex items-center justify-between px-4 md:px-16 py-4 border-b bg-[#EAEAEA]">
+        <h1 className="text-base md:text-lg font-bold text-gray-900">Select Your Vehicle</h1>
         <button
           onClick={() => navigate('/')}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-[#1a2b5e] font-medium transition-colors"
@@ -146,7 +146,7 @@ export default function SelectVehiclePage() {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 gap-6 px-8 md:px-16 py-6 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col md:flex-row flex-1 gap-6 px-4 md:px-16 py-6 max-w-7xl mx-auto w-full">
 
         {/* LEFT PANEL */}
         <div className="w-full md:w-[42%] flex flex-col gap-4">
@@ -192,25 +192,24 @@ export default function SelectVehiclePage() {
             </div>
 
             {/* Date & time */}
-            <div className="flex items-center gap-3 border-gray-100 pb-2">
-              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-6 py-2.5">
-                <LuCalendarDays size={16} className="text-gray-400" />
-                <span>Wed, Feb 18th 2026</span>
+            <div className="flex flex-wrap items-center gap-2 border-gray-100 pb-2">
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <LuCalendarDays size={16} className="text-gray-400 flex-shrink-0" />
+                <span className="whitespace-nowrap text-xs md:text-sm">Wed, Feb 18th 2026</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500  rounded-full bg-white px-6 py-2.5">
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+                <LuClock3 size={16} className="text-gray-400 flex-shrink-0" />
+                <span className="text-xs md:text-sm">03:20</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
                 <LuClock3 size={16} className="text-gray-400" />
-                <span>03:20</span>
-                
+                {isHourlyRide ? (
+                  <span className="text-xs md:text-sm">3 hours</span>
+                ) : (
+                  <span className="text-xs md:text-sm">12:11 pm</span>
+                )}
               </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5 w-32">
-              <LuClock3 size={16} className="text-gray-400" />
-            {isHourlyRide ? (
-                  <span>3 hours</span>
-                ) : (
-                  <span>12:11 pm</span>
-                )}
-                </div>
           </div>
         </div>
 
@@ -237,33 +236,32 @@ export default function SelectVehiclePage() {
                   )}
                 </div>
                 {/* Main card row */}
-                <div className="flex items-center gap-4 px-4 py-4">
+                <div className="flex items-center gap-3 px-3 py-3 md:px-4 md:py-4">
                   {/* Car image */}
                   <img
                     src={v.image}
                     alt={v.name}
-                    className="w-28 h-16 object-contain flex-shrink-0"
+                    className="w-20 h-12 md:w-28 md:h-16 object-contain flex-shrink-0"
                   />
 
                   <div className="flex-1 min-w-0">
-                    <p className={`text-md font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>{v.name}</p>
-                    <p className={`text-sm mt-0.5 leading-snug ${isSelected ? 'text-blue-200' : 'text-gray-400'}`}>{v.subtitle}</p>
-                    <div className="flex items-center justify-between">
+                    <p className={`text-sm md:text-md font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>{v.name}</p>
+                    <p className={`text-xs md:text-sm mt-0.5 leading-snug line-clamp-1 ${isSelected ? 'text-blue-200' : 'text-gray-400'}`}>{v.subtitle}</p>
+                    <div className="flex items-center justify-between flex-wrap gap-1">
                       <FeatureIcons passengers={v.passengers} luggage={v.luggage} Selected={isSelected} />
-                      <p className={`pr-5 text-lg font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                      <p className={`pr-2 md:pr-5 text-base md:text-lg font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
                         ${v.price.toFixed(2)}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Expanded controls — only for selected */}
                 {isSelected && (
-                  <div className="px-4 pb-4 flex flex-col gap-3">
-                    <div className="border-t ml-4  w-[92%] border-dashed border-white/50" />
-                    <div className="flex items-center gap-4 flex-wrap">
+                  <div className="px-3 pb-3 md:px-4 md:pb-4 flex flex-col gap-3">
+                    <div className="border-t ml-4 w-[92%] border-dashed border-white/50" />
+                    <div className="flex items-center gap-2 md:gap-4 flex-wrap">
                       {/* Passengers counter */}
-                      <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5">
+                      <div className="flex items-center gap-1.5 md:gap-2 bg-white/10 rounded-full px-2 md:px-3 py-1.5">
                         <img src={usericon} className="w-4 h-4" />
                         <span className="text-xs text-blue-200 whitespace-nowrap">Passengers (S)</span>
                         <button
@@ -278,7 +276,7 @@ export default function SelectVehiclePage() {
                       </div>
 
                       {/* Luggage counter */}
-                      <div className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5">
+                      <div className="flex items-center gap-1.5 md:gap-2 bg-white/10 rounded-full px-2 md:px-3 py-1.5">
                         <img src={briefcase} className="w-4 h-4" />
                         <span className="text-xs text-blue-200 whitespace-nowrap">Luggage (S)</span>
                         <button
@@ -295,7 +293,7 @@ export default function SelectVehiclePage() {
                       {/* Continue button */}
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate('/additional-details'); }}
-                        className="ml-auto flex items-center gap-2 bg-white text-[#1a2b5e] text-xs font-bold px-5 py-2 rounded-full hover:bg-blue-50 transition-colors"
+                        className="ml-auto flex items-center gap-2 bg-white text-[#1a2b5e] text-xs font-bold px-4 md:px-5 py-2 rounded-full hover:bg-blue-50 transition-colors"
                       >
                         Continue <FiChevronRight size={14} />
                       </button>

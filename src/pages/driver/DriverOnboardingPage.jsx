@@ -3,11 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiChevronDown, FiCheck, FiGlobe } from 'react-icons/fi';
 import { LuUser } from 'react-icons/lu';
 import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
-import { FaLinkedin, FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import logoImg from '../../assets/navbarlogo.png';
 import usFlag from '../../assets/us.png';
 import testpdf from '../../assets/testpdf.pdf';
-
+import profile from '../../assets/profile.svg';
+import { AiOutlineLogout } from "react-icons/ai";
+import Footer from '../../components/Footer';
+import wallet from '../../assets/wallet.png';
+import whitewallet from '../../assets/whitewallet.png';
 // Dummy list of countries and states
 const countries = ['USA', 'Canada', 'UK', 'Australia'];
 const vehicleClasses = ['Business Class', 'First Class', 'Standard'];
@@ -33,26 +36,41 @@ const InputField = ({ label, type = 'text', placeholder, value, onChange, icon }
   </div>
 );
 
-const SelectField = ({ label, options, value, onChange }) => (
-  <div className="w-full relative">
-    <label className="block text-[14px] text-gray-600 mb-2 ml-1">{label}</label>
-    <div className="relative">
-      <select
-        value={value}
-        onChange={onChange}
-        className="w-full appearance-none rounded-full border border-gray-200/80 bg-white py-3.5 pl-5 pr-10 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] transition-colors"
-      >
-        <option value="" disabled>Select Option</option>
-        {options.map((opt, idx) => (
-          <option key={idx} value={opt}>{opt}</option>
-        ))}
-      </select>
-      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-        <FiChevronDown className="text-gray-400" size={18} />
+const SelectField = ({ label, options, value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="w-full relative">
+      <label className="block text-[14px] text-gray-600 mb-2 ml-1">{label}</label>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          className="w-full flex items-center justify-between rounded-full border border-gray-200/80 bg-white py-3.5 pl-5 pr-4 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] transition-colors"
+        >
+          <span className={value ? 'text-gray-700' : 'text-gray-400'}>{value || 'Select Option'}</span>
+          <FiChevronDown className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} size={18} />
+        </button>
+        {open && (
+          <div className="absolute z-50 left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-2">
+            {options.map((opt, idx) => {
+              const isSelected = value === opt;
+              return (
+                <div
+                  key={idx}
+                  onClick={() => { onChange({ target: { value: opt } }); setOpen(false); }}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer transition-colors ${isSelected ? 'bg-[#f8f9fa]' : 'hover:bg-gray-50'}`}
+                >
+                  <span className={`text-[14px] flex-1 ${isSelected ? 'font-medium text-gray-800' : 'text-gray-600'}`}>{opt}</span>
+                  <div className={`w-4 h-4 rounded-full flex-shrink-0 ${isSelected ? 'bg-[#1b2d5d]' : 'border-2 border-gray-300'}`} />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const RadioGroup = ({ label, name, options, value, onChange }) => (
   <div className="w-full">
@@ -66,7 +84,7 @@ const RadioGroup = ({ label, name, options, value, onChange }) => (
             value={opt.value}
             checked={value === opt.value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-4 h-4 text-[#1b2d5d] border-gray-300 focus:ring-[#1b2d5d]"
+            className="w-5 h-5 accent-[#1b2d5d] border-gray-300 focus:ring-[#1b2d5d]"
           />
           <span className="text-[15px] text-gray-600">{opt.label}</span>
         </label>
@@ -78,17 +96,17 @@ const RadioGroup = ({ label, name, options, value, onChange }) => (
 // Form Steps Components
 
 const Step1 = ({ formData, updateDoc }) => (
-  <div className="space-y-6">
-    <div className="mb-8">
+  <div className="space-y-4">
+    <div className="mb-6">
       <h2 className="text-[20px] font-medium text-[#111]">Company Information</h2>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-12">
       <InputField label="Company Name" placeholder="UX Pilot" value={formData.companyName} onChange={(e) => updateDoc('companyName', e.target.value)} />
       <SelectField label="Company Type ( Legal Form)" options={['Sole Proprietorship', 'General Partnership', 'LLC', 'Corp', 'Inc.']} value={formData.companyType} onChange={(e) => updateDoc('companyType', e.target.value)} />
 
-      <div className="col-span-1 md:col-span-2 mt-4">
-        <h3 className="text-[18px] font-medium text-[#111] mb-4 border-b pb-2 border-transparent">Company Address</h3>
+      <div className="col-span-1 md:col-span-2 mt-3">
+        <h3 className="text-[18px] font-medium text-[#111] mb-2 border-b pb-2 border-transparent">Company Address</h3>
       </div>
 
       <SelectField label="Country" options={countries} value={formData.country} onChange={(e) => updateDoc('country', e.target.value)} />
@@ -111,7 +129,7 @@ const Step1 = ({ formData, updateDoc }) => (
 );
 
 const Step2 = ({ formData, updateDoc }) => (
-  <div className="space-y-8">
+  <div className="space-y-6">
     <div className="mb-6">
       <h2 className="text-[18px] font-bold text-[#111]">Fleet Information</h2>
       <p className="text-[14px] text-gray-500 mt-1">Please provide the following information about your fleet:</p>
@@ -225,7 +243,7 @@ const Step4 = ({ formData, updateDoc }) => (
 
     <div className="pt-6 border-t mt-8">
       <p className="text-[14px] text-gray-500 mb-2">Upon clicking &quot;Next&quot; the following information will be submitted for review:</p>
-      <ul className="list-disc pl-5 space-y-1 mb-6 text-[14px] text-gray-500">
+      <ul className="list-disc pl-5 space-y-1 mb-6 text-[14px] text-gray-600 marker:text-gray-900">
         <li>Company Information</li>
         <li>Fleet Information</li>
         <li>First Chauffeur Information</li>
@@ -254,10 +272,7 @@ const Step9 = ({ formData, updateDoc }) => (
       <div className="border border-[#1b2d5d] rounded-xl p-4 flex items-center justify-between cursor-pointer">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-[#1b2d5d] flex items-center justify-center text-white">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <img src={whitewallet} alt="card" className='w-6 h-6' />
           </div>
           <div>
             <div className="text-[15px] font-medium text-[#111]">Dabit Cart</div>
@@ -279,18 +294,16 @@ const Step9 = ({ formData, updateDoc }) => (
         <InputField label="" icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-gray-400"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} placeholder="CVC" value={formData.cardCvc} onChange={(e) => updateDoc('cardCvc', e.target.value)} />
       </div>
 
-      <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-100 flex items-start gap-4">
-        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mt-1">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 10H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+      <div className="bg-white rounded-xl p-4 border border-gray-100 flex items-center gap-4">
+        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mt-1">
+          <img src={wallet} alt="wallet" className='w-6 h-6' />
         </div>
         <div className="flex-1">
           <div className="text-[15px] font-medium text-[#111]">Created card</div>
           <div className="text-[13px] text-gray-500 mb-2">Save your info for faster booking</div>
-          <div className="inline-flex items-center gap-1.5 bg-gray-200/50 text-gray-500 text-[11px] px-2 py-1 rounded">
-            <span>ℹ️</span> ID verification required for credit card payments.
+          <div className="flex items-center justify-start text-gray-600 gap-2 bg-[#1B2D5D26] px-4 py-2 rounded-md w-[65%]">
+            <div className="w-5 h-5 rounded-full border border-gray-800 flex items-center justify-center text-[12px] text-black">!</div>
+            <p className="text-[14px] text-gray-500">ID verification required for credit card payments.</p>
           </div>
         </div>
       </div>
@@ -360,14 +373,14 @@ const Step10 = ({ formData, updateDoc }) => {
 
 const Step5 = () => (
   <div className="space-y-6">
-    <div className="mb-6">
+    <div className="mb-10">
       <h2 className="text-[20px] font-bold text-[#111]">Onboarding Program</h2>
     </div>
 
     <div className="text-[15px] text-gray-600 leading-relaxed font-light space-y-6 max-w-4xl">
-      <p>Thanks you fo providing your company details. We are excited to have you drive with us soon. As a Lime Services partner, you'll get:</p>
+      <p className='text-black font-semibold'>Thanks you fo providing your company details. We are excited to have you drive with us soon. As a Lime Services partner, you'll get:</p>
 
-      <ul className="list-disc pl-5 space-y-2 text-gray-500">
+      <ul className="list-disc pl-5 space-y-2 text-gray-500 marker:text-gray-900">
         <li>Quality-based bonus opportunities and the chance to join out partner prestige Club</li>
         <li>Regular, reliable payment for all rides</li>
         <li>Access to an established global customer base of business-class travellers</li>
@@ -375,9 +388,9 @@ const Step5 = () => (
         <li>Choice of which rides you want to take to fill any gaps in your daily schedule</li>
       </ul>
 
-      <p>Before you can perform your first ride and join  Limo services global network of partner we need your help with the following:</p>
+      <p className='text-black font-semibold'>Before you can perform your first ride and join  Limo services global network of partner we need your help with the following:</p>
 
-      <ul className="list-disc pl-5 space-y-2 text-gray-500">
+      <ul className="list-disc pl-5 space-y-2 text-gray-500 marker:text-gray-900">
         <li>Upload 14 required documents</li>
         <li>Complete all Partner training modules</li>
         <li>Sign the partner agreement contract</li>
@@ -432,9 +445,9 @@ const Step6 = () => {
   ];
 
   const TableHeader = () => (
-    <div className="hidden md:flex items-center justify-between bg-black text-white px-4 py-3 rounded-none text-[13px] font-medium mt-2">
+    <div className="hidden md:flex items-center justify-between bg-black text-white px-4 py-3 rounded-t-lg text-[13px] font-medium mt-2">
       <div className="flex-1">Name</div>
-      <div className="w-32">Expiry Date</div>
+      <div className="w-40">Expiry Date</div>
       <div className="w-24">Status</div>
       <div className="w-20"></div>
     </div>
@@ -474,8 +487,8 @@ const Step6 = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-start text-gray-400 mt-6 pb-4">
-        <div className="w-5 h-5 rounded-full border border-gray-400 flex items-center justify-center text-[12px]">i</div>
+      <div className="flex items-center justify-start text-gray-600 mt-6 pb-4">
+        <div className="w-5 h-5 rounded-full border border-gray-600 flex items-center justify-center text-[12px]">i</div>
       </div>
     </div>
   );
@@ -512,7 +525,7 @@ const Step7 = () => {
 
       <div className="border border-gray-100 rounded-lg overflow-hidden">
         <div className="hidden md:flex items-center justify-between bg-black text-white px-6 py-4 text-[14px] font-medium">
-          <div className="w-20">Module#</div>
+          <div className="w-40">Module#</div>
           <div className="flex-1">Training Modules</div>
           <div className="w-48 text-right">Progress Percentage</div>
         </div>
@@ -520,7 +533,7 @@ const Step7 = () => {
         <div className="divide-y divide-gray-100">
           {modules.map((mod) => (
             <div key={mod.num} className="flex flex-col md:flex-row md:items-center px-6 py-5 hover:bg-gray-50 transition-colors">
-              <div className="w-20 text-[14px] text-gray-400 mb-1 md:mb-0">{mod.num}</div>
+              <div className="w-40 text-[14px] text-gray-400 mb-1 md:mb-0">{mod.num}</div>
               <div className="flex-1 text-[14px] text-gray-500 font-medium cursor-pointer hover:text-[#1b2d5d]">{mod.num}. {mod.name}</div>
               <div className="w-48 text-right text-[14px] text-[#1b2d5d] underline mt-2 md:mt-0">{mod.progress}</div>
             </div>
@@ -553,7 +566,7 @@ const Step8 = ({ formData, updateDoc }) => (
     </div>
 
     <div className="pt-2">
-      <a href="#" className="text-[14px] text-[#1b2d5d] hover:underline">Click here to download a copy of your contractual agreement.</a>
+      <a href="#" className="text-[14px] text-[#1B2D5D] hover:underline">Click here to download a copy of your contractual agreement.</a>
     </div>
 
     <div className="mt-6">
@@ -742,26 +755,27 @@ export default function DriverOnboardingPage() {
         <div className="flex-shrink-0 min-w-[200px] flex justify-end">
           <div className="relative group">
             <button className="flex items-center gap-3 bg-white border rounded-full py-2.5 px-5 hover:bg-gray-50 transition-colors shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 -ml-2"></span>
-              <span className="w-1.5 h-1.5 rounded-full bg-gray-400 -ml-2"></span>
-              <span className="text-[14px] font-medium text-gray-600 block pl-2">Onboarding</span>
-              <FiChevronDown className="text-gray-400 ml-1" />
+              <img src={profile} alt="profile" className="w-7 h-6" />
+              <span className="text-[14px] font-medium text-gray-600 block">Onboarding</span>
+              <FiChevronDown className="text-gray-600 ml-1 w-6 h-6" />
             </button>
 
             {/* Dropdown Menu placeholder */}
             <div className="absolute right-0 top-full mt-2 w-[280px] bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-[#f8f9fa] border border-gray-100 mb-1 cursor-pointer">
-                <div className="w-2 h-2 rounded-full bg-[#1b2d5d]"></div>
+              <div className="flex items-center gap-1 p-3 rounded-xl bg-[#f8f9fa] border border-gray-100 mb-1 cursor-pointer">
+                <img src={profile} alt="profile" className="w-7 h-6" />
                 <span className="text-[14px] font-medium text-gray-800">Onboarding Registration</span>
+                <div className="ml-auto w-4 h-4 rounded-full bg-[#1b2d5d] flex-shrink-0" />
               </div>
               <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer">
-                <LuUser className="text-gray-500" size={18} />
+                <LuUser className="text-gray-500" size={20} />
                 <span className="text-[14px] text-gray-600">My Profile</span>
+                <div className="ml-auto w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
               </div>
               <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer text-red-500">
-                <BsArrowLeft className="text-red-500" size={18} />
+                <AiOutlineLogout className="text-red-500" size={20} />
                 <span className="text-[14px]">Logout</span>
+                <div className="ml-auto w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
               </div>
             </div>
           </div>
@@ -772,8 +786,8 @@ export default function DriverOnboardingPage() {
       <main className="flex-1 flex justify-center py-10 md:py-16 px-4">
         <div className="w-full max-w-[1000px]">
 
-          <div className="mb-10">
-            <h1 className="text-[28px] md:text-[32px] font-semibold text-[#1b2d5d]">Partner Onboarding</h1>
+          <div className="mb-4">
+            <h1 className="text-[24px] md:text-[28px] font-semibold text-[#1b2d5d]">Partner Onboarding</h1>
             {currentStep === 1 && (
               <div className="mt-4 text-[15px] text-gray-500 max-w-2xl leading-relaxed">
                 Thank you Jayson smith for choosing to partner with Limo Services. You have selected Algiers as your primary city of operations.
@@ -814,40 +828,7 @@ export default function DriverOnboardingPage() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-[#1e1e1e] text-white pt-16 pb-8 px-6 md:px-12 lg:px-24">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col md:flex-row justify-between mb-16 gap-10">
-            <div className="max-w-md">
-              <h3 className="text-[26px] font-semibold mb-4">Limo Services</h3>
-              <p className="text-gray-400 text-[15px] leading-relaxed">
-                Limo Services offers luxury chauffeur-driven rides through a simple web platform, connecting riders with professional drivers for reliable, premium transportation.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-[26px] font-semibold mb-6">Information</h3>
-              <ul className="flex flex-wrap md:flex-nowrap gap-x-6 gap-y-3">
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Become a Partner</Link></li>
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Terms</Link></li>
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Privacy Policy</Link></li>
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Support</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-gray-700/50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-gray-400 text-[14px]">Copyright © Limo Services</p>
-            <div className="flex gap-5">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaLinkedin size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaFacebook size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaInstagram size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaYoutube size={20} /></a>
-            </div>
-          </div>
-        </div>
-      </footer>
-
+      <Footer />
       {/* Admin Under Review Modal */}
       {showReviewModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">

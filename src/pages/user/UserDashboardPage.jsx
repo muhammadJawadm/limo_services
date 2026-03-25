@@ -200,8 +200,18 @@ export default function UserDashboardPage() {
                   <p className="text-sm font-semibold">Welcome</p>
                   <p className="text-sm text-gray-500">Jayson Smith</p>
                 </div>
-                <div className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white">
-                  <FaUserCircle size={36} className='text-white bg-black rounded-full p-0.5' />
+                <div className="relative group">
+                  <div className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white cursor-pointer">
+                    <FaUserCircle size={36} className='text-white bg-black rounded-full p-0.5' />
+                  </div>
+                  {/* Profile hover dropdown */}
+                  <div className="absolute right-0 top-full mt-2 w-[240px] bg-white rounded-xl shadow-xl border border-gray-100 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <p className="text-sm text-gray-400">Welcome</p>
+                    <h3 className="text-2xl font-semibold text-[#191919] leading-tight mt-0.5">Jayson Smith</h3>
+                    <button className="mt-4 w-full rounded-full border border-[#1b2d5d] py-2.5 text-sm font-medium text-[#1b2d5d] hover:bg-gray-50 transition-colors">
+                      View Profile
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -316,15 +326,6 @@ export default function UserDashboardPage() {
                       </table>
                     </div>
 
-                    {activeRideTab === 'Upcoming Ride' && (
-                      <div className="mt-5 ml-auto w-full max-w-[300px] rounded-xl bg-white p-6 text-[#191919] shadow-sm">
-                        <p className="text-sm text-gray-500">Welcome</p>
-                        <h3 className="text-4xl font-semibold leading-tight">Jayson Smith</h3>
-                        <button className="mt-5 w-full rounded-full border border-[#1b2d5d] py-3 text-xl font-medium text-[#1b2d5d]">
-                          View Profile
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </section>
               )}

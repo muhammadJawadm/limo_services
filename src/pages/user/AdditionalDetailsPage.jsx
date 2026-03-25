@@ -54,8 +54,8 @@ export default function AdditionalDetailsPage() {
       <StepperNavbar currentStep={1} />
 
       {/* Page header */}
-      <div className="flex items-center justify-between px-8 md:px-16 py-4 bg-[#EAEAEA] border-b border-gray-200">
-        <h1 className="text-lg font-bold text-gray-900">Additional Details</h1>
+      <div className="flex items-center justify-between px-4 md:px-16 py-4 bg-[#EAEAEA] border-b border-gray-200">
+        <h1 className="text-base md:text-lg font-bold text-gray-900">Additional Details</h1>
         <button
           onClick={() => navigate('/select-vehicle')}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-[#1a2b5e] font-medium transition-colors"
@@ -65,7 +65,7 @@ export default function AdditionalDetailsPage() {
       </div>
 
       {/* Main content */}
-      <div className="flex flex-1 gap-6 px-8 md:px-16 py-6 max-w-7xl mx-auto w-full">
+      <div className="flex flex-col md:flex-row flex-1 gap-6 px-4 md:px-16 py-6 max-w-7xl mx-auto w-full">
 
         {/* LEFT PANEL — Trip details */}
         <div className="w-full md:w-[42%]">
@@ -96,33 +96,35 @@ export default function AdditionalDetailsPage() {
             </div>
 
             {/* Date & time */}
-            <div className="flex items-center gap-6 ">
-              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
-                <LuCalendarDays size={16} className="text-gray-400" />
-                <span>Wed, Feb 18th 2026</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
+                <LuCalendarDays size={15} className="text-gray-400 flex-shrink-0" />
+                <span className="whitespace-nowrap">Wed, Feb 18th 2026</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
-                <LuClock3 size={16} className="text-gray-400" />
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
+                <LuClock3 size={15} className="text-gray-400 flex-shrink-0" />
                 <span>12:11</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
-                <LuClock3 size={16} className="text-gray-400" />
-                {isHourlyRide ? <span>3 hours</span> : <span></span>}
-              </div>
+              {isHourlyRide && (
+                <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
+                  <LuClock3 size={15} className="text-gray-400" />
+                  <span>3 hours</span>
+                </div>
+              )}
             </div>
 
             {/* Passengers & luggage */}
-            <div className="flex items-center gap-6 mt-2">
-              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
                 <img src={usericonblack} className="w-4 h-4" alt="passengers" />
                 <span>3 Passengers</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
                 <img src={briefcaseblack} className="w-4 h-4" alt="luggage" />
                 <span>3 Luggage</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
-                <img src={childSeatIcon} className="w-5 h-5" alt="luggage" />
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
+                <img src={childSeatIcon} className="w-5 h-5" alt="child" />
                 <span>1 Toddler</span>
               </div>
             </div>
@@ -136,27 +138,27 @@ export default function AdditionalDetailsPage() {
           <div className="bg-[#1a2b5e] rounded-2xl px-5 py-4">
             <div className="flex items-center gap-4">
               {/* Car image */}
-              <img src={businessSedanImg} alt="Business Sedan" className="w-28 h-16 object-contain flex-shrink-0" />
+              <img src={businessSedanImg} alt="Business Sedan" className="w-20 h-12 md:w-28 md:h-16 object-contain flex-shrink-0" />
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <div className="flex  gap-48 mb-1">
-                  <p className="text-white font-bold text-base">Business Sedan</p>
-                  <span className="flex items-end gap-1 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
+                  <p className="text-white font-bold text-sm md:text-base">Business Sedan</p>
+                  <span className="flex items-center gap-1 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
                     <BsCheck2 size={11} /> Selected
                   </span>
                 </div>
                 <p className="text-blue-200 text-xs">Cadillac CT6, Lyric or similar</p>
                 {/* Feature icons row + price */}
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex lg:flex-row flex-col items-center justify-between mt-2">
                   <div className="flex items-center gap-3 ">
                     <div className='flex items-center gap-3 border rounded-full px-3 py-1 bg-white/10'>
-                    <span className="flex items-center gap-1 text-xs text-white">
-                      <img src={usericon} className="w-4 h-4" alt="passengers" /> 3
-                    </span>
-                    <span className="flex items-center gap-1 text-xs text-white">
-                      <img src={briefcase} className="w-4 h-4" alt="luggage" /> 3
-                    </span>
+                      <span className="flex items-center gap-1 text-xs text-white">
+                        <img src={usericon} className="w-4 h-4" alt="passengers" /> 3
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-white">
+                        <img src={briefcase} className="w-4 h-4" alt="luggage" /> 3
+                      </span>
                     </div>
                     <img src={seat} className="w-6 h-6" alt="seat" />
                     <img src={wifi} className="w-6 h-6" alt="wifi" />
@@ -190,7 +192,7 @@ export default function AdditionalDetailsPage() {
                 </button>
                 {/* Dropdowns — only when toggle is on */}
                 {childSeats && (
-                  <div className="flex items-center gap-4 mt-1 flex-wrap">
+                  <div className="flex items-center gap-3 mt-2 flex-wrap">
                     {/* Infant */}
                     <div className="relative">
                       <label className="absolute -top-2 left-3 text-xs text-gray-500 font-medium bg-white px-1 leading-none">Infant</label>

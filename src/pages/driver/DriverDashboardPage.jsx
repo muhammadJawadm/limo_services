@@ -7,8 +7,7 @@ import {
     FiLogOut,
     FiPlus,
     FiSearch,
-    FiUsers,
-    FiUser
+    FiUsers
 } from 'react-icons/fi';
 import { LuCar } from 'react-icons/lu';
 import logoImg from '../../assets/navbarlogo.png';
@@ -76,9 +75,7 @@ import MessagesModal from '../../components/dashboard/MessagesModal';
 import RideAlertsView from '../../components/dashboard/RideAlertsView';
 import PassengerView from '../../components/dashboard/PassengerView';
 import PassengerEditModal from '../../components/dashboard/PassengerEditModal';
-import AccountInfoView from '../../components/dashboard/AccountInfoView';
-import AccountEditModal from '../../components/dashboard/AccountEditModal';
-import NewReservationModal from '../../components/dashboard/NewReservationModal';
+
 import ReturnTripModal from '../../components/dashboard/ReturnTripModal';
 import { FaUserCircle } from 'react-icons/fa';
 import DriverProfileDetailsView from '../../components/dashboard/DriverProfileDetailsView';
@@ -86,15 +83,12 @@ import DriverProfileDetailsView from '../../components/dashboard/DriverProfileDe
 export default function DriverDashboardPage() {
     const [activeRideTab, setActiveRideTab] = useState('Upcoming Ride');
     const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard'); // 'Dashboard' | 'Notification'
-    const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details'); // 'Ride Details' | 'Passenger' | 'Account Info'
+    const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details'); // 'Ride Details' | 'Profile Details'
 
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [isRideDetailsModalOpen, setIsRideDetailsModalOpen] = useState(false);
     const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
     const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
-    const [isAccountEditModalOpen, setIsAccountEditModalOpen] = useState(false);
-    const [accountEditType, setAccountEditType] = useState('passenger');
-    const [isNewReservationModalOpen, setIsNewReservationModalOpen] = useState(false);
     const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
     const [selectedRideConfig, setSelectedRideConfig] = useState({ isReturnTrip: false, hasFlightInfo: false });
 
@@ -175,16 +169,6 @@ export default function DriverDashboardPage() {
                                     Ride Details
                                 </button>
 
-                                <button
-                                    onClick={() => setActiveTopNavTab('Account Info')}
-                                    className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm transition-colors ${activeTopNavTab === 'Account Info'
-                                        ? 'bg-[#1b2d5d] text-white'
-                                        : 'border border-gray-300 bg-white text-gray-500 hover:bg-gray-50'
-                                        }`}
-                                >
-                                    <FiUser size={15} />
-                                    Account Info
-                                </button>
                             </div>
 
                             <div className="flex items-center gap-3">
@@ -192,8 +176,21 @@ export default function DriverDashboardPage() {
                                     <p className="text-sm font-semibold">Welcome</p>
                                     <p className="text-sm text-gray-500">Jayson Smith</p>
                                 </div>
-                                <div className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white">
-                                    <FaUserCircle size={36} className='text-white bg-black rounded-full p-0.5' />
+                                <div className="relative group">
+                                    <div className="grid h-10 w-10 place-items-center rounded-full border border-gray-300 bg-white cursor-pointer">
+                                        <FaUserCircle size={36} className='text-white bg-black rounded-full p-0.5' />
+                                    </div>
+                                    {/* Profile hover dropdown */}
+                                    <div className="absolute right-0 top-full mt-2 w-[240px] bg-white rounded-xl shadow-xl border border-gray-100 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                        <p className="text-sm text-gray-400">Welcome</p>
+                                        <h3 className="text-2xl font-semibold text-[#191919] leading-tight mt-0.5">Jayson Smith</h3>
+                                        <button
+                                            onClick={() => setActiveTopNavTab('Profile Details')}
+                                            className="mt-4 w-full rounded-full border border-[#1b2d5d] py-2.5 text-sm font-medium text-[#1b2d5d] hover:bg-gray-50 transition-colors"
+                                        >
+                                            View Profile
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -283,18 +280,6 @@ export default function DriverDashboardPage() {
                                             </table>
                                         </div>
 
-                                        {activeRideTab === 'Upcoming Ride' && (
-                                            <div className="mt-5 ml-auto w-full max-w-[300px] rounded-xl bg-white p-6 text-[#191919] shadow-sm">
-                                                <p className="text-sm text-gray-500">Welcome</p>
-                                                <h3 className="text-4xl font-semibold leading-tight">Jayson Smith</h3>
-                                                <button 
-                                                    onClick={() => setActiveTopNavTab('Profile Details')}
-                                                    className="mt-5 w-full rounded-full border border-[#1b2d5d] py-3 text-xl font-medium text-[#1b2d5d] hover:bg-gray-50 transition-colors"
-                                                >
-                                                    View Profile
-                                                </button>
-                                            </div>
-                                        )}
                                     </div>
                                 </section>
                             )}
@@ -305,17 +290,7 @@ export default function DriverDashboardPage() {
                                 </div>
                             )}
 
-                            {activeTopNavTab === 'Account Info' && (
-                                <div className="px-4 sm:px-6 lg:px-8 pb-6">
-                                    <AccountInfoView
-                                        onEditAccount={(type) => {
-                                            setAccountEditType(type);
-                                            setIsAccountEditModalOpen(true);
-                                        }}
-                                        onNewReservation={() => setIsNewReservationModalOpen(true)}
-                                    />
-                                </div>
-                            )}
+
 
                             {activeTopNavTab === 'Profile Details' && (
                                 <DriverProfileDetailsView />
@@ -348,15 +323,6 @@ export default function DriverDashboardPage() {
             <PassengerEditModal
                 isOpen={isPassengerEditModalOpen}
                 onClose={() => setIsPassengerEditModalOpen(false)}
-            />
-            <AccountEditModal
-                isOpen={isAccountEditModalOpen}
-                onClose={() => setIsAccountEditModalOpen(false)}
-                editType={accountEditType}
-            />
-            <NewReservationModal
-                isOpen={isNewReservationModalOpen}
-                onClose={() => setIsNewReservationModalOpen(false)}
             />
             <ReturnTripModal
                 isOpen={isReturnTripModalOpen}

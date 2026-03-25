@@ -18,10 +18,10 @@ export default function CorporateSupportSection() {
       </div>
 
       {/* Centered Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-16 flex justify-end items-center min-h-[600px] py-16">
-        
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-16 flex justify-end items-center min-h-[600px] py-10 md:py-16">
+
         {/* Left — Man image anchored to the bottom of the container */}
-        <div className="absolute bottom-0 left-8 md:left-16 z-10 w-[60%] sm:w-auto overflow-visible pointer-events-none">
+        <div className="absolute bottom-0 left-8 md:left-16 z-10 w-[60%] sm:w-auto overflow-visible pointer-events-none hidden lg:block">
           <div className="relative">
             <img
               src={footerMan}
@@ -37,7 +37,7 @@ export default function CorporateSupportSection() {
         </div>
 
         {/* Right — Contact Form */}
-        <div className="bg-white rounded-3xl p-10 w-full max-w-md shadow-xl relative z-20 pointer-events-auto">
+        <div className="bg-white rounded-3xl p-2 md:p-10 w-full max-w-md shadow-xl relative z-20 pointer-events-auto">
           {/* Title & subtitle */}
           <h2 className="text-[#1a2b5e] font-bold text-2xl mb-2 text-center">
             Need Corporate Support?
@@ -48,7 +48,7 @@ export default function CorporateSupportSection() {
 
           <div className="space-y-4">
             {/* Row 1: First Name + Last Name */}
-            <div className="flex gap-3">
+            <div className="flex flex-col md:flex-row gap-3">
               <input
                 name="firstName"
                 value={form.firstName}
@@ -61,12 +61,12 @@ export default function CorporateSupportSection() {
                 value={form.lastName}
                 onChange={handleChange}
                 placeholder="Last Name"
-                className="flex-1 px-5 py-3.5 w-10 rounded-full text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200"
+                className="flex-1 px-5 py-3.5 w-full md:w-10 rounded-full text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200"
               />
             </div>
 
             {/* Row 2: Email + Phone with flag */}
-            <div className="flex gap-3">
+            <div className="flex flex-col md:flex-row gap-3">
               <input
                 name="email"
                 value={form.email}
@@ -77,11 +77,19 @@ export default function CorporateSupportSection() {
               />
               <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-3.5 flex-1">
                 {/* US Flag with dropdown chevron */}
-                <span className="text-xl leading-none"><img src={usFlag} alt="" /></span>
+                <span className="text-xl leading-none flex-shrink-0"><img src={usFlag} alt="" /></span>
                 <svg className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
-                <span className="text-sm text-gray-600 font-medium">+1</span>
+                <span className="text-sm text-gray-600 font-medium flex-shrink-0">+1</span>
+                <input
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="Phone number"
+                  type="tel"
+                  className="flex-1 text-sm bg-transparent text-gray-700 placeholder-gray-400 outline-none min-w-0 w-full"
+                />
               </div>
             </div>
 

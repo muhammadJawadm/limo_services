@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiChevronDown } from 'react-icons/fi';
 import { LuUser } from 'react-icons/lu';
 import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 import { FaLinkedin, FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import logoImg from '../../assets/navbarlogo.png';
+import { FaPen } from "react-icons/fa";
+import Footer from '../../components/Footer';
+import redstarbg from '../../assets/redstarbg.png';
 
 const InputField = ({ label, type = 'text', placeholder, value, onChange }) => (
   <div className="w-full">
@@ -45,37 +48,40 @@ const SelectField = ({ label, options, value, onChange }) => (
 export default function DriverProfilePage() {
   const [formData, setFormData] = useState({
     // User Section
-    name: 'Jayson smith',
-    companyName: 'UX Pilot',
-    aboutUser: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-    sfUserId: '00045454TIERDI4454',
-    userEmail: 'Limo@gmail.com',
-    userMobile: '+44 441 7784 444',
-    userAddress: 'Los Angeles, CA 90001 United States',
-    
+    name: '',
+    companyName: '',
+    aboutUser: '',
+    sfUserId: '',
+    userEmail: '',
+    userMobile: '',
+    userAddress: '',
+
     // About Section
-    firstName: 'Jayson smith',
-    lastName: 'UX Pilot',
-    about: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-    title: '00045454TIERDI4454',
-    company: 'Limo@gmail.com',
-    mobilePhone: '+44 441 7784 444',
-    address: 'Los Angeles, CA 90001 United States',
-    
+    firstName: '',
+    lastName: '',
+    about: '',
+    title: '',
+    company: '',
+    mobilePhone: '',
+    address: '',
+
     // Contact Section
-    email: 'Limo@gmail.com',
-    phone: '+1 12 4578 78',
-    fax: '00045454TIERDI4454',
-    country: 'United States',
-    street: 'Los Angeles, CA 90001 United States',
-    zipCode: 'Los Angeles, CA 90001 United States',
-    city: 'Los Angeles',
-    stateProvince: 'None',
+    email: '',
+    phone: '',
+    fax: '',
+    country: '',
+    street: '',
+    zipCode: '',
+    city: '',
+    stateProvince: '',
   });
 
   const updateDoc = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
+
+  const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const countries = ['United States', 'United Kingdom', 'Canada', 'Australia'];
   const states = ['None', 'California', 'New York', 'Texas'];
@@ -87,7 +93,7 @@ export default function DriverProfilePage() {
         <div className="flex-shrink-0">
           <img src={logoImg} alt="Prvyn Services" className="h-10 object-contain" />
         </div>
-        
+
         <div className="flex-shrink-0 min-w-[200px] flex justify-end">
           <div className="relative group">
             <button className="flex items-center gap-3 bg-white border rounded-full py-2.5 px-5 hover:bg-gray-50 transition-colors shadow-sm">
@@ -95,7 +101,7 @@ export default function DriverProfilePage() {
               <span className="text-[14px] font-medium text-gray-600 block">Profile</span>
               <FiChevronDown className="text-gray-400 ml-1" />
             </button>
-            
+
             {/* Dropdown Menu placeholder */}
             <div className="absolute right-0 top-full mt-2 w-[280px] bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 p-2">
               <Link to="/driver/onboarding" className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 mb-1 cursor-pointer">
@@ -106,10 +112,13 @@ export default function DriverProfilePage() {
                 <LuUser className="text-[#1b2d5d]" size={18} />
                 <span className="text-[14px] font-medium text-gray-800">My Profile</span>
               </div>
-              <Link to="/driver/login" className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer text-red-500">
+              <button
+                onClick={() => setShowLogoutModal(true)}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer text-red-500 w-full"
+              >
                 <BsArrowLeft className="text-red-500" size={18} />
                 <span className="text-[14px]">Logout</span>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -123,38 +132,36 @@ export default function DriverProfilePage() {
           </div>
 
           <div className="space-y-12">
-            
+
             {/* Customer Section */}
             <section>
               <div className="flex items-center gap-4 mb-8">
                 <h2 className="text-[20px] font-medium text-[#111]">Customer</h2>
                 <button className="flex items-center gap-2 bg-[#1b2d5d] hover:bg-[#132042] text-white text-[13px] font-medium py-1.5 px-4 rounded-full transition-colors">
                   Edit
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="ml-1">
-                    <path d="M11 4H4C2.89543 4 2 4.89543 2 6V20C2 21.1046 2.89543 22 4 22H18C19.1046 22 20 21.1046 20 20V13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M18.5 2.50001C19.3284 1.67158 20.6716 1.67158 21.5 2.50001C22.3284 3.32844 22.3284 4.67158 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <FaPen size={12} />
                 </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12">
-                <InputField label="Name" placeholder="" value={formData.name} onChange={(e) => updateDoc('name', e.target.value)} />
-                <InputField label="Company Name" placeholder="" value={formData.companyName} onChange={(e) => updateDoc('companyName', e.target.value)} />
-                
+                <InputField label="Name" placeholder="Enter your name" value={formData.name} onChange={(e) => updateDoc('name', e.target.value)} />
+                <InputField label="Company Name" placeholder="Enter your company name" value={formData.companyName} onChange={(e) => updateDoc('companyName', e.target.value)} />
+
                 <div className="col-span-1 md:col-span-2 w-full">
                   <label className="block text-[14px] text-gray-600 mb-2 ml-1">About</label>
                   <textarea
                     rows="4"
+                    placeholder='Lorem ipsum dolor sit amet, consectetur adipiscing elit...'
                     value={formData.aboutUser}
                     onChange={(e) => updateDoc('aboutUser', e.target.value)}
                     className="w-full rounded-3xl border border-gray-200/80 bg-white p-5 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] transition-colors resize-none"
                   ></textarea>
                 </div>
 
-                <InputField label="SF USer ID" placeholder="" value={formData.sfUserId} onChange={(e) => updateDoc('sfUserId', e.target.value)} />
-                <InputField label="Email" type="email" placeholder="" value={formData.userEmail} onChange={(e) => updateDoc('userEmail', e.target.value)} />
-                <InputField label="Mobile Phone" placeholder="" value={formData.userMobile} onChange={(e) => updateDoc('userMobile', e.target.value)} />
-                <InputField label="Address" placeholder="" value={formData.userAddress} onChange={(e) => updateDoc('userAddress', e.target.value)} />
+                <InputField label="SF USer ID" placeholder="00045454TIERDI4454" value={formData.sfUserId} onChange={(e) => updateDoc('sfUserId', e.target.value)} />
+                <InputField label="Email" type="email" placeholder="[EMAIL_ADDRESS]" value={formData.userEmail} onChange={(e) => updateDoc('userEmail', e.target.value)} />
+                <InputField label="Mobile Phone" placeholder="+44 441 7784 444" value={formData.userMobile} onChange={(e) => updateDoc('userMobile', e.target.value)} />
+                <InputField label="Address" placeholder="Los Angeles, CA 90001 United States" value={formData.userAddress} onChange={(e) => updateDoc('userAddress', e.target.value)} />
               </div>
             </section>
 
@@ -167,23 +174,24 @@ export default function DriverProfilePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12">
-                <InputField label="First Name" placeholder="" value={formData.firstName} onChange={(e) => updateDoc('firstName', e.target.value)} />
-                <InputField label="Last Name" placeholder="" value={formData.lastName} onChange={(e) => updateDoc('lastName', e.target.value)} />
-                
+                <InputField label="First Name" placeholder="Jayson" value={formData.firstName} onChange={(e) => updateDoc('firstName', e.target.value)} />
+                <InputField label="Last Name" placeholder="smith" value={formData.lastName} onChange={(e) => updateDoc('lastName', e.target.value)} />
+
                 <div className="col-span-1 md:col-span-2 w-full">
                   <label className="block text-[14px] text-gray-600 mb-2 ml-1">About</label>
                   <textarea
                     rows="4"
+                    placeholder='Lorem ipsum dolor sit amet, consectetur adipiscing elit...'
                     value={formData.about}
                     onChange={(e) => updateDoc('about', e.target.value)}
                     className="w-full rounded-3xl border border-gray-200/80 bg-white p-5 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] transition-colors resize-none"
                   ></textarea>
                 </div>
 
-                <InputField label="Title" placeholder="" value={formData.title} onChange={(e) => updateDoc('title', e.target.value)} />
-                <InputField label="Company" placeholder="" value={formData.company} onChange={(e) => updateDoc('company', e.target.value)} />
-                <InputField label="Mobile Phone" placeholder="" value={formData.mobilePhone} onChange={(e) => updateDoc('mobilePhone', e.target.value)} />
-                <InputField label="Address" placeholder="" value={formData.address} onChange={(e) => updateDoc('address', e.target.value)} />
+                <InputField label="Title" placeholder="CEO" value={formData.title} onChange={(e) => updateDoc('title', e.target.value)} />
+                <InputField label="Company" placeholder="UX Pilot" value={formData.company} onChange={(e) => updateDoc('company', e.target.value)} />
+                <InputField label="Mobile Phone" placeholder="+44 441 7784 444" value={formData.mobilePhone} onChange={(e) => updateDoc('mobilePhone', e.target.value)} />
+                <InputField label="Address" placeholder="Los Angeles, CA 90001 United States" value={formData.address} onChange={(e) => updateDoc('address', e.target.value)} />
               </div>
             </section>
 
@@ -194,13 +202,13 @@ export default function DriverProfilePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12">
-                <InputField label="Email" type="email" placeholder="" value={formData.email} onChange={(e) => updateDoc('email', e.target.value)} />
-                <InputField label="Phone" placeholder="" value={formData.phone} onChange={(e) => updateDoc('phone', e.target.value)} />
-                <InputField label="Fax" placeholder="" value={formData.fax} onChange={(e) => updateDoc('fax', e.target.value)} />
+                <InputField label="Email" type="email" placeholder="[EMAIL_ADDRESS]" value={formData.email} onChange={(e) => updateDoc('email', e.target.value)} />
+                <InputField label="Phone" placeholder="+44 441 7784 444" value={formData.phone} onChange={(e) => updateDoc('phone', e.target.value)} />
+                <InputField label="Fax" placeholder="4444" value={formData.fax} onChange={(e) => updateDoc('fax', e.target.value)} />
                 <SelectField label="Country" options={countries} value={formData.country} onChange={(e) => updateDoc('country', e.target.value)} />
-                <InputField label="Steet" placeholder="" value={formData.street} onChange={(e) => updateDoc('street', e.target.value)} />
-                <InputField label="Zip/Postal Code" placeholder="" value={formData.zipCode} onChange={(e) => updateDoc('zipCode', e.target.value)} />
-                <InputField label="City" placeholder="" value={formData.city} onChange={(e) => updateDoc('city', e.target.value)} />
+                <InputField label="Steet" placeholder="Los Angeles, CA 90001 United States" value={formData.street} onChange={(e) => updateDoc('street', e.target.value)} />
+                <InputField label="Zip/Postal Code" placeholder="6587" value={formData.zipCode} onChange={(e) => updateDoc('zipCode', e.target.value)} />
+                <InputField label="City" placeholder="New York" value={formData.city} onChange={(e) => updateDoc('city', e.target.value)} />
                 <SelectField label="State Proven" options={states} value={formData.stateProvince} onChange={(e) => updateDoc('stateProvince', e.target.value)} />
               </div>
             </section>
@@ -220,37 +228,36 @@ export default function DriverProfilePage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#1e1e1e] text-white pt-16 pb-8 px-6 md:px-12 lg:px-24">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col md:flex-row justify-between mb-16 gap-10">
-            <div className="max-w-md">
-              <h3 className="text-[26px] font-semibold mb-4">Limo Services</h3>
-              <p className="text-gray-400 text-[15px] leading-relaxed">
-                Limo Services offers luxury chauffeur-driven rides through a simple web platform, connecting riders with professional drivers for reliable, premium transportation.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-[26px] font-semibold mb-6">Information</h3>
-              <ul className="flex flex-wrap md:flex-nowrap gap-x-6 gap-y-3">
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Become a Partner</Link></li>
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Terms</Link></li>
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Privacy Policy</Link></li>
-                <li><Link to="#" className="text-gray-300 hover:text-white transition-colors text-[15px]">Support</Link></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="pt-8 border-t border-gray-700/50 flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-gray-400 text-[14px]">Copyright © Limo Services</p>
-            <div className="flex gap-5">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaLinkedin size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaFacebook size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaInstagram size={20} /></a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors"><FaYoutube size={20} /></a>
+      <Footer />
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-[24px] p-8 max-w-sm w-full text-center shadow-2xl">
+            {/* Icon */}
+
+            <img className='mx-auto mb-6' src={redstarbg} alt="" />
+
+            <h3 className="text-[22px] font-bold text-[#111] mb-2">Log out</h3>
+            <p className="text-[14px] text-gray-400 mb-8">Are you sure you want to log out?</p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 py-3.5 rounded-full bg-gray-500 text-white text-[15px] font-medium hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowLogoutModal(false); navigate('/driver/login'); }}
+                className="flex-1 py-3.5 rounded-full bg-red-500 text-white text-[15px] font-medium hover:bg-red-600 transition-colors"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
-      </footer>
+      )}
     </div>
   );
 }
