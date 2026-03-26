@@ -1,10 +1,10 @@
-import Navbar from '../../components/Navbar';
-import HeroSection from '../../components/HeroSection';
-import PremiumRideSection from '../../components/PremiumRideSection';
-import ComfortLuxurySection from '../../components/ComfortLuxurySection';
-import WhyChooseUsSection from '../../components/WhyChooseUsSection';
-import ServiceAreasSection from '../../components/ServiceAreasSection';
-import CorporateSupportSection from '../../components/CorporateSupportSection';
+import Navbar from '../../components/user-homepage/Navbar';
+import HeroSection from '../../components/user-homepage/HeroSection';
+import PremiumRideSection from '../../components/user-homepage/PremiumRideSection';
+import ComfortLuxurySection from '../../components/user-homepage/ComfortLuxurySection';
+import WhyChooseUsSection from '../../components/user-homepage/WhyChooseUsSection';
+import ServiceAreasSection from '../../components/user-homepage/ServiceAreasSection';
+import CorporateSupportSection from '../../components/user-homepage/CorporateSupportSection';
 import Footer from '../../components/Footer';
 
 export default function HomePage() {

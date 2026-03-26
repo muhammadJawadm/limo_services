@@ -10,7 +10,7 @@ export default function DriverForgetPasswordPage() {
 
   const handleSendCode = (e) => {
     e.preventDefault();
-    navigate('/driver/otp-verification');
+    navigate('/driver/reset-password');
   };
 
   return (

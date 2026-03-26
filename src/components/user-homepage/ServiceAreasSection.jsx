@@ -1,8 +1,8 @@
-import globeImg from '../assets/globe_map.png';
+import globeImg from '../../assets/globe_map.png';
 
 const pins = [
-  { label: 'USA',    top: '42%', left: '20%', color: 'text-red-500' },
-  { label: 'UK',     top: '30%', left: '45%', color: 'text-blue-600' },
+  { label: 'USA', top: '42%', left: '20%', color: 'text-red-500' },
+  { label: 'UK', top: '30%', left: '45%', color: 'text-blue-600' },
   { label: 'Canada', top: '28%', left: '18%', color: 'text-red-400' },
 ];
 

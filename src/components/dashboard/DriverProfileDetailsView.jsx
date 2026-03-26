@@ -74,28 +74,34 @@ const ToggleSwitch = ({ checked, onChange }) => (
     </button>
 );
 
-const DocRow = ({ name, expiry, status }) => (
-    <div className="flex flex-col md:flex-row flex-wrap md:items-center justify-between py-4 border-b border-gray-100 gap-4">
-        <div className="flex-1 md:max-w-[50%] text-[13px] md:text-[14px] text-gray-600 font-medium leading-relaxed">{name}</div>
-        <div className="w-full md:w-32 text-[13px] md:text-[14px] text-gray-500">{expiry || '-'}</div>
-        <div className="w-full md:w-24 flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${status === 'Uploaded' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-[13px] md:text-[14px] text-gray-500 font-light">{status}</span>
-        </div>
-        <div className="w-full md:w-20 text-left md:text-right">
-            <button className="text-[#1b2d5d] text-[13px] md:text-[14px] hover:underline">Upload</button>
+const DocumentTable = ({ data }) => (
+    <div className="w-full overflow-x-auto shadow-sm border border-gray-100 rounded-xl bg-white mt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="min-w-[700px]">
+            <div className="flex items-center bg-black text-white px-5 sm:px-6 py-4 rounded-t-xl text-xs sm:text-[14px] font-medium">
+                <div className="flex-[2] min-w-[300px] pr-4">Name</div>
+                <div className="w-[120px] sm:w-[140px] shrink-0">Expiry Date</div>
+                <div className="w-[100px] sm:w-[120px] shrink-0">Status</div>
+                <div className="w-[80px] shrink-0 text-right">Action</div>
+            </div>
+            <div className="px-5 sm:px-6">
+                {data.map((doc, i) => (
+                    <div key={i} className="flex items-center py-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                        <div className="flex-[2] min-w-[300px] pr-4 text-xs sm:text-[14px] text-gray-600 font-medium leading-relaxed">{doc.name}</div>
+                        <div className="w-[120px] sm:w-[140px] shrink-0 text-xs sm:text-[14px] text-gray-500">{doc.expiry || '-'}</div>
+                        <div className="w-[100px] sm:w-[120px] shrink-0 flex items-center gap-2">
+                            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${doc.status === 'Uploaded' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            <span className="text-xs sm:text-[14px] text-gray-500 font-light">{doc.status}</span>
+                        </div>
+                        <div className="w-[80px] shrink-0 text-right">
+                            <button className="text-[#1b2d5d] text-xs sm:text-[14px] hover:underline font-medium">Upload</button>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     </div>
 );
 
-const TableHeader = () => (
-    <div className="hidden md:flex items-center justify-between bg-black text-white px-6 py-4 rounded-t-xl text-[14px] font-medium mt-2">
-        <div className="flex-1 md:max-w-[50%]">Name</div>
-        <div className="w-32">Expiry Date</div>
-        <div className="w-24">Status</div>
-        <div className="w-20"></div>
-    </div>
-);
 
 export default function DriverProfileDetailsView() {
     const [activeTab, setActiveTab] = useState('Personal Info');
@@ -262,42 +268,33 @@ export default function DriverProfileDetailsView() {
                             <h3 className="text-[18px] text-[#111] font-medium mb-1">Company Documents</h3>
                             <p className="text-[13px] text-gray-400 mb-4">Company documents required for Sunrise Correlation:</p>
 
-                            <TableHeader />
-                            <div className="bg-white rounded-b-xl border border-gray-100 px-6">
-                                {[
-                                    { name: 'W-9 Form', expiry: '02-6-2028', status: 'Missing' },
-                                    { name: 'Articles of Incorporation, articles of organization, or business registration.', expiry: '02-6-2028', status: 'Uploaded' },
-                                    { name: 'Federal Tax ID / EIN Certificate', expiry: '02-6-2028', status: 'Uploaded' },
-                                    { name: 'City of Houston- Vehicle for Hire Permit', expiry: '02-6-2028', status: 'Missing' },
-                                    { name: 'Copy of void check for payment detail confirmation', expiry: '-', status: 'Missing' }
-                                ].map((doc, i) => <DocRow key={i} {...doc} />)}
-                            </div>
+                            <DocumentTable data={[
+                                { name: 'W-9 Form', expiry: '02-6-2028', status: 'Missing' },
+                                { name: 'Articles of Incorporation, articles of organization, or business registration.', expiry: '02-6-2028', status: 'Uploaded' },
+                                { name: 'Federal Tax ID / EIN Certificate', expiry: '02-6-2028', status: 'Uploaded' },
+                                { name: 'City of Houston- Vehicle for Hire Permit', expiry: '02-6-2028', status: 'Missing' },
+                                { name: 'Copy of void check for payment detail confirmation', expiry: '-', status: 'Missing' }
+                            ]} />
 
                             <h3 className="text-[18px] text-[#111] font-medium mb-1 mt-8">Chauffeur Documents</h3>
                             <p className="text-[13px] text-gray-400 mb-4">Chauffeur documents required for Jayson smith:</p>
 
-                            <TableHeader />
-                            <div className="bg-white rounded-b-xl border border-gray-100 px-6">
-                                {[
-                                    { name: 'Chauffeur Profile Picture', expiry: '02-6-2028', status: 'Missing' },
-                                    { name: 'City of Houston Limo License', expiry: '02-6-2028', status: 'Uploaded' }
-                                ].map((doc, i) => <DocRow key={i} {...doc} />)}
-                            </div>
+                            <DocumentTable data={[
+                                { name: 'Chauffeur Profile Picture', expiry: '02-6-2028', status: 'Missing' },
+                                { name: 'City of Houston Limo License', expiry: '02-6-2028', status: 'Uploaded' }
+                            ]} />
 
                             <h3 className="text-[18px] text-[#111] font-medium mb-1 mt-8">Vehicle Documents</h3>
                             <p className="text-[13px] text-gray-400 mb-4">Vehicle documents required for Premium Sedan (TYR45454):</p>
 
-                            <TableHeader />
-                            <div className="bg-white rounded-b-xl border border-gray-100 px-6">
-                                {[
-                                    { name: 'Houston Limousine License window Decal', expiry: '02-6-2028', status: 'Missing' },
-                                    { name: 'Certificate of liability Insurance (min.$1M CSL (Sedan/SUV) $1.5MCSL (Spri...', expiry: '02-6-2028', status: 'Uploaded' },
-                                    { name: 'Taxas Premium Sedan Vehicle Registration Paper and Sticker', expiry: '02-6-2028', status: 'Uploaded' },
-                                    { name: 'City o Houston Permitted Vehicle Window Sticker', expiry: '02-6-2028', status: 'Missing' },
-                                    { name: 'Texas of the whole vehicle showing the license palte', expiry: '-', status: 'Missing' },
-                                    { name: 'Airport Permit', expiry: '-', status: 'Missing' }
-                                ].map((doc, i) => <DocRow key={i} {...doc} />)}
-                            </div>
+                            <DocumentTable data={[
+                                { name: 'Houston Limousine License window Decal', expiry: '02-6-2028', status: 'Missing' },
+                                { name: 'Certificate of liability Insurance (min.$1M CSL (Sedan/SUV) $1.5MCSL (Spri...', expiry: '02-6-2028', status: 'Uploaded' },
+                                { name: 'Taxas Premium Sedan Vehicle Registration Paper and Sticker', expiry: '02-6-2028', status: 'Uploaded' },
+                                { name: 'City o Houston Permitted Vehicle Window Sticker', expiry: '02-6-2028', status: 'Missing' },
+                                { name: 'Texas of the whole vehicle showing the license palte', expiry: '-', status: 'Missing' },
+                                { name: 'Airport Permit', expiry: '-', status: 'Missing' }
+                            ]} />
 
                             <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
                                 Edit <MdEdit size={14} />
@@ -313,37 +310,39 @@ export default function DriverProfileDetailsView() {
 
                             <p className="text-[14px] text-[#111] font-medium mb-4">You have competed out of 15 modules</p>
 
-                            <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                                <div className="hidden md:flex items-center justify-between bg-black text-white px-6 py-4 text-[14px] font-medium">
-                                    <div className="w-20">Module#</div>
-                                    <div className="flex-1">Training Modules</div>
-                                    <div className="w-48 text-right">Progress Percentage</div>
-                                </div>
+                            <div className="w-full overflow-x-auto border border-gray-100 rounded-xl shadow-sm [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden mt-2">
+                                <div className="min-w-[650px] bg-white">
+                                    <div className="flex items-center justify-between bg-black text-white px-5 sm:px-6 py-4 text-xs sm:text-[14px] font-medium">
+                                        <div className="w-16 sm:w-20 shrink-0">Module#</div>
+                                        <div className="flex-[2] min-w-[200px] pr-4">Training Modules</div>
+                                        <div className="w-40 sm:w-48 shrink-0 text-right">Progress Percentage</div>
+                                    </div>
 
-                                <div className="divide-y divide-gray-100 bg-white">
-                                    {[
-                                        { num: 1, name: 'Who We Are', progress: '0%' },
-                                        { num: 2, name: 'The Chauffeur App', progress: '0%' },
-                                        { num: 3, name: 'Reviewing Rides and Waiting Time Policy', progress: '0%' },
-                                        { num: 4, name: 'Service improvement opportunities', progress: '0%' },
-                                        { num: 5, name: 'Chauffeur Values - Act with Integrity', progress: '0%' },
-                                        { num: 6, name: 'Chauffeur Values - Be Adaptable', progress: '0%' },
-                                        { num: 7, name: 'Chauffeur Values - Be Consistent', progress: '0%' },
-                                        { num: 8, name: 'Chauffeur Values - Be Discreet', progress: '0%' },
-                                        { num: 9, name: 'Chauffeur Values - Be Refined', progress: '0%' },
-                                        { num: 10, name: 'Chauffeur Values - Be Reliable', progress: '0%' },
-                                        { num: 11, name: 'Chauffeur Values - Be Reliable', progress: '0%' },
-                                        { num: 12, name: 'Chauffeur Values - Be Respectful', progress: '0%' },
-                                        { num: 13, name: 'Chauffeur Values - Be Vehicle Champions', progress: '0%' },
-                                        { num: 14, name: 'Chauffeur Values - Go Above and Beyond', progress: '0%' },
-                                        { num: 15, name: 'Chauffeur Values - Prioritize Safety', progress: '0%' }
-                                    ].map((mod) => (
-                                        <div key={mod.num} className="flex flex-col md:flex-row md:items-center px-6 py-5 hover:bg-gray-50 transition-colors">
-                                            <div className="w-20 text-[14px] text-gray-400 mb-1 md:mb-0">{mod.num}</div>
-                                            <div className="flex-1 text-[14px] text-gray-500 font-light cursor-pointer hover:text-[#1b2d5d]">{mod.num}. {mod.name}</div>
-                                            <div className="w-48 text-right text-[14px] text-[#1b2d5d] mt-2 md:mt-0">{mod.progress}</div>
-                                        </div>
-                                    ))}
+                                    <div className="divide-y divide-gray-100">
+                                        {[
+                                            { num: 1, name: 'Who We Are', progress: '0%' },
+                                            { num: 2, name: 'The Chauffeur App', progress: '0%' },
+                                            { num: 3, name: 'Reviewing Rides and Waiting Time Policy', progress: '0%' },
+                                            { num: 4, name: 'Service improvement opportunities', progress: '0%' },
+                                            { num: 5, name: 'Chauffeur Values - Act with Integrity', progress: '0%' },
+                                            { num: 6, name: 'Chauffeur Values - Be Adaptable', progress: '0%' },
+                                            { num: 7, name: 'Chauffeur Values - Be Consistent', progress: '0%' },
+                                            { num: 8, name: 'Chauffeur Values - Be Discreet', progress: '0%' },
+                                            { num: 9, name: 'Chauffeur Values - Be Refined', progress: '0%' },
+                                            { num: 10, name: 'Chauffeur Values - Be Reliable', progress: '0%' },
+                                            { num: 11, name: 'Chauffeur Values - Be Reliable', progress: '0%' },
+                                            { num: 12, name: 'Chauffeur Values - Be Respectful', progress: '0%' },
+                                            { num: 13, name: 'Chauffeur Values - Be Vehicle Champions', progress: '0%' },
+                                            { num: 14, name: 'Chauffeur Values - Go Above and Beyond', progress: '0%' },
+                                            { num: 15, name: 'Chauffeur Values - Prioritize Safety', progress: '0%' }
+                                        ].map((mod) => (
+                                            <div key={mod.num} className="flex items-center px-5 sm:px-6 py-4 sm:py-5 hover:bg-gray-50 transition-colors">
+                                                <div className="w-16 sm:w-20 shrink-0 text-xs sm:text-[14px] text-gray-400">{mod.num}</div>
+                                                <div className="flex-[2] min-w-[200px] pr-4 text-xs sm:text-[14px] text-gray-500 font-light cursor-pointer hover:text-[#1b2d5d] truncate" title={`${mod.num}. ${mod.name}`}>{mod.num}. {mod.name}</div>
+                                                <div className="w-40 sm:w-48 shrink-0 text-right text-xs sm:text-[14px] text-[#1b2d5d] font-medium">{mod.progress}</div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                             <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">

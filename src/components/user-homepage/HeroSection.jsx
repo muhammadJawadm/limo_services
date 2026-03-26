@@ -1,5 +1,5 @@
-import heroImg from '../assets/mainhero.jpg';
-import BookingForm from './BookingForm';
+import heroImg from '../../assets/mainhero.jpg';
+import BookingForm from '../BookingForm';
 
 export default function HeroSection() {
   return (

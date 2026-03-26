@@ -17,7 +17,7 @@ export default function ResetPasswordPage() {
   const handleReset = (e) => {
     e.preventDefault();
     // Reset password logic here
-    navigate('/login');
+    navigate('/dashboard');
   };
 
   return (
@@ -71,6 +71,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   className="w-full rounded-full bg-[#1b2d5d] text-white py-4 text-[15px] font-medium hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20"
+
                 >
                   Reset Password
                 </button>

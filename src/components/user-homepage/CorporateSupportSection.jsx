@@ -1,9 +1,9 @@
-import footerBg from '../assets/footer_bottom.png';
-import footerMan from '../assets/footer_man.png';
+import footerBg from '../../assets/footer_bottom.png';
+import footerMan from '../../assets/footer_man.png';
 import { useState } from 'react';
-import shape from "../assets/shape.png"
-import usFlag from "../assets/us.png"
-import PrimaryButton from './PrimaryButton';
+import shape from "../../assets/shape.png"
+import usFlag from "../../assets/us.png"
+import PrimaryButton from '../PrimaryButton';
 
 export default function CorporateSupportSection() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', message: '' });

@@ -13,7 +13,7 @@ export default function DriverResetPasswordPage() {
 
   const handleReset = (e) => {
     e.preventDefault();
-    navigate('/driver/login');
+    navigate('/driver/dashboard');
   };
 
   return (

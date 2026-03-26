@@ -13,7 +13,7 @@ export default function DriverLoginPage() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate('/driver/dashboard');
+    navigate('/driver/forget-password');
   };
 
   return (

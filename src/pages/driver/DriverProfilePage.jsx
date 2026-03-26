@@ -87,19 +87,19 @@ export default function DriverProfilePage() {
   const states = ['None', 'California', 'New York', 'Texas'];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#Fcfcfc] font-sans">
+    <div className="relative min-h-screen flex flex-col bg-[#Fcfcfc] font-sans overflow-x-hidden w-full">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50 px-4 md:px-8 xl:px-12 h-20 flex items-center justify-between">
+      <header className="bg-white border-b sticky top-0 z-50 px-4 md:px-8 xl:px-12 h-16 md:h-20 flex items-center justify-between w-full">
         <div className="flex-shrink-0">
-          <img src={logoImg} alt="Prvyn Services" className="h-10 object-contain" />
+          <img src={logoImg} alt="Prvyn Services" className="h-8 md:h-10 object-contain" />
         </div>
 
-        <div className="flex-shrink-0 min-w-[200px] flex justify-end">
+        <div className="flex-shrink-0 flex justify-end sm:min-w-[150px] xl:min-w-[200px]">
           <div className="relative group">
-            <button className="flex items-center gap-3 bg-white border rounded-full py-2.5 px-5 hover:bg-gray-50 transition-colors shadow-sm">
+            <button className="flex items-center gap-2 md:gap-3 bg-white border rounded-full py-2 px-3 md:py-2.5 md:px-5 hover:bg-gray-50 transition-colors shadow-sm">
               <LuUser className="text-gray-600" size={16} />
-              <span className="text-[14px] font-medium text-gray-600 block">Profile</span>
-              <FiChevronDown className="text-gray-400 ml-1" />
+              <span className="text-[13px] md:text-[14px] font-medium text-gray-600 hidden sm:block">Profile</span>
+              <FiChevronDown className="text-gray-400 sm:ml-1" />
             </button>
 
             {/* Dropdown Menu placeholder */}
@@ -214,11 +214,11 @@ export default function DriverProfilePage() {
             </section>
 
             {/* Action Buttons */}
-            <div className="mt-12 flex items-center gap-4">
-              <button className="px-10 py-3.5 rounded-full border border-gray-300 bg-white text-[15px] font-medium text-gray-700 hover:bg-gray-50 transition-colors w-full md:w-auto min-w-[160px]">
+            <div className="mt-12 flex flex-col sm:flex-row items-center gap-4 w-full">
+              <button className="px-10 py-3.5 rounded-full border border-gray-300 bg-white text-[15px] font-medium text-gray-700 hover:bg-gray-50 transition-colors w-full sm:w-auto sm:min-w-[160px] flex-1 sm:flex-none">
                 Cancel
               </button>
-              <button className="px-10 py-3.5 rounded-full bg-[#1b2d5d] text-[15px] font-medium text-white hover:bg-[#132042] transition-colors w-full md:w-auto min-w-[160px]">
+              <button className="px-10 py-3.5 rounded-full bg-[#1b2d5d] text-[15px] font-medium text-white hover:bg-[#132042] transition-colors w-full sm:w-auto sm:min-w-[160px] flex-1 sm:flex-none">
                 Save
               </button>
             </div>

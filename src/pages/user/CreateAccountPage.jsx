@@ -146,7 +146,7 @@ export default function CreateAccountPage() {
               </div>
 
               <div className="pt-2">
-                <button className="w-full rounded-full bg-[#1b2d5d] text-white py-4 text-[15px] font-semibold hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20">
+                <button className="w-full rounded-full bg-[#1b2d5d] text-white py-4 text-[15px] font-semibold hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20" onClick={() => navigate('/otp-verification')}>
                   Sign Up
                 </button>
               </div>

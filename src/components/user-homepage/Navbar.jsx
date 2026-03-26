@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiEye, FiEyeOff, FiMenu, FiX } from 'react-icons/fi';
 import { LuLock, LuMail } from 'react-icons/lu';
-import logoImg from '../assets/navbarlogo.png';
+import logoImg from '../../assets/navbarlogo.png';
 
 export default function Navbar() {
   const navigate = useNavigate();

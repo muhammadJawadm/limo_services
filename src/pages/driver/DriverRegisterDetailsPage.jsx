@@ -19,7 +19,7 @@ export default function DriverRegisterDetailsPage() {
 
   const handleSignUp = (e) => {
     e.preventDefault();
-    navigate('/driver/onboarding');
+    navigate('/driver/otp-verification');
   };
 
   return (

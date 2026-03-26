@@ -35,7 +35,7 @@ export default function OTPVerificationPage() {
 
   const closeAndNavigate = () => {
     setShowModal(false);
-    navigate('/');
+    navigate('/forget-password');
   };
 
   return (

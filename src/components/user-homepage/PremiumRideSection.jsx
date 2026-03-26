@@ -1,4 +1,4 @@
-import sideImg from '../assets/mainpageside.png';
+import sideImg from '../../assets/mainpageside.png';
 
 const services = [
   {

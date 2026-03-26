@@ -1,8 +1,8 @@
-import mainCar from '../assets/maincar.png';
-import businessSedan from '../assets/business_seedan.png';
-import premiumSedan from '../assets/Premium_seedan.png';
-import luxurySuv from '../assets/luxury_suv.png';
-import premiumSuv from '../assets/premium_suv.png';
+import mainCar from '../../assets/maincar.png';
+import businessSedan from '../../assets/business_seedan.png';
+import premiumSedan from '../../assets/Premium_seedan.png';
+import luxurySuv from '../../assets/luxury_suv.png';
+import premiumSuv from '../../assets/premium_suv.png';
 
 const vehicles = [
   { img: businessSedan, name: 'Business Sedan', sub: 'Up to 3 passengers' },

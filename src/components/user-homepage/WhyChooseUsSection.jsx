@@ -2,10 +2,10 @@ import { FiUser } from 'react-icons/fi';
 import { MdDirectionsCar } from 'react-icons/md';
 import { BsStar } from 'react-icons/bs';
 import { FaArrowRight } from "react-icons/fa6";
-import PrimaryButton from './PrimaryButton';
-import iconbg1 from '../assets/whychooseicon1.png';
-import iconbg2  from '../assets/whychooseicon2.png';
-import iconbg3 from '../assets/whychooseicon3.png';
+import PrimaryButton from '../PrimaryButton';
+import iconbg1 from '../../assets/whychooseicon1.png';
+import iconbg2 from '../../assets/whychooseicon2.png';
+import iconbg3 from '../../assets/whychooseicon3.png';
 
 const cards = [
   {

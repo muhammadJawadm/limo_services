@@ -24,7 +24,7 @@ export default function LoginPage() {
       setHasError(true);
       return;
     }
-    // Perform login action
+    navigate('/otp-verification');
   };
 
   return (
