@@ -31,7 +31,7 @@ export default function CorporateSupportSection() {
             <img
               src={shape}
               alt="Arrow"
-              className="absolute -right-52 md:-right-72 top-1/3 w-48 md:w-64 opacity-90"
+              className="absolute -right-50 md:-right-64 top-1/3 w-48 md:w-64 opacity-90"
             />
           </div>
         </div>

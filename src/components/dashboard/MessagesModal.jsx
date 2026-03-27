@@ -108,21 +108,21 @@ export default function MessagesModal({ isOpen, onClose }) {
         </div>
 
         {/* Input Area */}
-        <div className="shrink-0 px-6 py-6 sm:px-8 bg-white">
-          <div className="flex w-full h-[150px] overflow-hidden rounded-[25px] border border-gray-200 shadow-sm focus-within:border-[#1b2d5d] focus-within:ring-1 focus-within:ring-[#1b2d5d] transition-all">
-            <div className="flex items-start pt-4 pl-4 text-gray-400">
-              <FiPaperclip size={20} className="cursor-pointer text-gray-600 hover:text-gray-900 transition" />
+        <div className="shrink-0 px-4 py-4 sm:px-6 sm:py-6 md:px-8 bg-white">
+          <div className="flex w-full h-[100px] sm:h-[120px] md:h-[150px] overflow-hidden rounded-[20px] sm:rounded-[25px] border border-gray-200 shadow-sm focus-within:border-[#1b2d5d] focus-within:ring-1 focus-within:ring-[#1b2d5d] transition-all">
+            <div className="flex items-start pt-3 sm:pt-4 pl-3 sm:pl-4 text-gray-400">
+              <FiPaperclip className="cursor-pointer text-gray-600 hover:text-gray-900 transition w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <textarea
               type="text"
               placeholder="Send a message..."
-              className="resize-none flex-1 px-4 py-4 text-[15px] text-[#111] outline-none placeholder:text-gray-400"
+              className="resize-none flex-1 px-3 py-3 sm:px-4 sm:py-4 text-[14px] sm:text-[15px] text-[#111] outline-none placeholder:text-gray-400"
             />
-            <div className="flex items-end pr-3 gap-3 text-gray-400 pb-2">
-              <FiSmile size={20} className="cursor-pointer text-gray-600 hover:text-gray-600 transition mb-2" />
-              <button className="flex h-[42px] items-center gap-2 rounded-full bg-[#1b2d5d] px-5 text-sm font-medium text-white transition-colors hover:bg-[#132042]">
+            <div className="flex items-end pr-2 sm:pr-3 gap-2 sm:gap-3 text-gray-400 pb-2.5 sm:pb-3">
+              <FiSmile className="cursor-pointer text-gray-600 hover:text-gray-900 transition mb-1 sm:mb-2 w-4 h-4 sm:w-5 sm:h-5" />
+              <button className="flex h-[36px] sm:h-[42px] items-center gap-1.5 sm:gap-2 rounded-full bg-[#1b2d5d] px-4 sm:px-5 text-[13px] sm:text-sm font-medium text-white transition-colors hover:bg-[#132042]">
                 Send
-                <FiSend size={15} />
+                <FiSend className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>

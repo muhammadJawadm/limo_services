@@ -9,7 +9,7 @@ const steps = [
 
 export default function StepperNavbar({ currentStep = 1 }) {
   return (
-    <nav className="sticky top-0 z-40 flex items-center justify-between px-3 md:px-8 py-3 bg-white shadow-sm border-b border-gray-100 w-full overflow-hidden">
+    <nav className="sticky top-0 z-[9999] flex items-center justify-between px-3 md:px-8 py-3 bg-white shadow-sm border-b border-gray-100 w-full overflow-hidden">
       {/* Logo */}
       <div className="flex items-center gap-2">
         <img src={logoImg} alt="Limo Services" className="h-8 md:h-10 object-contain" />

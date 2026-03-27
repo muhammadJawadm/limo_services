@@ -28,7 +28,7 @@ export default function PaymentFormPanel({ onProceed }) {
             <BsCreditCard size={17} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-900">Dabit Cart</p>
+            <p className="text-sm font-semibold text-gray-900">Debit Card</p>
             <p className="text-xs text-gray-400">Pay directly form your bank</p>
           </div>
           <div className="w-6 h-6 rounded-full bg-[#1a2b5e] flex items-center justify-center flex-shrink-0">

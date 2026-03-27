@@ -14,10 +14,10 @@ export default function TripDetailsPanel({ stops, isHourlyRide }) {
         {/* Route summary bar */}
         <div className="flex items-center gap-2 px-4 py-3 bg-white border-t border-gray-100 text-sm text-gray-900">
           <img src={arowswap} alt="Arrow Swap" className="w-5 h-5" />
-          <span className="font-semibold">16.2 km</span>
+          <span className="font-semibold">10.0 mi</span>
           <span></span>
           <LuClock3 size={18} />
-          <span>35 mins</span>
+          <span>1 hrs 35 mins</span>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export default function TripDetailsPanel({ stops, isHourlyRide }) {
             {isHourlyRide ? (
               <span className="text-xs md:text-sm">3 hours</span>
             ) : (
-              <span className="text-xs md:text-sm">12:11 pm</span>
+              <span className="text-xs md:text-sm">3 hours</span>
             )}
           </div>
         </div>

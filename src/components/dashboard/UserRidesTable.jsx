@@ -123,7 +123,9 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
                 <th className="px-4 lg:px-5 py-4 font-medium whitespace-nowrap">Routing Information</th>
                 <th className="px-4 lg:px-5 py-4 font-medium whitespace-nowrap">Status</th>
                 <th className="px-4 lg:px-5 py-4 font-medium whitespace-nowrap">Total</th>
-                <th className="px-4 lg:px-5 py-4 font-medium whitespace-nowrap">Cancel</th>
+                {activeRideTab === 'Upcoming Ride' && (
+                  <th className="px-4 lg:px-5 py-4 font-medium whitespace-nowrap">Cancel</th>
+                )}
                 <th className="rounded-tr-xl text-center px-4 lg:px-5 py-4 font-medium whitespace-nowrap">Action</th>
               </tr>
             </thead>
@@ -144,11 +146,13 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
                     <StatusPill tab={row.tab} />
                   </td>
                   <td className="px-4 lg:px-5 py-5 align-top pt-6 font-medium text-gray-800">{row.total}</td>
+                  {row.tab === 'Upcoming Ride' && (
+                    <td className="px-4 lg:px-5 py-5 align-top pt-6">
+                      <span className="text-gray-500 hover:text-red-500 cursor-pointer transition-colors">Cancel</span>
+                    </td>
+                  )}
                   <td className="px-4 lg:px-5 py-5 align-top pt-6">
-                    <span className="text-gray-500 hover:text-red-500 cursor-pointer transition-colors">Cancel</span>
-                  </td>
-                  <td className="px-4 lg:px-5 py-5 align-top pt-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 whitespace-nowrap text-gray-500 font-medium ml-2">
+                    <div className="flex flex-col sm:flex-row items-center sm:justify-center gap-4 sm:gap-5 whitespace-nowrap text-gray-500 font-medium">
                       <span
                         className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
                         onClick={() => openRideDetails(true, false)}
@@ -163,13 +167,15 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
                         <FiEye size={16} />
                         View
                       </span>
-                      <span
-                        className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                        onClick={() => openRideDetails(false, true)}
-                      >
-                        <FiEdit size={16} />
-                        Edit
-                      </span>
+                      {row.tab === 'Upcoming Ride' && (
+                        <span
+                          className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
+                          onClick={() => openRideDetails(false, true)}
+                        >
+                          <FiEdit size={16} />
+                          Edit
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>

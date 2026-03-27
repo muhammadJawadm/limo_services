@@ -123,10 +123,7 @@ export default function AdditionalDetailsPage() {
                 <img src={briefcaseblack} className="w-4 h-4" alt="luggage" />
                 <span>3 Luggage</span>
               </div>
-              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
-                <img src={childSeatIcon} className="w-5 h-5" alt="child" />
-                <span>1 Toddler</span>
-              </div>
+
             </div>
           </div>
         </div>

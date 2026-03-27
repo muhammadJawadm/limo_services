@@ -1,6 +1,12 @@
 import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
-const infoLinks = ['Become a Driver', 'Terms', 'Privacy Policy', 'Support'];
+const infoLinks = [
+  { label: 'Become a Driver', path: '/driver/register' },
+  { label: 'Terms', path: '#' },
+  { label: 'Privacy Policy', path: '#' },
+  { label: 'Support', path: '#' }
+];
 
 export default function Footer() {
   return (
@@ -23,10 +29,10 @@ export default function Footer() {
             <h3 className="font-bold  text-lg mb-3 text-white">Information</h3>
             <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
               {infoLinks.map((link) => (
-                <li key={link}>
-                  <a href="#" className=" text-sm hover:text-blue-600 text-white transition-colors">
-                    {link}
-                  </a>
+                <li key={link.label}>
+                  <Link to={link.path} className=" text-sm hover:text-blue-600 text-white transition-colors">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>

@@ -23,7 +23,7 @@ export const Step9 = ({ formData, updateDoc }) => (
             <img src={whitewallet} alt="card" className='w-6 h-6' />
           </div>
           <div>
-            <div className="text-[15px] font-medium text-[#111]">Dabit Cart</div>
+            <div className="text-[15px] font-medium text-[#111]">Debit Card</div>
             <div className="text-[13px] text-gray-500">Pay directly form your bank</div>
           </div>
         </div>

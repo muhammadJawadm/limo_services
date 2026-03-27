@@ -151,7 +151,7 @@ export default function RideDetailsModal({
 
                 <div className="space-y-2 pt-1 sm:pt-0 border-t border-gray-100 sm:border-0 mt-3 sm:mt-0">
                   <span className="text-[13px] sm:text-[14px] text-[#111] font-medium sm:font-normal block mb-2 sm:mb-1">Child Seats:</span>
-                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                  <div className="flex flex-col lg:flex-row ">
                     <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300">
                       <span className="truncate mr-1">0 Infant</span>
                       <FiChevronDown className="shrink-0" />

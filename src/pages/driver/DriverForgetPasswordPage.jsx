@@ -10,7 +10,7 @@ export default function DriverForgetPasswordPage() {
 
   const handleSendCode = (e) => {
     e.preventDefault();
-    navigate('/driver/reset-password');
+    navigate('/driver/otp-verification');
   };
 
   return (
@@ -32,7 +32,7 @@ export default function DriverForgetPasswordPage() {
 
             <form onSubmit={handleSendCode} className="mt-10 space-y-6">
               <div>
-                <label className="text-[14px] font-medium text-[#111] ml-1">Address</label>
+                <label className="text-[14px] font-medium text-[#111] ml-1">Email Address</label>
                 <div className="relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border border-gray-200 bg-white transition-colors">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <LuMail className="text-gray-400" size={18} />

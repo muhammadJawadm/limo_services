@@ -121,7 +121,7 @@ export default function AccountEditModal({ isOpen, onClose, editType = 'passenge
             </div>
             <div className="relative cursor-pointer">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                <CiCreditCard1 size={20} /> 
+                <CiCreditCard1 size={20} />
               </div>
               <select className="w-full rounded-full border border-gray-200 pl-11 pr-10 py-3 text-[15px] text-gray-400 outline-none appearance-none bg-white cursor-pointer focus:border-[#1b2d5d]">
                 <option value="" disabled selected hidden>Card Status:</option>
@@ -143,7 +143,7 @@ export default function AccountEditModal({ isOpen, onClose, editType = 'passenge
     <div className="fixed inset-0 z-[60] overflow-y-auto bg-black/50 p-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
       <div className="min-h-full grid place-items-center py-8">
         <div className="w-full max-w-[650px] rounded-[30px] bg-white p-6 sm:p-8 text-[#111111] shadow-2xl relative">
-          
+
           {renderContent()}
 
           {/* Footer actions */}
@@ -158,7 +158,7 @@ export default function AccountEditModal({ isOpen, onClose, editType = 'passenge
               onClick={onClose}
               className="flex-1 rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042]"
             >
-              Updated
+              Update
             </button>
           </div>
         </div>

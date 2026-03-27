@@ -79,7 +79,7 @@ export default function BookingSuccessModal({ show }) {
                 <p className="text-sm font-bold text-gray-900">1</p>
               </div>
               <div className="pr-2 sm:pr-0">
-                <p className="text-[11px] sm:text-xs text-gray-400 mb-0.5 uppercase sm:normal-case font-medium sm:font-normal">Pick Up &amp; Estimated Arrived</p>
+                <p className="text-[11px] sm:text-xs text-gray-400 mb-0.5 uppercase sm:normal-case font-medium sm:font-normal">Pick Up &amp; Estimated Arrival</p>
                 <p className="text-sm font-bold text-gray-900">11:00pm to 01:00pm</p>
               </div>
             </div>

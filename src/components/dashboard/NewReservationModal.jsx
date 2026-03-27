@@ -63,13 +63,13 @@ export default function NewReservationModal({ isOpen, onClose }) {
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <div className="flex items-center justify-between sm:hidden mb-4 px-2">
-                <h2 className="text-xl font-bold text-[#111]">New Reservation</h2>
+              <h2 className="text-xl font-bold text-[#111]">New Reservation</h2>
             </div>
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
-              
+
               {/* Left Column */}
               <div className="space-y-5 lg:space-y-6">
-                
+
                 {/* Trip Details Section */}
                 <div className="overflow-hidden rounded-xl sm:rounded-2xl border border-gray-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
                   <button
@@ -259,7 +259,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
 
               {/* Right Column */}
               <div className="space-y-5 lg:space-y-6">
-                
+
                 {/* Vehicle Information Section */}
                 <div className="overflow-hidden rounded-xl sm:rounded-2xl border border-gray-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
                   <button
@@ -399,28 +399,28 @@ export default function NewReservationModal({ isOpen, onClose }) {
                     </div>
                     <span className="text-[16px] sm:text-[20px] font-semibold text-[#111] whitespace-nowrap">Return Trip</span>
                   </div>
-                  
+
                   {/* Price shown on top line right side on mobile, but next to switch on desktop */}
                   <div className="text-[26px] sm:text-[32px] font-bold text-[#1b2d5d] sm:text-[#111] sm:hidden">$450.00</div>
                 </div>
 
                 <div className="flex flex-col lg:flex-row lg:items-center gap-y-3 lg:gap-x-6 sm:ml-6 xl:ml-0">
                   <span className="text-[26px] sm:text-[32px] font-bold text-[#111] hidden sm:block">$450.00</span>
-                  
+
                   {isReturnTrip && (
                     <div className="flex flex-col sm:flex-row flex-wrap sm:items-center gap-2 sm:gap-4 text-[#666] text-[14px] sm:text-[15px] font-medium lg:border-l lg:pl-6 border-gray-300">
                       <span className="flex items-center gap-2.5">
                         <div className="bg-blue-50/80 text-[#1b2d5d] p-1.5 rounded-md border border-[#1b2d5d]/10">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </div> 
-                        <span className="text-[#333]">Pickup:</span> 
+                        </div>
+                        <span className="text-[#333]">Pickup:</span>
                         <span className="font-semibold text-[#111]">$450.00</span>
                       </span>
                       <span className="flex items-center gap-2.5">
                         <div className="bg-blue-50/80 text-[#1b2d5d] p-1.5 rounded-md border border-[#1b2d5d]/10">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 8 9 12 5"></polyline><polyline points="12 19 8 15 12 19"></polyline><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                        </div> 
-                        <span className="text-[#333]">Return:</span> 
+                        </div>
+                        <span className="text-[#333]">Return:</span>
                         <span className="font-semibold text-[#111]">$450.00</span>
                       </span>
                     </div>
@@ -433,7 +433,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
                   onClick={onClose}
                   className="flex-1 rounded-full border border-gray-300 bg-white py-3 sm:py-3.5 text-[15px] font-semibold text-[#444] shadow-sm transition-all hover:bg-gray-50 hover:text-black active:scale-[0.98]"
                 >
-                  Cancel
+                  Back
                 </button>
                 <button
                   onClick={handleBook}

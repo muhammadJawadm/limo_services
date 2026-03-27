@@ -8,7 +8,7 @@ const STORED_CARDS = [
 export default function AccountInfoView({ onEditAccount }) {
    return (
       <section className="flex-1 text-[#111111] bg-transparent min-h-screen">
-         
+
          {/* Header Row */}
          <div className="mb-4 sm:mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-[#EAEAEA] px-4 py-4 sm:px-6 lg:px-8 rounded-none sm:rounded-tl-lg sm:rounded-tr-lg">
             <h2 className="text-2xl sm:text-[26px] lg:text-[32px] font-semibold text-[#111]">Account Info</h2>
@@ -158,7 +158,7 @@ export default function AccountInfoView({ onEditAccount }) {
                               <td className="px-4 lg:px-5 py-4 sm:py-5 text-center">
                                  <button onClick={() => onEditAccount('card')} className="inline-flex items-center justify-center gap-1.5 text-[#4d4d4d] hover:text-[#111] transition-colors group">
                                     <FiEdit2 size={16} className="text-[#1b2d5d] group-hover:text-[#111] transition-colors" />
-                                    <span className="italic block font-medium underline">Edit</span>
+                                    {/* <span className="italic block font-medium underline">Edit</span> */}
                                  </button>
                               </td>
                            </tr>

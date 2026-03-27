@@ -19,7 +19,7 @@ export default function DriverRegisterDetailsPage() {
 
   const handleSignUp = (e) => {
     e.preventDefault();
-    navigate('/driver/otp-verification');
+    navigate('/driver/forget-password');
   };
 
   return (
@@ -73,7 +73,7 @@ export default function DriverRegisterDetailsPage() {
               </div>
 
               <div>
-                <label className="text-[14px] font-medium text-[#111] ml-1">Address</label>
+                <label className="text-[14px] font-medium text-[#111] ml-1">Email Address</label>
                 <div className="relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border border-gray-200 bg-white transition-colors">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <LuMail className="text-gray-400" size={18} />

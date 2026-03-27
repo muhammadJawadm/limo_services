@@ -115,10 +115,12 @@ export default function PassengerView({ onEditPassenger }) {
                     <td className="px-4 lg:px-5 py-4 sm:py-5 text-center">
                       <button
                         onClick={onEditPassenger}
-                        className="inline-flex items-center gap-1.5 text-[#1b2d5d] hover:text-[#132042] font-medium transition-colors"
+                        className="group relative inline-flex items-center gap-1.5 text-[#1b2d5d] hover:text-[#132042] font-medium transition-colors"
                       >
                         <CiEdit size={18} className="sm:text-[20px]" />
-                        <span className="text-[#4d4d4d] font-normal underline hover:text-[#111]">Edit</span>
+                        <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                          Edit
+                        </span>
                       </button>
                     </td>
                   </tr>

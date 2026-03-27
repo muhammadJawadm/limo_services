@@ -78,7 +78,7 @@ export default function CreateAccountPage() {
               </div>
 
               <div>
-                <label className="text-[15px] font-medium text-gray-800 ml-1">Address</label>
+                <label className="text-[15px] font-medium text-gray-800 ml-1">Email Address</label>
                 <div className="mt-1.5">
                   <InputRow
                     icon={<LuMail size={18} />}

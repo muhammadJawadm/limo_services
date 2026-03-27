@@ -98,7 +98,9 @@ export default function DriverRidesTable({ openRideDetails, setIsReturnTripModal
                                 <th className="px-5 py-4 font-semibold">Routing Information</th>
                                 <th className="px-5 py-4 font-semibold">Status</th>
                                 <th className="px-5 py-4 font-semibold">Total</th>
-                                <th className="px-5 py-4 font-semibold">Cancel</th>
+                                {activeRideTab === 'Upcoming Ride' && (
+                                    <th className="px-5 py-4 font-semibold">Cancel</th>
+                                )}
                                 <th className="rounded-tr-2xl text-center px-5 py-4 font-semibold">Action</th>
                             </tr>
                         </thead>
@@ -119,9 +121,13 @@ export default function DriverRidesTable({ openRideDetails, setIsReturnTripModal
                                         <StatusPill tab={row.tab} />
                                     </td>
                                     <td className="px-2 py-5">{row.total}</td>
-                                    <td className="px-5 py-5">Cancel</td>
+                                    {row.tab === 'Upcoming Ride' && (
+                                        <td className="px-5 py-5">
+                                            <span className="cursor-pointer hover:text-red-500 transition-colors">Cancel</span>
+                                        </td>
+                                    )}
                                     <td className="px-2 py-5">
-                                        <div className="flex  items-center gap-3 whitespace-nowrap">
+                                        <div className="flex justify-center items-center gap-3 whitespace-nowrap">
                                             <span
                                                 className="flex cursor-pointer items-center gap-1 hover:text-[#1b2d5d]"
                                                 onClick={() => openRideDetails(true, false)}

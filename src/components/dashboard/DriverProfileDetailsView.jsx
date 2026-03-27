@@ -139,7 +139,7 @@ export default function DriverProfileDetailsView() {
                                 <div className="hidden sm:block"></div>
                                 <InputDiv label="Fast Name" value="Jayson Smi" icon={<CiUser className="w-5 h-5 object-contain" />} />
                                 <InputDiv label="Last Name" value="Jayson Smi" icon={<CiUser className="w-5 h-5 object-contain" />} />
-                                <InputDiv label="Address" value="jayson@gmail.com" icon={<FaRegEnvelope className="w-5 h-5 object-contain opacity-60" />} />
+                                <InputDiv label="Email Address" value="jayson@gmail.com" icon={<FaRegEnvelope className="w-5 h-5 object-contain opacity-60" />} />
                                 <InputDiv label="Phone Number" value="+1" icon={<img src={usFlag} alt="US" className="w-6 h-4 object-cover rounded-[2px]" />} />
                                 <InputDiv label="Password" value="........." type="password" icon={<TbLockPassword className="w-5 h-5 object-contain opacity-60" />} />
                             </div>
@@ -254,7 +254,7 @@ export default function DriverProfileDetailsView() {
                                     <li>First Chauffeur Information</li>
                                     <li>First Vehicle Information</li>
                                 </ul>
-                                <p className="font-semibold text-[#111] text-[14px] leading-snug">Please confirm the above provided information is accurate as you will not be able to updated it once submitted</p>
+                                <p className="font-semibold text-[#111] text-[14px] leading-snug">Please confirm the above provided information is accurate as you will not be able to update it once submitted</p>
                             </div>
                             <button className="mt-8 bg-[#1b2d5d] hover:bg-[#132042] transition-colors text-white rounded-full px-16 py-3 flex items-center justify-center gap-2 font-medium text-[15px] min-w-[140px]">
                                 Edit <MdEdit size={14} />
@@ -410,7 +410,7 @@ export default function DriverProfileDetailsView() {
                                     <img src={whitewallet} alt="whitewallet" className='w-6 h-6' />
                                 </div>
                                 <div className="flex-1">
-                                    <div className="text-[15px] font-medium text-[#111]">Dabit Cart</div>
+                                    <div className="text-[15px] font-medium text-[#111]">Debit Card</div>
                                     <div className="text-[13px] text-gray-400">Pay directly form your bank</div>
                                 </div>
                             </div>

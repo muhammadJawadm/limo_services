@@ -28,7 +28,7 @@ export default function Navbar() {
             <li><a href="#" className="hover:text-blue-700 transition-colors">Terms</a></li>
             <li><a href="#" className="hover:text-blue-700 transition-colors">Privacy</a></li>
             <li><a href="#" className="hover:text-blue-700 transition-colors">Support</a></li>
-            <li><a href="#" className="hover:text-blue-700 transition-colors">Become a partner</a></li>
+            <li><a href="/driver/register" className="hover:text-blue-700 transition-colors">Become a partner</a></li>
           </ul>
 
           <div className="flex items-center gap-3">
