@@ -150,9 +150,9 @@ export default function AdditionalDetailsPage() {
                 </div>
                 <p className="text-blue-200 text-xs">Cadillac CT6, Lyric or similar</p>
                 {/* Feature icons row + price */}
-                <div className="flex lg:flex-row flex-col items-center justify-between mt-2">
-                  <div className="flex items-center gap-3 ">
-                    <div className='flex items-center gap-3 border rounded-full px-3 py-1 bg-white/10'>
+                <div className="flex lg:flex-row flex-col items-start justify-between mt-2">
+                  <div className="flex items-center gap-1 lg:gap-3">
+                    <div className='flex items-center gap-3 border rounded-full px-3 py-1 bg-white/10 '>
                       <span className="flex items-center gap-1 text-xs text-white">
                         <img src={usericon} className="w-4 h-4" alt="passengers" /> 3
                       </span>

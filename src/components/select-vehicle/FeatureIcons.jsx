@@ -14,7 +14,7 @@ import planeblack from "../../assets/planeblack.png";
 export default function FeatureIcons({ passengers, luggage, Selected }) {
   if (Selected) {
     return (
-      <div className="flex items-center gap-2 mt-2">
+      <div className="flex items-center gap-1 md:gap-2 mt-2">
         <div className="flex items-center gap-3 bg-white/10 rounded-full px-3 py-1.5">
           <span className="flex items-center gap-1 text-xs text-white">
             <img src={usericon} alt="User" className="w-5 h-5" /> {passengers}
@@ -31,7 +31,7 @@ export default function FeatureIcons({ passengers, luggage, Selected }) {
     );
   }
   return (
-    <div className="flex items-center gap-2 mt-2">
+    <div className="flex items-center gap-1 md:gap-2 mt-2">
       <div className="flex items-center gap-3  border rounded-full px-3 py-1.5">
         <span className="flex items-center gap-1 text-xs text-gray-500">
           <img src={usericonblack} alt="User" className="w-4 h-4" /> {passengers}

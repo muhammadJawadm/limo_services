@@ -57,7 +57,7 @@ export default function PaymentFormPanel({ onProceed }) {
           <div className="flex-1">
             <p className="text-sm font-semibold text-gray-900">Created card</p>
             <p className="text-xs text-gray-400 mt-0.5">Save your info for faster booking</p>
-            <div className="flex items-center gap-1 mt-1 bg-gray-200 px-2 py-1 rounded-lg w-[50%]">
+            <div className="flex items-center gap-1 mt-1 bg-gray-200 px-2 py-1 rounded-lg w-full xl:w-[60%]">
               <BsInfoCircle size={11} className="text-[#1a2b5e] flex-shrink-0" />
               <p className="text-xs text-[#1a2b5e]">ID verification required for credit card payments.</p>
             </div>

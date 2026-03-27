@@ -54,7 +54,9 @@ export default function StepperNavbar({ currentStep = 1 }) {
       </div>
 
       {/* Login Button */}
-      <button className="bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-xs md:text-sm font-semibold px-3 md:px-5 py-2 md:py-3 rounded-3xl shadow whitespace-nowrap">
+      <button className="bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-xs md:text-sm font-semibold px-3 md:px-5 py-2 md:py-3 rounded-3xl shadow whitespace-nowrap"
+        onClick={() => navigate('/login')}
+      >
         Login
       </button>
     </nav>
