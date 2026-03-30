@@ -10,7 +10,7 @@ import group from "../assets/groupofpop.png";
 export default function BookingForm() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('point'); // 'point' | 'hourly'
-  const [stops, setStops] = useState([{ value: 'New York street Bay Four' }]);
+  const [stops, setStops] = useState([]);
   const [stopLocations, setStopLocations] = useState([{ value: '' }]);
   const [showSwitchPopup, setShowSwitchPopup] = useState(false);
   const [hourlyDuration, setHourlyDuration] = useState('');
@@ -141,7 +141,7 @@ export default function BookingForm() {
                     <input
                       type="text"
                       defaultValue={sl.value}
-                      placeholder="Stop location"
+                      placeholder="Stop Location"
                       className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400"
                     />
                   </div>
@@ -209,19 +209,7 @@ export default function BookingForm() {
               </div>
 
               {/* 2. Stop row — yellow pin + trash button */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3 flex-1">
-                  <MdOutlineLocationOn className="text-yellow-500 flex-shrink-0" size={20} />
-                  <input
-                    type="text"
-                    defaultValue="New York street Bay Four"
-                    className="flex-1 text-sm outline-none bg-transparent text-gray-700 font-medium"
-                  />
-                </div>
-                <button className="w-11 h-11 flex items-center justify-center bg-red-100 text-red-500 rounded-full flex-shrink-0 hover:bg-red-200 transition-colors">
-                  <BsTrash size={16} />
-                </button>
-              </div>
+
 
               {/* 3. Stop Location — gray pin + gold checkmark */}
               <div className="flex items-center gap-2">

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiChevronLeft } from 'react-icons/fi';
-import logoImg from '../../assets/navbarlogo.png';
+import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
 
 export default function DriverOTPVerificationPage() {
@@ -28,7 +28,7 @@ export default function DriverOTPVerificationPage() {
   };
 
   const handleContinue = () => {
-    navigate('/driver/reset-password');
+    navigate('/driver/forget-password');
   };
 
   return (

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LuMail } from 'react-icons/lu';
-import logoImg from '../../assets/navbarlogo.png';
+import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
 
 export default function DriverForgetPasswordPage() {
@@ -10,7 +10,7 @@ export default function DriverForgetPasswordPage() {
 
   const handleSendCode = (e) => {
     e.preventDefault();
-    navigate('/driver/otp-verification');
+    navigate('/driver/reset-password');
   };
 
   return (

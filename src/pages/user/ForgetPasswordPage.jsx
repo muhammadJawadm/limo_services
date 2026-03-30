@@ -10,7 +10,7 @@ export default function ForgetPasswordPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Logic to send verification code goes here
-    navigate('/otp-verification'); // Usually goes to OTP after sending code
+    navigate('/reset-password'); // Usually goes to OTP after sending code
   };
 
   return (
@@ -47,7 +47,7 @@ export default function ForgetPasswordPage() {
                 <button
                   type="submit"
                   className="w-full rounded-full bg-[#1b2d5d] text-white py-4 text-[15px] font-semibold hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20"
-                  onClick={() => navigate('/otp-verification')}
+                  onClick={() => navigate('/reset-password')}
                 >
                   Send Verification Code
                 </button>

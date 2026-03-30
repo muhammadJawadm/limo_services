@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LuUser, LuMail, LuLock } from 'react-icons/lu';
 import { FiChevronDown } from 'react-icons/fi';
-import logoImg from '../../assets/navbarlogo.png';
+import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
 import usFlag from '../../assets/us.png';
 
@@ -19,15 +19,15 @@ export default function DriverRegisterDetailsPage() {
 
   const handleSignUp = (e) => {
     e.preventDefault();
-    navigate('/driver/forget-password');
+    navigate('/driver/otp-verification');
   };
 
   return (
-    <div className="min-h-screen bg-[#Fcfcfc] flex items-center justify-center p-4  md:p-6 lg:p-6">
-      <div className="w-full max-w-[1400px] h-[calc(100vh-3rem)] min-h-[600px] grid grid-cols-1 lg:grid-cols-2 bg-[#Fcfcfc] rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+    <div className="min-h-screen bg-[#Fcfcfc] p-4 flex flex-col md:p-6 lg:p-6">
+      <div className="w-full max-w-[1400px] mx-auto flex-1 grid grid-cols-1 lg:grid-cols-2 bg-[#Fcfcfc] rounded-3xl shadow-sm border border-gray-100 overflow-hidden lg:h-[calc(100vh-3rem)]">
 
         {/* Left Section - Form */}
-        <section className="p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col justify-start max-w-2xl w-full mx-auto relative overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <section className="p-8 md:p-12 lg:p-16 xl:p-20 flex flex-col justify-start max-w-2xl w-full mx-auto relative h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {/* Logo */}
           <div className="absolute top-8 left-8 md:top-12 md:left-12 lg:top-12 lg:left-16 xl:top-16 xl:left-20">
             <img src={logoImg} alt="Prvyn Services" className="h-10 md:h-12 object-contain" />

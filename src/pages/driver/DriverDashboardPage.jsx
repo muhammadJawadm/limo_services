@@ -21,11 +21,11 @@ export default function DriverDashboardPage() {
     const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
     const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
     const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
-    const [selectedRideConfig, setSelectedRideConfig] = useState({ hasFlightInfo: false });
+    const [selectedRideConfig, setSelectedRideConfig] = useState({ hasFlightInfo: false, isViewMode: false });
 
     // Helper functions
-    const openRideDetails = (hasFlightInfo) => {
-        setSelectedRideConfig({ hasFlightInfo });
+    const openRideDetails = (hasFlightInfo, isViewMode = false) => {
+        setSelectedRideConfig({ hasFlightInfo, isViewMode });
         setIsRideDetailsModalOpen(true);
     };
 
@@ -88,6 +88,7 @@ export default function DriverDashboardPage() {
                 isOpen={isRideDetailsModalOpen}
                 onClose={() => setIsRideDetailsModalOpen(false)}
                 hasFlightInfo={selectedRideConfig.hasFlightInfo}
+                isViewMode={selectedRideConfig.isViewMode}
                 onOpenMessage={handleOpenMessages}
             />
             <MessagesModal

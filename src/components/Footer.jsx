@@ -2,10 +2,10 @@ import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const infoLinks = [
-  { label: 'Become a Driver', path: '/driver/register' },
-  { label: 'Terms', path: '#' },
-  { label: 'Privacy Policy', path: '#' },
-  { label: 'Support', path: '#' }
+  { label: 'Become a Partner', path: '/driver/register' },
+  { label: 'Terms & Condition', path: '/terms' },
+  { label: 'Privacy Policy', path: '/privacy' },
+  { label: 'Support', path: '/support' }
 ];
 
 export default function Footer() {
@@ -19,8 +19,7 @@ export default function Footer() {
           <div className="max-w-xs">
             <h3 className="font-bold  text-lg text-white mb-3">Lemo Services</h3>
             <p className=" text-sm leading-relaxed text-white">
-              Limo Services offers you are effective of a worldwide in a premium we are people here to connect,
-              making limo with professional drivers for reliable, service years in transportation.
+              Limo Services offers luxury chauffeur-driven rides through a simple web platform, connecting riders with professional drivers for reliable, premium transportation.
             </p>
           </div>
 
@@ -61,3 +60,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+

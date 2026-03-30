@@ -136,7 +136,7 @@ export default function DriverRidesTable({ openRideDetails, setIsReturnTripModal
                                             </span>
                                             <span
                                                 className="flex cursor-pointer items-center gap-1 hover:text-[#1b2d5d]"
-                                                onClick={() => setIsReturnTripModalOpen(true)}
+                                                onClick={() => openRideDetails(true, true)}
                                             >
                                                 <FiEye size={16} />
                                                 View

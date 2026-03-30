@@ -9,6 +9,7 @@ export default function DriverDetailsModal({
   isOpen,
   onClose,
   hasFlightInfo = true,
+  isViewMode = false,
   onOpenMessage,
 }) {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -33,12 +34,14 @@ export default function DriverDetailsModal({
             >
               Message
             </button>
-            <button
-              onClick={() => setIsCancelModalOpen(true)}
-              className="rounded-full border border-gray-200 px-5 py-2 text-[14px] font-medium text-[#666] transition-colors hover:bg-gray-50 bg-white"
-            >
-              Cancel Trip
-            </button>
+            {!isViewMode && (
+              <button
+                onClick={() => setIsCancelModalOpen(true)}
+                className="rounded-full border border-gray-200 px-5 py-2 text-[14px] font-medium text-[#666] transition-colors hover:bg-gray-50 bg-white"
+              >
+                Cancel Trip
+              </button>
+            )}
           </div>
         </div>
 
@@ -225,11 +228,13 @@ export default function DriverDetailsModal({
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 bg-white justify-end px-6 py-5 sm:px-8 sm:py-6">
-          <button onClick={onClose} className="rounded-full bg-[#1b2d5d] px-8 py-3 w-full sm:w-auto text-[15px] font-medium text-white transition-all hover:bg-[#132042] shadow-sm">
-            Confirm Pickup
-          </button>
-        </div>
+        {!isViewMode && (
+          <div className="flex shrink-0 bg-white justify-end px-6 py-5 sm:px-8 sm:py-6">
+            <button onClick={onClose} className="rounded-full bg-[#1b2d5d] px-8 py-3 w-full sm:w-auto text-[15px] font-medium text-white transition-all hover:bg-[#132042] shadow-sm">
+              Confirm Pickup
+            </button>
+          </div>
+        )}
 
       </div>
 

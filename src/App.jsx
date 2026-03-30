@@ -11,6 +11,9 @@ import OTPVerificationPage from './pages/user/OTPVerificationPage';
 import ResetPasswordPage from './pages/user/ResetPasswordPage';
 import ForgetPasswordPage from './pages/user/ForgetPasswordPage';
 import UserDashboardPage from './pages/user/UserDashboardPage';
+import TermsPage from './pages/user/TermsPage';
+import PrivacyPage from './pages/user/PrivacyPage';
+import SupportPage from './pages/user/SupportPage';
 
 // Driver Pages
 import DriverRegisterPage from './pages/driver/DriverRegisterPage';
@@ -38,8 +41,11 @@ export default function App() {
         <Route path="/otp-verification" element={<OTPVerificationPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/forget-password" element={<ForgetPasswordPage />} />
-        <Route path="/dashboard" element={<UserDashboardPage />} />
-
+        <Route path="/dashboard" element={<UserDashboardPage />} />        
+        {/* Info Pages */}
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/support" element={<SupportPage />} />
         {/* Driver Routes */}
         <Route path="/driver/register" element={<DriverRegisterPage />} />
         <Route path="/driver/register/details" element={<DriverRegisterDetailsPage />} />

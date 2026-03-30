@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FiEye, FiEyeOff, FiMenu, FiX } from 'react-icons/fi';
 import { LuLock, LuMail } from 'react-icons/lu';
 import logoImg from '../../assets/navbarlogo.png';
@@ -19,16 +19,16 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center gap-2 ml-[4%]">
             <div className="w-full">
-              <img src={logoImg} alt="Limo Services" className="w-full h-full object-cover" />
+              <img src={logoImg} alt="Limo Services" className="w-full h-full object-cover" onClick={() => navigate('/')} />
             </div>
           </div>
 
           {/* Nav Links — desktop */}
           <ul className="hidden md:flex items-center gap-8 text-gray-600 text-sm font-medium">
-            <li><a href="#" className="hover:text-blue-700 transition-colors">Terms</a></li>
-            <li><a href="#" className="hover:text-blue-700 transition-colors">Privacy</a></li>
-            <li><a href="#" className="hover:text-blue-700 transition-colors">Support</a></li>
-            <li><a href="/driver/register" className="hover:text-blue-700 transition-colors">Become a partner</a></li>
+            <li><Link to="/terms" className="hover:text-blue-700 transition-colors">Terms</Link></li>
+            <li><Link to="/privacy" className="hover:text-blue-700 transition-colors">Privacy</Link></li>
+            <li><Link to="/support" className="hover:text-blue-700 transition-colors">Support</Link></li>
+            <li><Link to="/driver/register" className="hover:text-blue-700 transition-colors">Become a partner</Link></li>
           </ul>
 
           <div className="flex items-center gap-3">
@@ -55,10 +55,10 @@ export default function Navbar() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-gray-100 bg-white px-8 py-4 flex flex-col gap-4">
             <ul className="flex flex-col gap-4 text-gray-600 text-sm font-medium">
-              <li><a href="#" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Terms</a></li>
-              <li><a href="#" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Privacy</a></li>
-              <li><a href="#" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Support</a></li>
-              <li><a href="#" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Become a partner</a></li>
+              <li><Link to="/terms" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Terms</Link></li>
+              <li><Link to="/privacy" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Privacy</Link></li>
+              <li><Link to="/support" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Support</Link></li>
+              <li><Link to="/driver/register" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Become a partner</Link></li>
             </ul>
             <button
               onClick={() => { setMobileMenuOpen(false); setShowLoginModal(true); }}

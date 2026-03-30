@@ -1,20 +1,23 @@
 import globeImg from '../../assets/globe_map.png';
 
 const pins = [
-  { label: 'USA', top: '42%', left: '20%', color: 'text-red-500' },
-  { label: 'UK', top: '30%', left: '45%', color: 'text-blue-600' },
-  { label: 'Canada', top: '28%', left: '18%', color: 'text-red-400' },
+  { label: 'Los Angeles', top: '42%', left: '15%', color: 'text-orange-500' },
+  { label: 'San Francisco', top: '34%', left: '14%', color: 'text-yellow-500' },
+  { label: 'Houston, TX', top: '48%', left: '22%', color: 'text-red-500' },
+  { label: 'New York', top: '40%', left: '28%', color: 'text-blue-500' },
+  { label: 'Boston', top: '32%', left: '29%', color: 'text-indigo-500' },
+ 
 ];
 
 export default function ServiceAreasSection() {
   return (
     <section className="py-20 px-8 md:px-16 bg-gray-50 text-center">
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Our Service Areas</h2>
-      <p className="text-gray-500 text-sm mb-12 max-w-lg mx-auto">
+      <p className="text-gray-500 text-sm max-w-lg mx-auto">
         Providing premium chauffeur services across major cities and key international destinations, ensuring safe and luxury transportation wherever you travel.
       </p>
 
-      <div className="relative max-w-3xl mx-auto">
+      <div className="relative max-w-4xl mx-auto">
         <img src={globeImg} alt="Globe Map" className="w-full object-contain" />
 
         {/* Location Pins */}

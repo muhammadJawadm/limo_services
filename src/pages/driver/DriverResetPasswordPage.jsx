@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LuLock } from 'react-icons/lu';
-import logoImg from '../../assets/navbarlogo.png';
+import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
 
 export default function DriverResetPasswordPage() {
@@ -13,7 +13,7 @@ export default function DriverResetPasswordPage() {
 
   const handleReset = (e) => {
     e.preventDefault();
-    navigate('/driver/dashboard');
+    navigate('/driver/onboarding');
   };
 
   return (
