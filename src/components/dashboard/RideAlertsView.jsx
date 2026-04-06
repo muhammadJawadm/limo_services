@@ -39,16 +39,7 @@ function NotificationItem({ icon, title, description, isHighlighted, bgColor, ic
 export default function RideAlertsView() {
   return (
     <section className="rounded-xl bg-gray-50 flex-1">
-      <div className="mb-3 flex flex-col gap-3 bg-[#EAEAEA] px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-10">
-        <h2 className="text-4xl font-semibold">Ride Alerts</h2>
-        <button
-          onClick={() => setIsNewReservationModalOpen(true)}
-          className="flex items-center gap-2 self-start rounded-full bg-[#1b2d5d] px-6 py-3 text-lg font-medium text-white sm:self-auto hover:bg-[#132042] transition-colors"
-        >
-          <FiPlus size={20} />
-          New Reservation
-        </button>
-      </div>
+      
 
       <div className="px-4 pb-8 sm:px-10 mt-6 max-w-[1000px]">
         {/* Today Section */}

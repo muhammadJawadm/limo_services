@@ -11,7 +11,11 @@ export default function DriverTopNav({
     <header className="mt-4 lg:mt-6 mb-5 flex flex-col gap-5 px-4 sm:px-6 lg:px-8 xl:flex-row xl:items-center xl:justify-between">
       <div className="flex items-center justify-between w-full xl:w-auto">
           <h1 className="text-2xl sm:text-3xl font-semibold text-[#161616]">
-              {activeSidebarTab === 'Dashboard' ? 'Dashboard' : 'Notification'}
+              {activeSidebarTab === 'Dashboard'
+                  ? 'Dashboard'
+                  : activeSidebarTab === 'Notification'
+                      ? 'Notification'
+                      : 'Admin Chat'}
           </h1>
 
           {/* Profile - Mobile & Tablet Only */}

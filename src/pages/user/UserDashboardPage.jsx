@@ -43,8 +43,8 @@ export default function UserDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#efefef] text-[#111111]">
-      <div className="mx-auto max-w-full lg:flex">
+    <div className="h-screen bg-[#efefef] text-[#111111] overflow-hidden">
+      <div className="mx-auto max-w-full lg:flex h-full">
 
         {/* SIDEBAR */}
         <UserSidebar 
@@ -56,48 +56,52 @@ export default function UserDashboardPage() {
         />
 
         {/* MAIN CONTENT */}
-        <main className="min-h-screen bg-white flex-1 flex flex-col w-full overflow-hidden">
+        <main className="h-full bg-white flex-1 flex flex-col w-full overflow-hidden">
 
           {/* HEADER */}
-          <UserTopNav 
-            activeSidebarTab={activeSidebarTab} 
-            activeTopNavTab={activeTopNavTab} 
-            setActiveTopNavTab={setActiveTopNavTab} 
-          />
+          <div className="sticky top-0 z-20 bg-white">
+            <UserTopNav 
+              activeSidebarTab={activeSidebarTab} 
+              activeTopNavTab={activeTopNavTab} 
+              setActiveTopNavTab={setActiveTopNavTab} 
+            />
+          </div>
 
-          {activeSidebarTab === 'Dashboard' ? (
-            <>
-              {activeTopNavTab === 'Ride Details' && (
-                <UserRidesTable 
-                  setIsNewReservationModalOpen={setIsNewReservationModalOpen}
-                  openRideDetails={openRideDetails}
-                  setIsReturnTripModalOpen={setIsReturnTripModalOpen}
-                />
-              )}
-
-              {activeTopNavTab === 'Passenger' && (
-                <div className="px-4 sm:px-6 lg:px-8 pb-6 bg-[#efefef] flex-1">
-                  <PassengerView onEditPassenger={() => setIsPassengerEditModalOpen(true)} />
-                </div>
-              )}
-
-              {activeTopNavTab === 'Account Info' && (
-                <div className="px-4 sm:px-6 lg:px-8 pb-6 bg-[#efefef] flex-1">
-                  <AccountInfoView
-                    onEditAccount={(type) => {
-                      setAccountEditType(type);
-                      setIsAccountEditModalOpen(true);
-                    }}
-                    onNewReservation={() => setIsNewReservationModalOpen(true)}
+          <div className="flex-1 overflow-y-auto">
+            {activeSidebarTab === 'Dashboard' ? (
+              <>
+                {activeTopNavTab === 'Ride Details' && (
+                  <UserRidesTable 
+                    setIsNewReservationModalOpen={setIsNewReservationModalOpen}
+                    openRideDetails={openRideDetails}
+                    setIsReturnTripModalOpen={setIsReturnTripModalOpen}
                   />
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="bg-[#efefef] flex-1">
-              <RideAlertsView />
-            </div>
-          )}
+                )}
+
+                {activeTopNavTab === 'Passenger' && (
+                  <div className="px-4 sm:px-6 lg:px-8 pb-6 bg-[#efefef] flex-1">
+                    <PassengerView onEditPassenger={() => setIsPassengerEditModalOpen(true)} />
+                  </div>
+                )}
+
+                {activeTopNavTab === 'Account Info' && (
+                  <div className="px-4 sm:px-6 lg:px-8 pb-6 bg-[#efefef] flex-1">
+                    <AccountInfoView
+                      onEditAccount={(type) => {
+                        setAccountEditType(type);
+                        setIsAccountEditModalOpen(true);
+                      }}
+                      onNewReservation={() => setIsNewReservationModalOpen(true)}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="bg-[#efefef] flex-1">
+                <RideAlertsView />
+              </div>
+            )}
+          </div>
         </main>
       </div>
 

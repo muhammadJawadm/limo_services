@@ -10,9 +10,10 @@ import PassengerView from '../../components/dashboard/PassengerView';
 import PassengerEditModal from '../../components/dashboard/PassengerEditModal';
 import ReturnTripModal from '../../components/dashboard/ReturnTripModal';
 import DriverProfileDetailsView from '../../components/dashboard/DriverProfileDetailsView';
+import DriverAdminChatView from '../../components/dashboard/DriverAdminChatView';
 
 export default function DriverDashboardPage() {
-    const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard'); // 'Dashboard' | 'Notification'
+    const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard'); // 'Dashboard' | 'Notification' | 'Admin Chat'
     const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details'); // 'Ride Details' | 'Profile Details'
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -35,8 +36,8 @@ export default function DriverDashboardPage() {
     };
 
     return (
-        <div className="relative min-h-screen bg-[#efefef] text-[#111111] overflow-x-hidden w-full">
-            <div className="mx-auto max-w-full lg:flex">
+        <div className="relative h-screen bg-[#efefef] text-[#111111] overflow-hidden w-full">
+            <div className="mx-auto max-w-full lg:flex h-full">
                 <DriverSidebar 
                     activeSidebarTab={activeSidebarTab}
                     setActiveSidebarTab={setActiveSidebarTab}
@@ -45,35 +46,39 @@ export default function DriverDashboardPage() {
                     setIsLogoutModalOpen={setIsLogoutModalOpen}
                 />
 
-                <main className="min-h-screen bg-white flex-1 flex flex-col w-full overflow-hidden">
+                <main className="h-full bg-white flex-1 flex flex-col w-full overflow-hidden">
                     <DriverTopNav 
                         activeSidebarTab={activeSidebarTab} 
                         activeTopNavTab={activeTopNavTab} 
                         setActiveTopNavTab={setActiveTopNavTab} 
                     />
 
-                    {activeSidebarTab === 'Dashboard' ? (
-                        <>
-                            {activeTopNavTab === 'Ride Details' && (
-                                <DriverRidesTable 
-                                    openRideDetails={openRideDetails}
-                                    setIsReturnTripModalOpen={setIsReturnTripModalOpen}
-                                />
-                            )}
+                    <div className="flex-1 overflow-y-auto">
+                        {activeSidebarTab === 'Dashboard' ? (
+                            <>
+                                {activeTopNavTab === 'Ride Details' && (
+                                    <DriverRidesTable 
+                                        openRideDetails={openRideDetails}
+                                        setIsReturnTripModalOpen={setIsReturnTripModalOpen}
+                                    />
+                                )}
 
-                            {activeTopNavTab === 'Passenger' && (
-                                <div className="px-4 sm:px-6 lg:px-8 pb-6">
-                                    <PassengerView onEditPassenger={() => setIsPassengerEditModalOpen(true)} />
-                                </div>
-                            )}
+                                {activeTopNavTab === 'Passenger' && (
+                                    <div className="px-4 sm:px-6 lg:px-8 pb-6">
+                                        <PassengerView onEditPassenger={() => setIsPassengerEditModalOpen(true)} />
+                                    </div>
+                                )}
 
-                            {activeTopNavTab === 'Profile Details' && (
-                                <DriverProfileDetailsView />
-                            )}
-                        </>
-                    ) : (
-                        <RideAlertsView />
-                    )}
+                                {activeTopNavTab === 'Profile Details' && (
+                                    <DriverProfileDetailsView />
+                                )}
+                            </>
+                        ) : activeSidebarTab === 'Notification' ? (
+                            <RideAlertsView />
+                        ) : (
+                            <DriverAdminChatView />
+                        )}
+                    </div>
 
                 </main>
             </div>

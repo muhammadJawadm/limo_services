@@ -1,4 +1,4 @@
-import { FiBell, FiGrid, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
+import { FiBell, FiGrid, FiLogOut, FiMenu, FiMessageSquare, FiX } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo.png';
 
 export default function DriverSidebar({
@@ -41,6 +41,16 @@ export default function DriverSidebar({
               >
                   <FiBell size={18} />
                   Notification
+              </button>
+              <button
+                  onClick={() => { setActiveSidebarTab('Admin Chat'); setIsMobileMenuOpen(false); }}
+                  className={`flex w-full items-center gap-3 rounded-full px-4 py-3 text-left text-sm sm:text-base transition-colors ${activeSidebarTab === 'Admin Chat'
+                      ? 'bg-[#1b2d5d] font-medium text-white'
+                      : 'text-[#4d4d4d] hover:bg-gray-100'
+                      }`}
+              >
+                  <FiMessageSquare size={18} />
+                  Admin Chat
               </button>
           </nav>
 

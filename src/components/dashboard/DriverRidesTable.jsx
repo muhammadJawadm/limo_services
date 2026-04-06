@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { FiEye } from 'react-icons/fi';
+import { FiEye ,FiPlus } from 'react-icons/fi';
 import blackcaricon from '../../assets/blackcaricon.png';
 import { MdOutlineLocationOn } from 'react-icons/md';
 
@@ -66,9 +66,16 @@ export default function DriverRidesTable({ openRideDetails, setIsReturnTripModal
 
     return (
         <section className="bg-[#efefef] flex-1 flex flex-col">
-            <div className="mb-4 flex flex-col gap-4 bg-[#EAEAEA] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-                <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-semibold">Rides Details</h2>
-            </div>
+            <div className="mb-3 flex flex-col gap-3 bg-[#EAEAEA] px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+                    <h2 className="text-4xl font-semibold">Ride Detaild</h2>
+                    <button
+                      onClick={() => setIsNewReservationModalOpen(true)}
+                      className="flex items-center gap-2 self-start rounded-full bg-[#1b2d5d] px-6 py-3 text-lg font-medium text-white sm:self-auto hover:bg-[#132042] transition-colors"
+                    >
+                      <FiPlus size={20} />
+                      New Reservation
+                    </button>
+                  </div>
 
             <div className="px-4 pb-8 sm:px-6 lg:px-8">
                 <div className="mb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
