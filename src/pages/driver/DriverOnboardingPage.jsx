@@ -253,17 +253,20 @@ export default function DriverOnboardingPage() {
             <button
               onClick={() => {
                 setShowReviewModal(false);
-                navigate('/driver/profile');
+                navigate('/driver/dashboard');
               }}
               className="w-full bg-[#1b2d5d] text-white rounded-full py-3.5 font-medium text-[15px] hover:bg-[#132042] transition-colors mb-3"
             >
-              Simulate Approval
+              Go to Dashboard
             </button>
             <button
-              onClick={() => setShowReviewModal(false)}
+              onClick={() => {
+                setShowReviewModal(false);
+                navigate('/driver/profile');
+              }}
               className="w-full border border-gray-200 text-gray-700 rounded-full py-3.5 font-medium text-[15px] hover:bg-gray-50 transition-colors"
             >
-              Close
+              View Profile
             </button>
           </div>
         </div>
