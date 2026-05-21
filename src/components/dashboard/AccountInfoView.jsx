@@ -1,18 +1,82 @@
+import { useEffect, useState } from 'react';
 import { FiEdit2, FiPlus, FiChevronDown } from 'react-icons/fi';
 import { RiEdit2Line } from "react-icons/ri";
+import { getCustomerProfile } from '../../services/customerService';
 
 const STORED_CARDS = [
-   { id: 1, name: 'Jason smith', number: 'CC**7458', expiry: '1451', billing: 'Usaquen. Bogota, Colombia' },
+   // { id: 1, name: 'Jason smith', number: 'CC**7458', expiry: '1451', billing: 'Usaquen. Bogota, Colombia' },
 ];
 
-export default function AccountInfoView({ onEditAccount }) {
+const EMPTY_PROFILE = {
+   id: '',
+   firstName: '',
+   lastName: '',
+   email: '',
+   phone: '',
+   location: '',
+   companyName: '',
+};
+
+export default function AccountInfoView({ onEditAccount, onNewReservation, refreshKey = 0 }) {
+   const [profile, setProfile] = useState(EMPTY_PROFILE);
+   const [isLoading, setIsLoading] = useState(true);
+   const [error, setError] = useState('');
+
+   useEffect(() => {
+      const loadProfile = async () => {
+         setIsLoading(true);
+         setError('');
+
+         const result = await getCustomerProfile();
+         if (!result?.success) {
+            setError(result?.message || 'Failed to load customer profile.');
+            setProfile(EMPTY_PROFILE);
+            setIsLoading(false);
+            return;
+         }
+
+         const data = result?.data ?? {};
+         setProfile({
+            id: data.id ?? '',
+            firstName: data.firstName ?? '',
+            lastName: data.lastName ?? '',
+            email: data.email ?? '',
+            phone: data.phone ?? '',
+            location: data.location ?? '',
+            companyName: data.companyName ?? '',
+         });
+         setIsLoading(false);
+      };
+
+      loadProfile();
+   }, [refreshKey]);
+
+   const displayAccountId = profile.id ? profile.id.slice(0, 4).toUpperCase() : '—';
+   const displayFirstName = profile.firstName || '—';
+   const displayLastName = profile.lastName || '—';
+   const displayCompanyName = profile.companyName || '—';
+   const displayEmail = profile.email || '—';
+   const displayPhone = profile.phone || '—';
+   const displayLocation = profile.location || '—';
    return (
       <section className="flex-1 text-[#111111] bg-transparent min-h-screen">
+
+         {isLoading ? (
+            <div className="mx-4 sm:mx-6 lg:mx-8 mb-4 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-500 shadow-sm">
+               Loading account info...
+            </div>
+         ) : null}
+
+         {error ? (
+            <div className="mx-4 sm:mx-6 lg:mx-8 mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+               {error}
+            </div>
+         ) : null}
 
          {/* Header Row */}
          <div className="mb-4 sm:mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-[#EAEAEA] px-4 py-4 sm:px-6 lg:px-8 rounded-none sm:rounded-tl-lg sm:rounded-tr-lg">
             <h2 className="text-2xl sm:text-[26px] lg:text-[32px] font-semibold text-[#111]">Account Info</h2>
-            <button className="flex w-full sm:w-auto justify-center items-center gap-2 rounded-full bg-[#1b2d5d] px-6 py-3 text-[15px] sm:text-[16px] font-medium text-white hover:bg-[#132042] transition-colors shadow-sm">
+            <button onClick={onNewReservation} className="flex w-full sm:w-auto justify-center items-center gap-2 rounded-full bg-[#1b2d5d] px-6 py-3 text-[15px] sm:text-[16px] font-medium text-white hover:bg-[#132042] transition-colors shadow-sm">
                <FiPlus size={20} />
                New Reservation
             </button>
@@ -31,26 +95,26 @@ export default function AccountInfoView({ onEditAccount }) {
                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[24px] sm:h-[24px] text-[#222]"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                      <span className="text-[#111]">Passenger Info</span>
                      <span className="rounded-full border border-[#ff4a40] px-3 py-0.5 sm:px-4 sm:py-1 text-[11px] sm:text-[13px] font-medium text-[#ff4a40] mt-1 sm:mt-0 ml-0 sm:ml-2 whitespace-nowrap bg-red-50">
-                        Acc# 4411
+                        Acc# {displayAccountId}
                      </span>
                   </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-[130px_1fr] md:grid-cols-[150px_1fr] gap-y-3 sm:gap-y-4 text-sm sm:text-[15px]">
                      <div className="text-[#666] hidden sm:block">First Name:</div>
                      <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">First Name</div>
-                     <div className="font-medium text-gray-700">Jayson</div>
+                     <div className="font-medium text-gray-700">{displayFirstName}</div>
 
                      <div className="text-[#666] hidden sm:block">Last Name:</div>
                      <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">Last Name</div>
-                     <div className="font-medium text-gray-700">Smith</div>
+                     <div className="font-medium text-gray-700">{displayLastName}</div>
 
                      <div className="text-[#666] hidden sm:block">Company Name:</div>
                      <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">Company Name</div>
-                     <div className="font-medium text-gray-700 capitalize">ux pilot</div>
+                     <div className="font-medium text-gray-700 capitalize">{displayCompanyName}</div>
 
                      <div className="text-[#666] hidden sm:block">Email Address:</div>
                      <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">Email Address</div>
-                     <div className="font-medium text-gray-700 break-all w-full truncate sm:whitespace-normal" title="jaysonsmith@gmail.com">jaysonsmith@gmail.com</div>
+                     <div className="font-medium text-gray-700 break-all w-full truncate sm:whitespace-normal" title={displayEmail}>{displayEmail}</div>
 
                      <div className="text-[#666] hidden sm:block mt-1">Password:</div>
                      <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">Password</div>
@@ -72,23 +136,12 @@ export default function AccountInfoView({ onEditAccount }) {
                   <div className="grid grid-cols-1 sm:grid-cols-[130px_1fr] md:grid-cols-[150px_1fr] gap-y-3 sm:gap-y-4 text-sm sm:text-[15px]">
                      <div className="text-[#666] hidden sm:block">Address Type:</div>
                      <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">Address Type</div>
-                     <div className="font-medium text-gray-700">Jayson</div>
+                     <div className="font-medium text-gray-700">Primary Address</div>
 
                      <div className="text-[#666] hidden sm:block">Primary Address:</div>
                      <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">Primary Address</div>
-                     <div className="font-medium text-gray-700 w-full break-words">Eight Mile West. Southfield, MI. USA</div>
+                     <div className="font-medium text-gray-700 w-full break-words">{displayLocation || '—'}</div>
 
-                     <div className="text-[#666] hidden sm:block w-full break-words">Apt/Street:</div>
-                     <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">Apt/Street</div>
-                     <div className="font-medium text-gray-700">1451</div>
-
-                     <div className="text-[#666] hidden sm:block">City:</div>
-                     <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">City</div>
-                     <div className="font-medium text-gray-700">Southfield</div>
-
-                     <div className="text-[#666] hidden sm:block">State/Province:</div>
-                     <div className="text-[#666] sm:hidden text-xs font-semibold uppercase tracking-wider mt-2 border-b border-gray-100 pb-1">State/Province</div>
-                     <div className="font-medium text-gray-700">USA</div>
                   </div>
                </div>
             </div>
@@ -108,7 +161,7 @@ export default function AccountInfoView({ onEditAccount }) {
                   <div>
                      <label className="text-xs sm:text-sm text-[#666] block mb-2 font-medium">Email Address</label>
                      <div className="rounded-xl sm:rounded-full bg-[#fdfdfd] border border-gray-200 px-4 sm:px-5 py-3 text-sm sm:text-[15px] text-[#222] font-medium shadow-[0_2px_4px_rgba(0,0,0,0.01)] w-full break-all">
-                        jaysonsmith@gmail.com
+                        {displayEmail}
                      </div>
                   </div>
                   <div>
@@ -118,7 +171,7 @@ export default function AccountInfoView({ onEditAccount }) {
                            <img src="https://flagcdn.com/w20/us.png" alt="US" className="w-[18px] h-[18px] sm:w-5 sm:h-5 object-cover rounded-full shadow-sm" />
                            <span className="text-[#4d4d4d] text-sm whitespace-nowrap"><FiChevronDown /></span>
                         </div>
-                        <span className="text-[#222] font-medium flex-1 text-sm sm:text-[15px] pl-1 tracking-wide">+1 (145) 125-451</span>
+                        <span className="text-[#222] font-medium flex-1 text-sm sm:text-[15px] pl-1 tracking-wide">{displayPhone}</span>
                      </div>
                   </div>
                </div>

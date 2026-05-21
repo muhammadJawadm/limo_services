@@ -10,7 +10,7 @@ export const Step2 = ({ formData, updateDoc }) => (
     <div className="space-y-6">
       <RadioGroup label="Do you have Prior Limo Services Experience?" name="priorExp" options={[{ label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }]} value={formData.priorExp} onChange={(v) => updateDoc('priorExp', v)} />
       <RadioGroup label="Do you have electric vehicles in your fleet?" name="electricVehicles" options={[{ label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }]} value={formData.electricVehicles} onChange={(v) => updateDoc('electricVehicles', v)} />
-      <RadioGroup label="Do you have femaile chauffeurs?" name="femaleChauffeurs" options={[{ label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }]} value={formData.femaleChauffeurs} onChange={(v) => updateDoc('femaleChauffeurs', v)} />
+      <RadioGroup label="Do you have female chauffeurs?" name="femaleChauffeurs" options={[{ label: 'Yes', value: 'yes' }, { label: 'No', value: 'no' }]} value={formData.femaleChauffeurs} onChange={(v) => updateDoc('femaleChauffeurs', v)} />
     </div>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12">

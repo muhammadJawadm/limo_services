@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
 import DriverSidebar from '../../components/dashboard/DriverSidebar';
 import DriverTopNav from '../../components/dashboard/DriverTopNav';
 import DriverRidesTable from '../../components/dashboard/DriverRidesTable';
@@ -13,6 +15,8 @@ import DriverProfileDetailsView from '../../components/dashboard/DriverProfileDe
 import DriverAdminChatView from '../../components/dashboard/DriverAdminChatView';
 
 export default function DriverDashboardPage() {
+    const navigate = useNavigate();
+    const { logout } = useAuthStore();
     const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard'); // 'Dashboard' | 'Notification' | 'Admin Chat'
     const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details'); // 'Ride Details' | 'Profile Details'
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -23,10 +27,12 @@ export default function DriverDashboardPage() {
     const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
     const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
     const [selectedRideConfig, setSelectedRideConfig] = useState({ hasFlightInfo: false, isViewMode: false });
+    const [selectedRide, setSelectedRide] = useState(null);
 
     // Helper functions
-    const openRideDetails = (hasFlightInfo, isViewMode = false) => {
-        setSelectedRideConfig({ hasFlightInfo, isViewMode });
+    const openRideDetails = (ride, isViewMode = false) => {
+        setSelectedRide(ride);
+        setSelectedRideConfig({ hasFlightInfo: Boolean(ride?.flightNumber), isViewMode });
         setIsRideDetailsModalOpen(true);
     };
 
@@ -74,7 +80,7 @@ export default function DriverDashboardPage() {
                                 )}
                             </>
                         ) : activeSidebarTab === 'Notification' ? (
-                            <RideAlertsView />
+                            <RideAlertsView role="driver" />
                         ) : (
                             <DriverAdminChatView />
                         )}
@@ -87,7 +93,7 @@ export default function DriverDashboardPage() {
             <LogoutModal
                 isOpen={isLogoutModalOpen}
                 onClose={() => setIsLogoutModalOpen(false)}
-                onConfirm={() => setIsLogoutModalOpen(false)}
+                onConfirm={() => { logout(); navigate('/driver/login'); }}
             />
             <DriverDetailsModal
                 isOpen={isRideDetailsModalOpen}
@@ -95,10 +101,13 @@ export default function DriverDashboardPage() {
                 hasFlightInfo={selectedRideConfig.hasFlightInfo}
                 isViewMode={selectedRideConfig.isViewMode}
                 onOpenMessage={handleOpenMessages}
+                bookingDetails={selectedRide}
             />
             <MessagesModal
                 isOpen={isMessagesModalOpen}
                 onClose={() => setIsMessagesModalOpen(false)}
+                rideId={selectedRide?.id || selectedRide?._id || selectedRide?.bookingId || null}
+                bookingDetails={selectedRide}
             />
             <PassengerEditModal
                 isOpen={isPassengerEditModalOpen}
@@ -107,6 +116,7 @@ export default function DriverDashboardPage() {
             <ReturnTripModal
                 isOpen={isReturnTripModalOpen}
                 onClose={() => setIsReturnTripModalOpen(false)}
+                bookingDetails={selectedRide}
             />
         </div>
     );

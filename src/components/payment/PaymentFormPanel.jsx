@@ -1,14 +1,68 @@
 import { useState } from 'react';
 import { BsCreditCard, BsShieldCheck, BsInfoCircle, BsCheck2 } from 'react-icons/bs';
-import { LuUser, LuCalendarDays } from 'react-icons/lu';
-import { FormInput } from './FormInputs';
+import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import wallet from '../../assets/wallet.png';
+import { confirmPayment } from '../../services/paymentService';
 
-export default function PaymentFormPanel({ onProceed }) {
-  const [cardName, setCardName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvc, setCvc] = useState('');
+export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleProceed = async () => {
+    if (!bookingId) {
+      setSubmitError('Booking id is missing. Please start a new booking.');
+      return;
+    }
+
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    if (!stripe || !elements) {
+      setSubmitError('Stripe is not ready yet. Please try again.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/payment-success`,
+      },
+      redirect: 'if_required',
+    });
+
+    if (error) {
+      setSubmitError(error.message || 'Payment failed.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (paymentIntent?.status === 'succeeded') {
+      console.log('Payment succeeded with PaymentIntent:', paymentIntent);
+      // Extract booker email/phone for guest bookings
+      const bookerEmail = bookingDetails?.bookerDetails?.email || bookingDetails?.email;
+      const bookerPhone = bookingDetails?.bookerDetails?.phone || bookingDetails?.phone;
+
+      const confirmResult = await confirmPayment(bookingId, paymentIntent.id, {
+        bookerEmail: bookerEmail || null,
+        bookerPhone: bookerPhone || null,
+      });
+      if (!confirmResult?.success) {
+        console.error('Error confirming payment:', confirmResult);
+        setSubmitError(confirmResult?.message || 'Failed to confirm payment.');
+        setIsSubmitting(false);
+        return;
+      }
+      setIsSubmitting(false);
+      // Pass booking details with payout status
+      onProceed({ ...bookingDetails, payout: confirmResult.payout });
+      return;
+    }
+
+    setIsSubmitting(false);
+  };
 
   return (
     <div className="w-full md:w-[62%]">
@@ -36,13 +90,10 @@ export default function PaymentFormPanel({ onProceed }) {
           </div>
         </div>
 
-        {/* Card form fields */}
+        {/* Stripe Payment Element */}
         <div className="flex flex-col gap-3 mb-5">
-          <FormInput icon={<LuUser size={16} />} placeholder="Card Holder Name" value={cardName} onChange={e => setCardName(e.target.value)} />
-          <FormInput icon={<BsCreditCard size={16} />} placeholder="Card Number" value={cardNumber} onChange={e => setCardNumber(e.target.value)} />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <FormInput icon={<LuCalendarDays size={16} />} placeholder="Date Expiry" value={expiry} onChange={e => setExpiry(e.target.value)} />
-            <FormInput icon={<BsShieldCheck size={16} />} placeholder="CVC" value={cvc} onChange={e => setCvc(e.target.value)} />
+          <div className="rounded-xl border border-gray-200/80 bg-white p-4">
+            <PaymentElement />
           </div>
         </div>
 
@@ -65,7 +116,7 @@ export default function PaymentFormPanel({ onProceed }) {
         </div>
 
         {/* Billing note */}
-        <p className="text-md text-gray-800 mb-4">Billing address is used to verify the credit or debit card</p>
+        <p className="text-md text-gray-800 mb-4">Billing address is used to verify the credit or debit card.</p>
 
         {/* Policy checkboxes */}
         <div className="flex flex-col gap-2 mb-6">
@@ -80,12 +131,16 @@ export default function PaymentFormPanel({ onProceed }) {
         </div>
 
         {/* Proceed to checkout */}
+        {submitError ? (
+          <p className="text-sm text-red-500 mb-3">{submitError}</p>
+        ) : null}
         <div className="flex justify-end">
           <button
-            onClick={onProceed}
-            className="flex items-center gap-2 bg-[#1a2b5e] text-white text-sm font-bold px-8 py-3 rounded-full hover:bg-[#253576] transition-colors"
+            onClick={handleProceed}
+            className="flex items-center gap-2 bg-[#1a2b5e] text-white text-sm font-bold px-8 py-3 rounded-full hover:bg-[#253576] transition-colors disabled:opacity-60"
+            disabled={isSubmitting || !stripe || !elements}
           >
-            Proceed to checkout
+            {isSubmitting ? 'Processing...' : 'Pay Now'}
           </button>
         </div>
       </div>

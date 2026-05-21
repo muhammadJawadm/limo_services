@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiChevronDown } from 'react-icons/fi';
+import { FiChevronDown, FiInfo } from 'react-icons/fi';
 import { LuBuilding2, LuLock, LuMail, LuUser } from 'react-icons/lu';
 import AuthSidePanel from '../../components/AuthSidePanel';
 import usFlag from '../../assets/us.png';
 import buildingIcon from '../../assets/company.png';
+import { useAuthStore } from '../../stores/authStore';
 
-function InputRow({ icon, type = 'text', placeholder, value, onChange }) {
+function InputRow({ icon, type = 'text', placeholder, value, onChange, hasError }) {
   return (
-    <div className="flex items-center rounded-full bg-white px-5 py-3.5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-50">
+    <div className={`flex items-center rounded-full bg-white px-5 py-3.5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border ${hasError ? 'border-red-200' : 'border-gray-50'}`}>
       <span className="text-gray-400">{icon}</span>
       <input
         type={type}
@@ -23,19 +24,54 @@ function InputRow({ icon, type = 'text', placeholder, value, onChange }) {
 
 export default function CreateAccountPage() {
   const navigate = useNavigate();
+  const { registerUser, isLoading, error, clearError } = useAuthStore();
+
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
-    address: '',
+    email: '',
     phone: '',
     password: '',
     company: '',
     optIn: false,
   });
+  const [formError, setFormError] = useState('');
+
+  const hasError = Boolean(formError || error);
+  const errorMessage = formError || error;
 
   const updateField = (key) => (e) => {
     const value = key === 'optIn' ? e.target.checked : e.target.value;
     setForm((prev) => ({ ...prev, [key]: value }));
+    if (formError) setFormError('');
+    if (error) clearError();
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+
+    if (!form.firstName.trim()) return setFormError('First name is required.');
+    if (!form.lastName.trim()) return setFormError('Last name is required.');
+    if (!form.email.trim()) return setFormError('Email address is required.');
+    if (!form.phone.trim()) return setFormError('Phone number is required.');
+    if (!form.password) return setFormError('Password is required.');
+
+    const fullPhone = form.phone.startsWith('+') ? form.phone : `+1${form.phone}`;
+
+    const result = await registerUser({
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
+      email: form.email.trim(),
+      phone: fullPhone,
+      password: form.password,
+    });
+
+    if (result?.success) {
+      navigate('/otp-verification', { state: { email: form.email.trim(), flow: 'register' } });
+      return;
+    }
+
+    setFormError(result?.message || 'Registration failed. Please try again.');
   };
 
   return (
@@ -52,7 +88,7 @@ export default function CreateAccountPage() {
               Continue as a guest for a quick booking, or create an account to save your details and manage future trips easily.
             </p>
 
-            <div className="mt-8 space-y-4">
+            <form onSubmit={handleSignUp} className="mt-8 space-y-4">
               <div>
                 <label className="text-[15px] font-medium text-gray-800 ml-1">First Name</label>
                 <div className="mt-1.5">
@@ -61,6 +97,7 @@ export default function CreateAccountPage() {
                     placeholder="Enter your first name"
                     value={form.firstName}
                     onChange={updateField('firstName')}
+                    hasError={hasError}
                   />
                 </div>
               </div>
@@ -73,6 +110,7 @@ export default function CreateAccountPage() {
                     placeholder="Enter your last name"
                     value={form.lastName}
                     onChange={updateField('lastName')}
+                    hasError={hasError}
                   />
                 </div>
               </div>
@@ -82,16 +120,18 @@ export default function CreateAccountPage() {
                 <div className="mt-1.5">
                   <InputRow
                     icon={<LuMail size={18} />}
+                    type="email"
                     placeholder="Enter your email address"
-                    value={form.address}
-                    onChange={updateField('address')}
+                    value={form.email}
+                    onChange={updateField('email')}
+                    hasError={hasError}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="text-[15px] font-medium text-gray-800 ml-1">Phone Number</label>
-                <div className="mt-1.5 flex items-center rounded-full bg-white px-5 py-3 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border border-gray-50">
+                <div className={`mt-1.5 flex items-center rounded-full bg-white px-5 py-3 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border ${hasError ? 'border-red-200' : 'border-gray-50'}`}>
                   <div className="flex items-center bg-gray-100 rounded-full px-2 py-1">
                     <img src={usFlag} alt="US" className="w-5 h-5 rounded-full object-cover" />
                     <FiChevronDown size={32} className="ml-1 text-gray-600" />
@@ -101,7 +141,7 @@ export default function CreateAccountPage() {
                     type="tel"
                     value={form.phone}
                     onChange={updateField('phone')}
-                    placeholder=""
+                    placeholder="(555) 000-0000"
                     className="ml-3 w-full bg-transparent text-sm text-gray-700 outline-none"
                   />
                 </div>
@@ -116,6 +156,7 @@ export default function CreateAccountPage() {
                     placeholder="*********"
                     value={form.password}
                     onChange={updateField('password')}
+                    hasError={hasError}
                   />
                 </div>
               </div>
@@ -132,35 +173,50 @@ export default function CreateAccountPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 mt-6 ml-1">
+              {/* Error message */}
+              {hasError && (
+                <div className="flex items-center text-red-500 text-[13px] ml-1 mt-1">
+                  <FiInfo size={14} className="mr-1.5 shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3 mt-2 ml-1">
                 <div
-                  className={`w-4 h-4 rounded-full border flex items-center justify-center cursor-pointer ${form.optIn ? 'border-[#1b2d5d] bg-[#1b2d5d]' : 'border-gray-300 bg-transparent'
-                    }`}
+                  className={`w-4 h-4 rounded-full border flex items-center justify-center cursor-pointer ${form.optIn ? 'border-[#1b2d5d] bg-[#1b2d5d]' : 'border-gray-300 bg-transparent'}`}
                   onClick={() => setForm(prev => ({ ...prev, optIn: !prev.optIn }))}
                 >
                   {form.optIn && <div className="w-2 h-2 rounded-full bg-white"></div>}
                 </div>
-                <span className="text-[15px] text-gray-500 cursor-pointer select-none" onClick={() => setForm(prev => ({ ...prev, optIn: !prev.optIn }))}>
+                <span
+                  className="text-[15px] text-gray-500 cursor-pointer select-none"
+                  onClick={() => setForm(prev => ({ ...prev, optIn: !prev.optIn }))}
+                >
                   I want to receive notification & Newsletters
                 </span>
               </div>
 
               <div className="pt-2">
-                <button className="w-full rounded-full bg-[#1b2d5d] text-white py-4 text-[15px] font-semibold hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20" onClick={() => navigate('/otp-verification')}>
-                  Sign Up
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full rounded-full bg-[#1b2d5d] text-white py-4 text-[15px] font-semibold hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? 'Creating account...' : 'Sign Up'}
                 </button>
               </div>
 
               <p className="text-[15px] text-gray-500 mt-4 ml-1">
                 Already have an Account?{' '}
                 <button
+                  type="button"
                   onClick={() => navigate('/login')}
                   className="text-[#1b2d5d] font-semibold hover:underline"
                 >
                   Log In
                 </button>
               </p>
-            </div>
+            </form>
           </div>
         </section>
       </div>

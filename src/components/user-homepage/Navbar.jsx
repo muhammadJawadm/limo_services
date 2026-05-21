@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiEye, FiEyeOff, FiMenu, FiX } from 'react-icons/fi';
-import { LuLock, LuMail } from 'react-icons/lu';
+import { FiMenu, FiX } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo.png';
+import { useAuthStore } from '../../stores/authStore';
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated } = useAuthStore();
+
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
+    || user?.name
+    || user?.email
+    || 'Customer';
+
+  const accountLink = isAuthenticated ? '/dashboard' : '/login';
 
   return (
     <>
@@ -28,17 +32,33 @@ export default function Navbar() {
             <li><Link to="/terms" className="hover:text-blue-700 transition-colors">Terms</Link></li>
             <li><Link to="/privacy" className="hover:text-blue-700 transition-colors">Privacy</Link></li>
             <li><Link to="/support" className="hover:text-blue-700 transition-colors">Support</Link></li>
-            <li><Link to="/driver/register" className="hover:text-blue-700 transition-colors">Become a partner</Link></li>
+            <li><Link to="/driver/login" className="hover:text-blue-700 transition-colors">Become a partner</Link></li>
           </ul>
 
           <div className="flex items-center gap-3">
-            {/* Auth Button — desktop only */}
-            <button
-              onClick={() => setShowLoginModal(true)}
-              className="hidden md:block bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-sm font-semibold px-5 py-3 rounded-3xl shadow"
-            >
-              Login/Registration
-            </button>
+            {isAuthenticated ? (
+              <Link
+                to={accountLink}
+                className="hidden md:inline-flex items-center rounded-3xl border border-[#1B2D5D] bg-white px-5 py-3 text-sm font-semibold text-[#1B2D5D] shadow-sm hover:bg-[#1B2D5D] hover:text-white transition-colors"
+              >
+                {displayName}
+              </Link>
+            ) : (
+              <div className="hidden md:flex items-center gap-3">
+                <Link
+                  to="/login"
+                  className="rounded-3xl border border-[#1B2D5D] bg-white px-5 py-3 text-sm font-semibold text-[#1B2D5D] shadow-sm hover:bg-[#1B2D5D] hover:text-white transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/create-account"
+                  className="rounded-3xl bg-[#1B2D5D] px-5 py-3 text-sm font-semibold text-white shadow hover:bg-blue-800 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
 
             {/* Hamburger — mobile only */}
             <button
@@ -58,93 +78,37 @@ export default function Navbar() {
               <li><Link to="/terms" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Terms</Link></li>
               <li><Link to="/privacy" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Privacy</Link></li>
               <li><Link to="/support" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Support</Link></li>
-              <li><Link to="/driver/register" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Become a partner</Link></li>
+              <li><Link to="/driver/login" onClick={() => setMobileMenuOpen(false)} className="hover:text-blue-700 transition-colors">Become a partner</Link></li>
             </ul>
-            <button
-              onClick={() => { setMobileMenuOpen(false); setShowLoginModal(true); }}
-              className="w-full bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-sm font-semibold px-5 py-3 rounded-3xl shadow"
-            >
-              Login/Registration
-            </button>
+            {isAuthenticated ? (
+              <Link
+                to={accountLink}
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-sm font-semibold px-5 py-3 rounded-3xl shadow text-center"
+              >
+                {displayName}
+              </Link>
+            ) : (
+              <div className="grid grid-cols-1 gap-3">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center border border-[#1B2D5D] text-[#1B2D5D] hover:bg-[#1B2D5D] hover:text-white transition-colors text-sm font-semibold px-5 py-3 rounded-3xl shadow-sm"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/create-account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-sm font-semibold px-5 py-3 rounded-3xl shadow"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </nav>
-
-      {showLoginModal && (
-        <div
-          className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center px-4"
-          onClick={() => setShowLoginModal(false)}
-        >
-          <div
-            className="w-full max-w-lg rounded-[24px] bg-white/100 px-6 py-7 md:px-7"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-center text-3xl font-semibold text-black">Login</h2>
-            <p className="mt-2 text-center text-base text-gray-500 leading-snug">
-              You&apos;ll be able to easily book and manage rides, and
-              <br />
-              get ride status updates
-            </p>
-
-            <div className="mt-5 space-y-4">
-              <div className="flex items-center rounded-full bg-white/70 border px-5 py-3 shadow-sm">
-                <LuMail size={20} className="text-gray-500" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder='John@gmail.com'
-                  className="ml-3 w-full bg-transparent text-base text-gray-600  outline-none"
-                />
-              </div>
-
-              <div className="flex items-center rounded-full bg-white/70 border px-5 py-3 shadow-sm">
-                <LuLock size={20} className="text-gray-500" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder='Enter your password'
-                  className="ml-3 w-full bg-transparent text-base text-gray-600 outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  {showPassword ? <FiEye size={20} /> : <FiEyeOff size={20} />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              onClick={() => { setShowLoginModal(false); navigate('/login'); }}
-              className="mt-5 w-full rounded-full bg-black py-3.5 text-xl font-medium text-white">
-              Login
-            </button>
-
-            <button
-              onClick={() => { setShowLoginModal(false); navigate('/forget-password'); }}
-              className="mt-4 w-full text-center text-xl text-gray-500 hover:text-gray-700 transition-colors">
-              Forgot password?
-            </button>
-
-            <button
-              onClick={() => { setShowLoginModal(false); navigate('/create-account'); }}
-              className="mt-4 w-full rounded-full bg-[#1B2D5D] py-3.5 text-xl font-medium text-white"
-            >
-              Create An account
-            </button>
-
-            <button
-              onClick={() => setShowLoginModal(false)}
-              className="mt-4 w-full rounded-full border-2 border-[#1B2D5D] bg-transparent py-3.5 text-xl font-medium text-[#1B2D5D]"
-            >
-              Back
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 }

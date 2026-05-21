@@ -23,7 +23,13 @@ export const Step8 = ({ formData, updateDoc }) => (
     </div>
 
     <div className="pt-2">
-      <a href="#" className="text-[14px] text-[#1B2D5D] hover:underline">Click here to download a copy of your contractual agreement.</a>
+      <a
+        href={testpdf}
+        download
+        className="text-[14px] text-[#1B2D5D] hover:underline"
+      >
+        Click here to download a copy of your contractual agreement.
+      </a>
     </div>
 
     <div className="mt-6">

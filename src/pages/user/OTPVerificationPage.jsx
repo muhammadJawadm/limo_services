@@ -1,41 +1,68 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiChevronLeft } from 'react-icons/fi';
+import { useCallback, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FiChevronLeft, FiInfo } from 'react-icons/fi';
 import AuthSidePanel from '../../components/AuthSidePanel';
-import tickicon from "../../assets/grouptickpop.png"
+import tickicon from "../../assets/grouptickpop.png";
+import { useAuthStore } from '../../stores/authStore';
+import { useOtpVerification } from '../../hooks/useOtpVerification';
 
 export default function OTPVerificationPage() {
   const navigate = useNavigate();
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const location = useLocation();
+
+  const emailFromState = location.state?.email ?? '';
+  const flow = location.state?.flow ?? 'register';
+
+  const { verifyOtp, verifyResetOtp, resendOtp, isLoading, error, clearError } = useAuthStore();
   const [showModal, setShowModal] = useState(false);
-  const inputRefs = useRef([]);
 
-  const handleChange = (index, value) => {
-    if (isNaN(value)) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+  const {
+    otp,
+    inputRefs,
+    cooldown,
+    hasError,
+    errorMessage,
+    handleChange,
+    handleKeyDown,
+    verifyCode,
+    resendCode,
+    setFormError,
+  } = useOtpVerification({
+    email: emailFromState,
+    flow,
+    verifyOtp,
+    verifyResetOtp,
+    resendOtp,
+    storeError: error,
+    clearStoreError: clearError,
+    startCooldownOnMount: true,
+  });
 
-    // Move to next input if value is entered
-    if (value !== '' && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handleContinue = (e) => {
+  const handleContinue = useCallback(async (e) => {
     e.preventDefault();
-    setShowModal(true);
+    const result = await verifyCode();
+
+    if (result?.success) {
+      setShowModal(true);
+      return;
+    }
+
+    if (result?.message) {
+      setFormError(result.message || 'Verification failed. Please try again.');
+    }
+  }, [verifyCode, setFormError]);
+
+  const handleResend = async () => {
+    await resendCode();
   };
 
   const closeAndNavigate = () => {
     setShowModal(false);
-    navigate('/forget-password');
+    if (flow === 'reset') {
+      navigate('/reset-password', { state: { email: emailFromState } });
+    } else {
+      navigate('/login');
+    }
   };
 
   return (
@@ -57,7 +84,9 @@ export default function OTPVerificationPage() {
 
             <h2 className="text-[26px] font-bold text-[#1b2d5d]">OTP Verification</h2>
             <p className="mt-2 text-[13px] text-gray-500 leading-relaxed pr-6">
-              We have sent a verification code to your phone number +1 454********6
+              {emailFromState
+                ? <>We sent a 6-digit code to <span className="text-[#1b2d5d] font-medium">{emailFromState}</span></>
+                : 'We have sent a verification code to your email.'}
             </p>
 
             <form onSubmit={handleContinue} className="mt-8 space-y-6">
@@ -71,29 +100,50 @@ export default function OTPVerificationPage() {
                     ref={(el) => (inputRefs.current[idx] = el)}
                     onChange={(e) => handleChange(idx, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(idx, e)}
-                    className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white border border-gray-100 shadow-sm text-center text-xl font-semibold text-[#1b2d5d] focus:outline-none focus:border-[#1b2d5d] focus:ring-1 focus:ring-[#1b2d5d] focus:bg-[#F9F9F9] transition-all"
+                    className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white border shadow-sm text-center text-xl font-semibold text-[#1b2d5d] focus:outline-none focus:border-[#1b2d5d] focus:ring-1 focus:ring-[#1b2d5d] transition-all ${hasError ? 'border-red-300' : 'border-gray-100'}`}
                   />
                 ))}
               </div>
 
+              {hasError && (
+                <div className="flex items-center text-red-500 text-[13px]">
+                  <FiInfo size={14} className="mr-1.5 shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               <div className="space-y-1 mt-4">
                 <p className="text-[12px] text-gray-800">
-                  We have sent code to <span className="text-[#1b2d5d] underline cursor-pointer">limeservice@gmail.com</span>
+                  Code sent to{' '}
+                  <span className="text-[#1b2d5d] underline cursor-pointer">
+                    {emailFromState || 'your email'}
+                  </span>
                 </p>
                 <p className="text-[12px] text-gray-800">
-                  Didn't receive code? <span className="font-medium text-[#1b2d5d]">00:54</span>{' '}
-                  <button type="button" className="text-gray-500 hover:text-[#1b2d5d] ml-1 underline">
-                    Re-send code
-                  </button>
+                  Didn't receive code?{' '}
+                  {cooldown > 0 ? (
+                    <span className="font-medium text-[#1b2d5d]">
+                      {String(Math.floor(cooldown / 60)).padStart(2, '0')}:{String(cooldown % 60).padStart(2, '0')}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      className="text-gray-500 hover:text-[#1b2d5d] ml-1 underline font-medium transition-colors"
+                    >
+                      Re-send code
+                    </button>
+                  )}
                 </p>
               </div>
 
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-[#1b2d5d] text-white py-3.5 text-[15px] font-medium hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20 max-w-[300px]"
+                  disabled={isLoading}
+                  className="w-full rounded-full bg-[#1b2d5d] text-white py-3.5 text-[15px] font-medium hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20 max-w-[300px] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Continue
+                  {isLoading ? 'Verifying...' : 'Continue'}
                 </button>
               </div>
             </form>
@@ -101,23 +151,17 @@ export default function OTPVerificationPage() {
         </section>
       </div>
 
-      {/* Verification Modal */}
+      {/* Success Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl p-8 max-w-[380px] w-full flex flex-col items-center text-center shadow-2xl relative animate-in fade-in zoom-in duration-200">
-
-            {/* Modal Icon / Graphic */}
             <div className="relative w-40 h-28 mb-4 flex items-center justify-center p-3">
-
-              {/* Star-like badge shape background (approximated with a circle and shadows/layers) */}
-              <img src={tickicon} className='object-contain' alt="" />
+              <img src={tickicon} className='object-contain' alt="Verified" />
             </div>
-
             <h3 className="text-[22px] font-bold text-gray-900 mb-2">Verification complete!</h3>
             <p className="text-[14px] text-gray-500 mb-8 max-w-[240px]">
               Your account has been successfully verified.
             </p>
-
             <button
               onClick={closeAndNavigate}
               className="w-full rounded-full bg-[#1b2d5d] text-white py-3.5 text-[15px] font-medium hover:bg-[#16254c] transition-colors"

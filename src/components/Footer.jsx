@@ -2,7 +2,7 @@ import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const infoLinks = [
-  { label: 'Become a Partner', path: '/driver/register' },
+  { label: 'Become a Partner', path: '/driver/login' },
   { label: 'Terms & Condition', path: '/terms' },
   { label: 'Privacy Policy', path: '/privacy' },
   { label: 'Support', path: '/support' }

@@ -3,7 +3,7 @@ import { CiEdit } from "react-icons/ci";
 import { useState, useRef, useEffect } from 'react';
 
 const PASSENGERS = [
-  { id: 1, name: 'Jason smith', phone: '+ 145 125 451', priority: 'VIP', empId: '1451', route: '2' },
+  // { id: 1, name: 'Jason smith', phone: '+ 145 125 451', priority: 'VIP', empId: '1451', route: '2' },
 ];
 
 export default function PassengerView({ onEditPassenger }) {

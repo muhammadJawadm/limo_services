@@ -4,10 +4,35 @@ import { useState } from 'react';
 import shape from "../../assets/shape.png"
 import usFlag from "../../assets/us.png"
 import PrimaryButton from '../PrimaryButton';
+import { createSupportRequest } from '../../services/supportService';
 
 export default function CorporateSupportSection() {
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', message: '' });
+  const initialForm = { firstName: '', lastName: '', email: '', phone: '', description: '' };
+  const [form, setForm] = useState(initialForm);
+  const [submitError, setSubmitError] = useState('');
+  const [submitSuccess, setSubmitSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitError('');
+    setSubmitSuccess('');
+    setIsSubmitting(true);
+
+    const result = await createSupportRequest(form);
+
+    if (!result.success) {
+      setSubmitError(result.message || 'Unable to send support request.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    setSubmitSuccess('Your support request has been sent successfully.');
+    setForm(initialForm);
+    setIsSubmitting(false);
+  };
 
   return (
     <section className="relative overflow-hidden min-h-[600px] flex justify-center">
@@ -37,7 +62,7 @@ export default function CorporateSupportSection() {
         </div>
 
         {/* Right — Contact Form */}
-        <div className="bg-white rounded-3xl p-2 md:p-10 w-full max-w-md shadow-xl relative z-20 pointer-events-auto">
+        <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-2 md:p-10 w-full max-w-md shadow-xl relative z-20 pointer-events-auto">
           {/* Title & subtitle */}
           <h2 className="text-[#1a2b5e] font-bold text-2xl mb-2 text-center">
             Need Corporate Support?
@@ -54,6 +79,7 @@ export default function CorporateSupportSection() {
                 value={form.firstName}
                 onChange={handleChange}
                 placeholder="First Name"
+                required
                 className="flex-1 px-5 py-3.5 rounded-full text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200"
               />
               <input
@@ -61,6 +87,7 @@ export default function CorporateSupportSection() {
                 value={form.lastName}
                 onChange={handleChange}
                 placeholder="Last Name"
+                required
                 className="flex-1 px-5 py-3.5 w-full md:w-10 rounded-full text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200"
               />
             </div>
@@ -73,6 +100,7 @@ export default function CorporateSupportSection() {
                 onChange={handleChange}
                 placeholder="Email Address"
                 type="email"
+                required
                 className="flex-1 px-5 py-3.5 rounded-full text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200"
               />
               <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-3.5 flex-1">
@@ -88,6 +116,7 @@ export default function CorporateSupportSection() {
                   onChange={handleChange}
                   placeholder="Phone number"
                   type="tel"
+                  required
                   className="flex-1 text-sm bg-transparent text-gray-700 placeholder-gray-400 outline-none min-w-0 w-full"
                 />
               </div>
@@ -95,20 +124,24 @@ export default function CorporateSupportSection() {
 
             {/* Row 3: Textarea */}
             <textarea
-              name="message"
-              value={form.message}
+              name="description"
+              value={form.description}
               onChange={handleChange}
               placeholder="Lorem impsum..."
               rows={6}
+              required
               className="w-full px-5 py-4 rounded-2xl text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200 resize-none"
             />
 
+            {submitError ? <p className="text-sm text-red-500">{submitError}</p> : null}
+            {submitSuccess ? <p className="text-sm text-green-600">{submitSuccess}</p> : null}
+
             {/* Submit button */}
-            <PrimaryButton fullWidth size="lg" type="submit" className="mt-1">
-              Submit
+            <PrimaryButton fullWidth size="lg" type="submit" className="mt-1" disabled={isSubmitting}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </PrimaryButton>
           </div>
-        </div>
+        </form>
       </div>
     </section>
   );

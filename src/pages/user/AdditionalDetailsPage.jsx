@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BsCheck2 } from 'react-icons/bs';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
@@ -18,14 +18,14 @@ import plane from "../../assets/plane.png";
 
 import businessSedanImg from '../../assets/business-class-car.png';
 import childSeatIcon from '../../assets/childicon.png';
-
-const stops = [
-  { label: 'USA Hockey Arena', address: 'Beck Road, Plymouth, MI, USA', type: 'pickup' },
-  { label: 'USA Vein Clinics', address: 'Telegraph Road, Southfield, MI, USA', type: 'stop' },
-  { label: 'USA Paper & Ribbon', address: 'Eight Mile West, Southfield, MI, USA', type: 'dropoff' },
-];
-
-const countOptions = [0, 1, 2, 3, 4];
+import { getVehicleCategoryById } from '../../services/vehicleCategoryService';
+import { updateBookingStep3 } from '../../services/bookingService';
+import { buildStops, countOptions, formatBookingDate, readBookingDraft } from './additionalDetails.helpers';
+import {
+  persistBookingSession,
+  resolveBookingContext,
+  resolveBookingId,
+} from '../../utils/bookingSession';
 
 export default function AdditionalDetailsPage() {
   const navigate = useNavigate();
@@ -34,20 +34,80 @@ export default function AdditionalDetailsPage() {
   const [infant, setInfant] = useState(0);
   const [toddler, setToddler] = useState(1);
   const [booster, setBooster] = useState(0);
+  const [bookingDetails, setBookingDetails] = useState(null);
+  const [vehicleDetails, setVehicleDetails] = useState(null);
+  const [loadingVehicle, setLoadingVehicle] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const storedBookingContext = (() => {
-    const raw = sessionStorage.getItem('bookingContext');
-    if (!raw) return null;
-
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  })();
-
-  const bookingContext = location.state ?? storedBookingContext ?? {};
+  const bookingContext = resolveBookingContext(location.state);
   const isHourlyRide = bookingContext.rideType === 'hourly';
+  const bookingId = resolveBookingId(bookingContext);
+
+  useEffect(() => {
+    const parsed = readBookingDraft();
+    if (!parsed) {
+      setBookingDetails(null);
+      return;
+    }
+
+    setBookingDetails(parsed);
+    setChildSeats(Boolean(parsed?.childSeatRequired));
+    setInfant(Number(parsed?.childSeats?.infant ?? parsed?.childSeatInfant ?? 0));
+    setToddler(Number(parsed?.childSeats?.toddler ?? parsed?.childSeatToddler ?? 0));
+    setBooster(Number(parsed?.childSeats?.booster ?? parsed?.childSeatBooster ?? 0));
+  }, []);
+
+  useEffect(() => {
+    const loadVehicleDetails = async () => {
+      if (!bookingDetails?.vehicleCategoryId) {
+        return;
+      }
+
+      setLoadingVehicle(true);
+      const result = await getVehicleCategoryById(bookingDetails.vehicleCategoryId);
+      if (result?.success) {
+        setVehicleDetails(result?.data ?? null);
+      }
+      setLoadingVehicle(false);
+    };
+
+    loadVehicleDetails();
+  }, [bookingDetails?.vehicleCategoryId]);
+
+  const stops = useMemo(() => {
+    return buildStops(bookingDetails);
+  }, [bookingDetails]);
+
+  const handleContinue = async () => {
+    if (!bookingId) {
+      setSubmitError('Booking id is missing. Please start a new booking.');
+      return;
+    }
+
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    const payload = {
+      childSeatRequired: Boolean(childSeats),
+      childSeats: {
+        infant: Number(infant),
+        toddler: Number(toddler),
+        booster: Number(booster),
+      },
+    };
+
+    const result = await updateBookingStep3(bookingId, payload);
+    if (!result?.success) {
+      setSubmitError(result?.message || 'Failed to update child seat details.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    persistBookingSession({ bookingDraft: result?.data ?? null });
+    setIsSubmitting(false);
+    navigate('/passenger-details');
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -99,16 +159,16 @@ export default function AdditionalDetailsPage() {
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
                 <LuCalendarDays size={15} className="text-gray-400 flex-shrink-0" />
-                <span className="whitespace-nowrap">Wed, Feb 18th 2026</span>
+                <span className="whitespace-nowrap">{formatBookingDate(bookingDetails?.date)}</span>
               </div>
               <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
                 <LuClock3 size={15} className="text-gray-400 flex-shrink-0" />
-                <span>12:11</span>
+                <span>{bookingDetails?.time || 'Select a time'}</span>
               </div>
               {isHourlyRide && (
                 <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
                   <LuClock3 size={15} className="text-gray-400" />
-                  <span>3 hours</span>
+                  <span>{bookingDetails?.hours ? `${bookingDetails.hours} hours` : 'Hourly ride'}</span>
                 </div>
               )}
             </div>
@@ -117,11 +177,11 @@ export default function AdditionalDetailsPage() {
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
                 <img src={usericonblack} className="w-4 h-4" alt="passengers" />
-                <span>3 Passengers</span>
+                <span>{bookingDetails?.noOfPassengers ?? 0} Passengers</span>
               </div>
               <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500 rounded-full bg-white px-3 py-2">
                 <img src={briefcaseblack} className="w-4 h-4" alt="luggage" />
-                <span>3 Luggage</span>
+                <span>{bookingDetails?.luggage ?? 0} Luggage</span>
               </div>
 
             </div>
@@ -135,26 +195,34 @@ export default function AdditionalDetailsPage() {
           <div className="bg-[#1a2b5e] rounded-2xl px-5 py-4">
             <div className="flex items-center gap-4">
               {/* Car image */}
-              <img src={businessSedanImg} alt="Business Sedan" className="w-20 h-12 md:w-28 md:h-16 object-contain flex-shrink-0" />
+              <img
+                src={vehicleDetails?.picture || businessSedanImg}
+                alt={vehicleDetails?.name || 'Selected vehicle'}
+                className="w-20 h-12 md:w-28 md:h-16 object-contain flex-shrink-0"
+              />
 
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
-                  <p className="text-white font-bold text-sm md:text-base">Business Sedan</p>
+                  <p className="text-white font-bold text-sm md:text-base">
+                    {vehicleDetails?.name || (loadingVehicle ? 'Loading vehicle...' : 'Selected vehicle')}
+                  </p>
                   <span className="flex items-center gap-1 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
                     <BsCheck2 size={11} /> Selected
                   </span>
                 </div>
-                <p className="text-blue-200 text-xs">Cadillac CT6, Lyric or similar</p>
+                <p className="text-blue-200 text-xs">
+                  {vehicleDetails?.classification ? `${vehicleDetails.classification} class` : 'Premium ride experience'}
+                </p>
                 {/* Feature icons row + price */}
                 <div className="flex lg:flex-row flex-col items-start justify-between mt-2">
                   <div className="flex items-center gap-1 lg:gap-3">
                     <div className='flex items-center gap-3 border rounded-full px-3 py-1 bg-white/10 '>
                       <span className="flex items-center gap-1 text-xs text-white">
-                        <img src={usericon} className="w-4 h-4" alt="passengers" /> 3
+                        <img src={usericon} className="w-4 h-4" alt="passengers" /> {vehicleDetails?.passengerCapacity ?? 0}
                       </span>
                       <span className="flex items-center gap-1 text-xs text-white">
-                        <img src={briefcase} className="w-4 h-4" alt="luggage" /> 3
+                        <img src={briefcase} className="w-4 h-4" alt="luggage" /> {vehicleDetails?.luggageCapacity ?? 0}
                       </span>
                     </div>
                     <img src={seat} className="w-6 h-6" alt="seat" />
@@ -162,7 +230,9 @@ export default function AdditionalDetailsPage() {
                     <img src={drink} className="w-6 h-6" alt="drink" />
                     <img src={plane} className="w-6 h-6" alt="plane" />
                   </div>
-                  <p className="text-white font-bold text-lg">$95.00</p>
+                  <p className="text-white font-bold text-lg">
+                    ${Number(vehicleDetails?.baseFare ?? bookingDetails?.totalAmount ?? 0).toFixed(2)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -230,12 +300,16 @@ export default function AdditionalDetailsPage() {
               </div>
             </div>
             {/* Continue button */}
+            {submitError ? (
+              <p className="text-sm text-red-500 mb-3">{submitError}</p>
+            ) : null}
             <div className="flex justify-end">
               <button
-                onClick={() => navigate('/passenger-details')}
+                onClick={handleContinue}
                 className="flex items-center gap-2 bg-[#1a2b5e] text-white text-sm font-bold px-8 py-3 rounded-full hover:bg-[#253576] transition-colors"
+                disabled={isSubmitting}
               >
-                Continue <FiChevronRight size={16} />
+                {isSubmitting ? 'Saving...' : 'Continue'} <FiChevronRight size={16} />
               </button>
             </div>
           </div>

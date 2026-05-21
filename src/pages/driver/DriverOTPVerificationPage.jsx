@@ -1,34 +1,62 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiChevronLeft } from 'react-icons/fi';
+import { useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FiChevronLeft, FiInfo } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
+import { useAuthStore } from '../../stores/authStore';
+import { OTP_RESEND_COOLDOWN, useOtpVerification } from '../../hooks/useOtpVerification';
 
 export default function DriverOTPVerificationPage() {
   const navigate = useNavigate();
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const inputRefs = useRef([]);
+  const location = useLocation();
 
-  const handleChange = (element, index) => {
-    if (isNaN(element.value)) return false;
+  const emailFromState = location.state?.email ?? '';
+  const flow = location.state?.flow ?? 'register';
 
-    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
+  const { verifyOtp, verifyResetOtp, resendOtp, isLoading, error, clearError } = useAuthStore();
 
-    // Focus next input
-    if (element.nextSibling) {
-      element.nextSibling.focus();
+  const {
+    otp,
+    inputRefs,
+    cooldown,
+    hasError,
+    errorMessage,
+    handleChange,
+    handleKeyDown,
+    verifyCode,
+    resendCode,
+    setFormError,
+  } = useOtpVerification({
+    email: emailFromState,
+    flow,
+    verifyOtp,
+    verifyResetOtp,
+    resendOtp,
+    storeError: error,
+    clearStoreError: clearError,
+    startCooldownOnMount: false,
+    initialCooldown: OTP_RESEND_COOLDOWN,
+  });
+
+  const handleContinue = useCallback(async () => {
+    const result = await verifyCode();
+
+    if (result?.success) {
+      if (flow === 'reset') {
+        navigate('/driver/reset-password', { state: { email: emailFromState } });
+      } else {
+        navigate('/driver/login');
+      }
+      return;
     }
-  };
 
-  const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0 && inputRefs.current[index - 1]) {
-      // Focus previous input on backspace if current is empty
-      inputRefs.current[index - 1].focus();
+    if (result?.message) {
+      setFormError(result.message || 'Verification failed. Please try again.');
     }
-  };
+  }, [verifyCode, setFormError, flow, navigate, emailFromState]);
 
-  const handleContinue = () => {
-    navigate('/driver/forget-password');
+  const handleResend = async () => {
+    await resendCode();
   };
 
   return (
@@ -52,20 +80,22 @@ export default function DriverOTPVerificationPage() {
 
             <h2 className="text-[28px] md:text-[32px] font-semibold text-[#1b2d5d]">OTP Verification</h2>
             <p className="mt-2 text-[15px] text-gray-500 max-w-sm leading-relaxed">
-              We have sent a verification code to your phone number +1 454********6
+              {emailFromState
+                ? <>We sent a 6-digit code to <span className="text-[#1b2d5d] font-medium">{emailFromState}</span></>
+                : 'We have sent a verification code to your email.'}
             </p>
 
             <div className="mt-8">
-              <div className="flex gap-3 md:gap-4 mb-8">
+              <div className="flex gap-3 md:gap-4 mb-4">
                 {otp.map((data, index) => (
                   <input
-                    className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-gray-200 bg-white text-center text-xl font-semibold text-[#111] focus:border-[#1b2d5d] focus:outline-none focus:ring-1 focus:ring-[#1b2d5d] transition-all"
+                    className={`w-12 h-12 md:w-14 md:h-14 rounded-full border bg-white text-center text-xl font-semibold text-[#111] focus:border-[#1b2d5d] focus:outline-none focus:ring-1 focus:ring-[#1b2d5d] transition-all ${hasError ? 'border-red-300' : 'border-gray-200'}`}
                     type="text"
                     name="otp"
                     maxLength="1"
                     key={index}
                     value={data}
-                    onChange={e => handleChange(e.target, index)}
+                    onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={e => handleKeyDown(e, index)}
                     onFocus={e => e.target.select()}
                     ref={el => inputRefs.current[index] = el}
@@ -73,21 +103,40 @@ export default function DriverOTPVerificationPage() {
                 ))}
               </div>
 
+              {hasError && (
+                <div className="flex items-center text-red-500 text-[13px] mb-4">
+                  <FiInfo size={14} className="mr-1.5 shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               <div className="space-y-1 mb-8 text-[14px]">
                 <p className="text-gray-700">
-                  We have sent code to <span className="text-[#1b2d5d] font-medium">limeservice@gmail.com</span>
+                  Code sent to <span className="text-[#1b2d5d] font-medium">{emailFromState || 'your email'}</span>
                 </p>
                 <p className="text-gray-500">
-                  Didn't receive code? <span className="text-[#1b2d5d] font-medium mr-1">00:54</span>
-                  <button className="text-gray-600 underline font-medium hover:text-[#111]">Re-send code</button>
+                  Didn't receive code?{' '}
+                  {cooldown > 0 ? (
+                    <span className="text-[#1b2d5d] font-medium mr-1">
+                      {String(Math.floor(cooldown / 60)).padStart(2, '0')}:{String(cooldown % 60).padStart(2, '0')}
+                    </span>
+                  ) : (
+                    <button
+                      onClick={handleResend}
+                      className="text-gray-600 underline font-medium hover:text-[#111] transition-colors"
+                    >
+                      Re-send code
+                    </button>
+                  )}
                 </p>
               </div>
 
               <button
                 onClick={handleContinue}
-                className="w-full max-w-sm rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042]"
+                disabled={isLoading}
+                className="w-full max-w-sm rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042] disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Continue
+                {isLoading ? 'Verifying...' : 'Continue'}
               </button>
             </div>
           </div>

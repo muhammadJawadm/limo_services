@@ -1,296 +1,193 @@
-import { useState } from 'react';
-import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
-import { BsTrash, BsCheck2, BsAirplane } from 'react-icons/bs';
-import { MdOutlineLocationOn } from 'react-icons/md';
-import { LuCalendarDays, LuClock3 } from 'react-icons/lu';
-import PrimaryButton from './PrimaryButton';
-import group from "../assets/groupofpop.png";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import PrimaryButton from './PrimaryButton'
+import { createBookingStep1 } from '../services/bookingService'
+import { hasAuthToken } from '../utils/authStorage'
+import {
+	normalizeBookingDate,
+	normalizeBookingTime,
+	normalizeHourlyDuration,
+} from '../utils/bookingFormUtils'
+import { persistBookingSession } from '../utils/bookingSession'
+import HourlySwitchPopup from './booking-form/HourlySwitchPopup'
+import PointToPointFields from './booking-form/PointToPointFields'
+import HourlyFields from './booking-form/HourlyFields'
 
 export default function BookingForm() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('point'); // 'point' | 'hourly'
-  const [stops, setStops] = useState([]);
-  const [stopLocations, setStopLocations] = useState([{ value: '' }]);
-  const [showSwitchPopup, setShowSwitchPopup] = useState(false);
-  const [hourlyDuration, setHourlyDuration] = useState('');
+	const navigate = useNavigate()
+	const [activeTab, setActiveTab] = useState('point')
+	const [pickupLocation, setPickupLocation] = useState('')
+	const [stops, setStops] = useState([])
+	const [stopLocations, setStopLocations] = useState([])
+	const [dropoffLocation, setDropoffLocation] = useState('')
+	const [dateValue, setDateValue] = useState('')
+	const [timeValue, setTimeValue] = useState('')
+	const [flightNumber, setFlightNumber] = useState('')
+	const [showSwitchPopup, setShowSwitchPopup] = useState(false)
+	const [hourlyDuration, setHourlyDuration] = useState('')
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [submitError, setSubmitError] = useState('')
 
-  const handleGetQuote = () => {
-    const bookingContext = {
-      rideType: activeTab,
-      hourlyDuration: activeTab === 'hourly' ? hourlyDuration.trim() : '',
-    };
+	const handleGetQuote = async () => {
+		if (isSubmitting) {
+			return
+		}
 
-    sessionStorage.setItem('bookingContext', JSON.stringify(bookingContext));
-    navigate('/select-vehicle', { state: bookingContext });
-  };
+		setSubmitError('')
 
-  const addStop = () => {
-    if (stops.length >= 4) {
-      setShowSwitchPopup(true);
-    } else {
-      setStops([...stops, { value: '' }]);
-    }
-  };
-  const removeStop = (i) => setStops(stops.filter((_, idx) => idx !== i));
+		if (activeTab === 'hourly') {
+			const hoursValue = normalizeHourlyDuration(hourlyDuration)
+			if (hoursValue === null) {
+				setSubmitError('Please enter the number of hours for an hourly ride.')
+				return
+			}
+		}
 
-  return (
-    <>
-      {/* ── Switch to Hourly Popup ── */}
-      {showSwitchPopup && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
-          <div className="bg-white rounded-3xl shadow-2xl px-10 py-10 flex flex-col items-center max-w-sm w-full mx-4 relative">
-            {/* Decorative dots */}
-            {/* Icon */}
-            <div className="mb-5">
-              <img src={group} alt="Group of People" className="w-36 h-24 object-contain" />
-            </div>
+		setIsSubmitting(true)
 
-            {/* Title */}
-            <h2 className="text-xl font-bold text-gray-900 mb-3 text-center">Switch to Hourly Ride</h2>
+		const mergedStops = [...stops, ...stopLocations]
+			.map((stop) => stop.trim())
+			.filter(Boolean)
 
-            {/* Description */}
-            <p className="text-gray-400 text-sm text-center leading-relaxed mb-7">
-              You've added more than 4 stops. An hourly ride may be more suitable and cost-effective for your journey.
-            </p>
+		const payload = {
+			type: activeTab === 'hourly' ? 'hourly' : 'ptop',
+			pickupLocation: pickupLocation.trim(),
+			stopLocations: mergedStops,
+			dropoffLocation: dropoffLocation.trim(),
+			date: normalizeBookingDate(dateValue.trim()),
+			time: normalizeBookingTime(timeValue),
+			flightNumber: flightNumber.trim(),
+			isGuest: !hasAuthToken(),
+		}
 
-            {/* Switch button */}
-            <button
-              onClick={() => {
-                setActiveTab('hourly');
-                setShowSwitchPopup(false);
-              }}
-              className="w-full bg-[#1a2b5e] text-white font-semibold py-4 rounded-full text-base hover:bg-[#253576] transition-colors"
-            >
-              Switch to Hourly
-            </button>
-          </div>
-        </div>,
-        document.body
-      )}
+		if (activeTab === 'hourly') {
+			payload.hours = normalizeHourlyDuration(hourlyDuration)
+		}
 
-      <div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-sm">
-        {/* ── Tab Header ── */}
-        <div className="flex">
-          <button
-            onClick={() => setActiveTab('point')}
-            className={`flex-1 py-4 text-sm font-bold tracking-wide transition-colors ${activeTab === 'point'
-              ? 'bg-[#1a2b5e] text-white'
-              : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-              }`}
-          >
-            Point-to-Point
-          </button>
-          <button
-            onClick={() => setActiveTab('hourly')}
-            className={`flex-1 py-4 text-sm font-bold tracking-wide transition-colors ${activeTab === 'hourly'
-              ? 'bg-[#1a2b5e] text-white'
-              : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-              }`}
-          >
-            Hourly
-          </button>
-        </div>
+		const result = await createBookingStep1(payload)
 
-        {/* ── Form Body ── */}
-        <div className="bg-gray-50 p-1 md:p-5 space-y-3">
-          {activeTab === 'point' ? (
-            <>
-              {/* 1. Pickup Location + Add Stop button */}
-              <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm  gap-0 md:gap-3">
-                <MdOutlineLocationOn className="text-green-500 flex-shrink-0" size={20} />
-                <input
-                  type="text"
-                  placeholder="Pickup Location"
-                  className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                />
-                <button
-                  onClick={addStop}
-                  className="flex items-center gap-1.5 bg-[#1a2b5e] text-white text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap hover:bg-[#253576] transition-colors"
-                >
-                  <span className="text-base leading-none">+</span> Add Stop
-                </button>
-              </div>
+		if (!result?.success) {
+			setSubmitError(result?.message || 'Failed to create booking draft.')
+			setIsSubmitting(false)
+			return
+		}
 
-              {/* 2. Dynamic stops */}
-              {stops.map((stop, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3 flex-1">
-                    <MdOutlineLocationOn className="text-yellow-500 flex-shrink-0" size={20} />
-                    <input
-                      type="text"
-                      defaultValue={stop.value}
-                      placeholder="Stop address"
-                      className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400"
-                    />
-                  </div>
-                  <button
-                    onClick={() => removeStop(i)}
-                    className="w-11 h-11 flex items-center justify-center bg-red-100 text-red-500 rounded-full flex-shrink-0 hover:bg-red-200 transition-colors"
-                  >
-                    <BsTrash size={16} />
-                  </button>
-                </div>
-              ))}
+		const bookingId = result?.data?.id || result?.data?._id || ''
+		const bookingContext = {
+			rideType: activeTab,
+			hourlyDuration: activeTab === 'hourly' ? hourlyDuration.trim() : '',
+			bookingId,
+		}
 
-              {/* 3. Stop location with gold checkmark */}
-              {stopLocations.map((sl, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3 flex-1">
-                    <MdOutlineLocationOn className="text-gray-400 flex-shrink-0" size={20} />
-                    <input
-                      type="text"
-                      defaultValue={sl.value}
-                      placeholder="Stop Location"
-                      className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400"
-                    />
-                  </div>
-                  <button className="w-11 h-11 flex items-center justify-center bg-yellow-500 text-white rounded-full flex-shrink-0 hover:bg-yellow-600 transition-colors">
-                    <BsCheck2 size={18} />
-                  </button>
-                </div>
-              ))}
+		persistBookingSession({
+			bookingId,
+			bookingDraft: result?.data ?? null,
+			bookingContext,
+		})
+		setIsSubmitting(false)
+		navigate('/select-vehicle', { state: bookingContext })
+	}
 
-              {/* 4. Drop-off address */}
-              <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3">
-                <MdOutlineLocationOn className="text-red-400 flex-shrink-0" size={20} />
-                <input
-                  type="text"
-                  placeholder="Drop-off address"
-                  className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                />
-              </div>
+	const addStop = () => {
+		if (stops.length >= 4) {
+			setShowSwitchPopup(true)
+		} else {
+			setStops([...stops, ''])
+		}
+	}
 
-              {/* 5. Date & Time row */}
-              <div className="flex gap-3">
-                <div className="flex items-center bg-white rounded-full px-4 py-4 shadow-sm gap-2 flex-1">
-                  <LuCalendarDays className="text-gray-400 flex-shrink-0" size={16} />
-                  <input
-                    type="text"
-                    placeholder="dd----YYYY"
-                    className="flex-1 text-xs outline-none bg-transparent placeholder-gray-400 text-gray-700 w-0"
-                  />
-                </div>
-                <div className="flex items-center bg-white rounded-full px-4 py-4 shadow-sm gap-2 flex-1">
-                  <LuClock3 className="text-gray-400 flex-shrink-0" size={16} />
-                  <input
-                    type="text"
-                    placeholder="12:11 pm"
-                    className="flex-1 text-xs outline-none bg-transparent placeholder-gray-400 text-gray-700 w-0"
-                  />
-                </div>
-              </div>
+	const removeStop = (i) => setStops(stops.filter((_, idx) => idx !== i))
+	const updateStop = (index, value) => {
+		setStops(stops.map((stop, idx) => (idx === index ? value : stop)))
+	}
+	const updateStopLocation = (index, value) => {
+		setStopLocations((current) => {
+			const nextStops = [...current]
+			nextStops[index] = value
+			return nextStops
+		})
+	}
 
-              {/* 6. Flight Number */}
-              <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-3">
-                <BsAirplane className="text-gray-400 flex-shrink-0" size={16} />
-                <input
-                  type="text"
-                  placeholder="Flight Number (Option)"
-                  className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {/* ── Hourly Tab Fields ── */}
+	const sharedFieldProps = {
+		pickupLocation,
+		onPickupChange: setPickupLocation,
+		stops,
+		stopLocations,
+		onAddStop: addStop,
+		onRemoveStop: removeStop,
+		onUpdateStop: updateStop,
+		onUpdateStopLocation: updateStopLocation,
+		dropoffLocation,
+		onDropoffChange: setDropoffLocation,
+		dateValue,
+		onDateChange: setDateValue,
+		timeValue,
+		onTimeChange: setTimeValue,
+		flightNumber,
+		onFlightNumberChange: setFlightNumber,
+	}
 
-              {/* 1. Pickup Location + Add Stop */}
-              <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3">
-                <MdOutlineLocationOn className="text-green-500 flex-shrink-0" size={20} />
-                <input
-                  type="text"
-                  placeholder="Pickup Location"
-                  className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                />
-                <button className="flex items-center gap-1.5 bg-[#1a2b5e] text-white text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap hover:bg-[#253576] transition-colors">
-                  <span className="text-base leading-none">+</span> Add Stop
-                </button>
-              </div>
+	return (
+		<>
+			<HourlySwitchPopup
+				isOpen={showSwitchPopup}
+				onSwitch={() => {
+					setActiveTab('hourly')
+					setShowSwitchPopup(false)
+				}}
+				onClose={() => setShowSwitchPopup(false)}
+			/>
 
-              {/* 2. Stop row — yellow pin + trash button */}
+			<div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-sm">
+				<div className="flex">
+					<button
+						onClick={() => setActiveTab('point')}
+						className={`flex-1 py-4 text-sm font-bold tracking-wide transition-colors ${activeTab === 'point'
+							? 'bg-[#1a2b5e] text-white'
+							: 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+							}`}
+					>
+						Point-to-Point
+					</button>
+					<button
+						onClick={() => setActiveTab('hourly')}
+						className={`flex-1 py-4 text-sm font-bold tracking-wide transition-colors ${activeTab === 'hourly'
+							? 'bg-[#1a2b5e] text-white'
+							: 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+							}`}
+					>
+						Hourly
+					</button>
+				</div>
 
+				<div className="bg-gray-50 p-1 md:p-5 space-y-3">
+					{activeTab === 'point' ? (
+						<PointToPointFields {...sharedFieldProps} />
+					) : (
+						<HourlyFields
+							{...sharedFieldProps}
+							hourlyDuration={hourlyDuration}
+							onHourlyDurationChange={setHourlyDuration}
+							onSameAsPickup={() => setDropoffLocation(pickupLocation)}
+						/>
+					)}
 
-              {/* 3. Stop Location — gray pin + gold checkmark */}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3 flex-1">
-                  <MdOutlineLocationOn className="text-gray-400 flex-shrink-0" size={20} />
-                  <input
-                    type="text"
-                    placeholder="Stop Location"
-                    className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                  />
-                </div>
-                <button className="w-11 h-11 flex items-center justify-center bg-yellow-500 text-white rounded-full flex-shrink-0 hover:bg-yellow-600 transition-colors">
-                  <BsCheck2 size={18} />
-                </button>
-              </div>
-
-              {/* 4. Duration */}
-              <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3">
-                <LuClock3 className="text-gray-400 flex-shrink-0" size={18} />
-                <input
-                  type="text"
-                  placeholder="Duration"
-                  value={hourlyDuration}
-                  onChange={(e) => setHourlyDuration(e.target.value)}
-                  className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                />
-              </div>
-
-              {/* 5. Drop-off Location + "Same as pickup" button */}
-              <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3">
-                <MdOutlineLocationOn className="text-red-400 flex-shrink-0" size={20} />
-                <input
-                  type="text"
-                  placeholder="Drop-off Location"
-                  className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                />
-                <button className="flex items-center bg-[#1a2b5e] text-white text-xs font-semibold px-2 md:px-4 py-2 rounded-full whitespace-nowrap hover:bg-[#253576] transition-colors">
-                  Same as pickup
-                </button>
-              </div>
-
-              {/* 6. Date & Time row */}
-              <div className="flex gap-3">
-                <div className="flex items-center bg-white rounded-full px-4 py-4 shadow-sm gap-2 flex-1">
-                  <LuCalendarDays className="text-gray-400 flex-shrink-0" size={16} />
-                  <input
-                    type="text"
-                    placeholder="dd----YYYY"
-                    className="flex-1 text-xs outline-none bg-transparent placeholder-gray-400 text-gray-700 w-0"
-                  />
-                </div>
-                <div className="flex items-center bg-white rounded-full px-4 py-4 shadow-sm gap-2 flex-1">
-                  <LuClock3 className="text-gray-400 flex-shrink-0" size={16} />
-                  <input
-                    type="text"
-                    placeholder="12:11 pm"
-                    className="flex-1 text-xs outline-none bg-transparent placeholder-gray-400 text-gray-700 w-0"
-                  />
-                </div>
-              </div>
-
-              {/* 7. Flight Number */}
-              <div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-3">
-                <BsAirplane className="text-gray-400 flex-shrink-0" size={16} />
-                <input
-                  type="text"
-                  placeholder="Flight Number (Option)"
-                  className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-                />
-              </div>
-            </>
-          )}
-
-          {/* ── Get Quote Button ── */}
-          <div className="mt-2">
-            <PrimaryButton fullWidth size="lg" className="tracking-wide mb-1 mt-5 bg-primary" onClick={handleGetQuote}>
-              Get Quote
-            </PrimaryButton>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+					<div className="mt-2">
+						{submitError ? (
+							<p className="text-sm text-red-500 text-center mb-3">{submitError}</p>
+						) : null}
+						<PrimaryButton
+							fullWidth
+							size="lg"
+							className="tracking-wide mb-1 mt-5 bg-primary"
+							onClick={handleGetQuote}
+							disabled={isSubmitting}
+						>
+							{isSubmitting ? 'Creating Draft...' : 'Get Quote'}
+						</PrimaryButton>
+					</div>
+				</div>
+			</div>
+		</>
+	)
 }

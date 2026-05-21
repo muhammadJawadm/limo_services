@@ -3,21 +3,33 @@ import { MdOutlineLocationOn, MdCircle } from 'react-icons/md';
 import { TbArrowRight } from 'react-icons/tb';
 import RouteMap from '../RouteMap';
 import arowswap from "../../assets/arrow-swap.png";
+import { formatBookingDate, formatBookingTime } from '../../utils/bookingFormatters';
 
-export default function TripDetailsPanel({ stops, isHourlyRide }) {
+export default function TripDetailsPanel({ stops, isHourlyRide, bookingDetails }) {
+  const displayDate = formatBookingDate(bookingDetails?.date);
+  const displayTime = formatBookingTime(bookingDetails?.time);
+  const displayHours = bookingDetails?.hours ? `${bookingDetails.hours} hours` : 'Point to point';
+
   return (
     <div className="w-full md:w-[42%] flex flex-col gap-4">
       {/* Map */}
       <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        <RouteMap />
+        <RouteMap
+          pickupLocation={bookingDetails?.pickupLocation}
+          dropoffLocation={bookingDetails?.dropoffLocation}
+        />
 
         {/* Route summary bar */}
         <div className="flex items-center gap-2 px-4 py-3 bg-white border-t border-gray-100 text-sm text-gray-900">
           <img src={arowswap} alt="Arrow Swap" className="w-5 h-5" />
-          <span className="font-semibold">10.0 mi</span>
-          <span></span>
-          <LuClock3 size={18} />
-          <span>1 hrs 35 mins</span>
+          <span className="font-semibold">{bookingDetails?.distanceMiles ? `${bookingDetails.distanceMiles} miles` : 'Distance'}</span>
+          <span className="text-gray-300">•</span>
+          {isHourlyRide && (
+            <>
+              <LuClock3 size={18} />
+              <span>{displayHours}</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -52,19 +64,17 @@ export default function TripDetailsPanel({ stops, isHourlyRide }) {
         <div className="flex flex-wrap items-center gap-2 border-gray-100 pb-2">
           <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
             <LuCalendarDays size={16} className="text-gray-400 flex-shrink-0" />
-            <span className="whitespace-nowrap text-xs md:text-sm">Wed, Feb 18th 2026</span>
+            <span className="whitespace-nowrap text-xs md:text-sm">{displayDate}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
             <LuClock3 size={16} className="text-gray-400 flex-shrink-0" />
-            <span className="text-xs md:text-sm">03:20</span>
+            <span className="text-xs md:text-sm">{displayTime}</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500 rounded-full bg-white px-4 py-2.5">
-            <LuClock3 size={16} className="text-gray-400" />
-            {isHourlyRide ? (
-              <span className="text-xs md:text-sm">3 hours</span>
-            ) : (
-              <span className="text-xs md:text-sm">3 hours</span>
-            )}
+            {isHourlyRide && <LuClock3 size={16} className="text-gray-400" />}
+            {isHourlyRide && 
+              <span className="text-xs md:text-sm">{displayHours}</span>
+           }
           </div>
         </div>
       </div>

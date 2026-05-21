@@ -1,19 +1,37 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LuMail, LuLock } from 'react-icons/lu';
+import { FiInfo } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
+import { useAuthStore } from '../../stores/authStore';
+import { useCredentialForm } from '../../hooks/useCredentialForm';
 
 export default function DriverLoginPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
+  const { loginDriver, isLoading, error, clearError } = useAuthStore();
+  const {
+    form,
+    hasError,
+    errorMessage,
+    updateField,
+    validateCredentials,
+    setSubmissionError,
+  } = useCredentialForm({ storeError: error, clearStoreError: clearError });
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate('/driver/otp-verification');
+    if (!validateCredentials()) {
+      return;
+    }
+
+    const result = await loginDriver(form);
+
+    if (result?.success) {
+      navigate('/driver/onboarding');
+      return;
+    }
+
+    setSubmissionError(result?.message || 'Login failed. Please try again.');
   };
 
   return (
@@ -36,7 +54,7 @@ export default function DriverLoginPage() {
             <form onSubmit={handleLogin} className="mt-10 space-y-6">
               <div>
                 <label className="text-[14px] font-medium text-[#111] ml-1">Email Address</label>
-                <div className="relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border border-gray-200 bg-white transition-colors">
+                <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <LuMail className="text-gray-400" size={18} />
                   </div>
@@ -44,7 +62,7 @@ export default function DriverLoginPage() {
                     type="email"
                     placeholder="jayson@gmail.com"
                     value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    onChange={updateField('email')}
                     className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
                   />
                 </div>
@@ -52,7 +70,7 @@ export default function DriverLoginPage() {
 
               <div>
                 <label className="text-[14px] font-medium text-[#111] ml-1">Password</label>
-                <div className="relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border border-gray-200 bg-white transition-colors">
+                <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <LuLock className="text-gray-400" size={18} />
                   </div>
@@ -60,11 +78,18 @@ export default function DriverLoginPage() {
                     type="password"
                     placeholder="*********"
                     value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    onChange={updateField('password')}
                     className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
                   />
                 </div>
               </div>
+
+              {hasError && (
+                <div className="flex items-center text-red-500 text-[13px] ml-1">
+                  <FiInfo size={14} className="mr-1.5 shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
 
               <div className="pt-1">
                 <Link to="/driver/forget-password" className="text-[14px] text-gray-500 hover:text-[#1b2d5d] transition-colors ml-1">
@@ -75,9 +100,10 @@ export default function DriverLoginPage() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042]"
+                  disabled={isLoading}
+                  className="w-full rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Login
+                  {isLoading ? 'Logging in...' : 'Login'}
                 </button>
               </div>
 

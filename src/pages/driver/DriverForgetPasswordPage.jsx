@@ -1,16 +1,40 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LuMail } from 'react-icons/lu';
+import { FiInfo } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
+import { useAuthStore } from '../../stores/authStore';
+import { useEmailForm } from '../../hooks/useEmailForm';
 
 export default function DriverForgetPasswordPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const { forgotPassword, isLoading, error, clearError } = useAuthStore();
+  const {
+    email,
+    hasError,
+    errorMessage,
+    handleEmailChange,
+    validateEmail,
+    setSubmissionError,
+    getTrimmedEmail,
+  } = useEmailForm({ storeError: error, clearStoreError: clearError });
 
-  const handleSendCode = (e) => {
+  const handleSendCode = async (e) => {
     e.preventDefault();
-    navigate('/driver/reset-password');
+    if (!validateEmail()) {
+      return;
+    }
+
+    const result = await forgotPassword(getTrimmedEmail());
+
+    if (result?.success) {
+      navigate('/driver/otp-verification', {
+        state: { email: getTrimmedEmail(), flow: 'reset' },
+      });
+      return;
+    }
+
+    setSubmissionError(result?.message || 'Failed to send verification code.');
   };
 
   return (
@@ -33,7 +57,7 @@ export default function DriverForgetPasswordPage() {
             <form onSubmit={handleSendCode} className="mt-10 space-y-6">
               <div>
                 <label className="text-[14px] font-medium text-[#111] ml-1">Email Address</label>
-                <div className="relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border border-gray-200 bg-white transition-colors">
+                <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <LuMail className="text-gray-400" size={18} />
                   </div>
@@ -41,18 +65,25 @@ export default function DriverForgetPasswordPage() {
                     type="email"
                     placeholder="jayson@gmail.com"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                     className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
                   />
                 </div>
+                {hasError && (
+                  <div className="flex items-center text-red-500 text-[13px] mt-2 ml-1">
+                    <FiInfo size={14} className="mr-1.5 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
               </div>
 
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042]"
+                  disabled={isLoading}
+                  className="w-full rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042] disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Send Verification Code
+                  {isLoading ? 'Sending code...' : 'Send Verification Code'}
                 </button>
               </div>
 

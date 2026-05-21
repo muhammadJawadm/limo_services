@@ -1,87 +1,61 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FiChevronDown, FiCheck, FiGlobe } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { FiChevronDown, FiCheck } from 'react-icons/fi';
 import { LuUser } from 'react-icons/lu';
-import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 import logoImg from '../../assets/navbarlogo.png';
 import profile from '../../assets/profile.svg';
 import { AiOutlineLogout } from "react-icons/ai";
 import Footer from '../../components/Footer';
+import { useDriverStore } from '../../stores/driverStore';
 
 // Steps
 import { Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9, Step10 } from '../../components/onboarding/steps';
+import { useAuthStore } from '../../stores/authStore';
 
 export default function DriverOnboardingPage() {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  const location = useLocation();
+  const { logout } = useAuthStore();
+  const {
+    onboardingForm,
+    updateOnboardingForm,
+    fetchOnboarding,
+    saveOnboardingStep,
+    submitOnboardingForm,
+    isOnboardingSaving,
+    isOnboardingLoading,
+    onboardingError,
+    clearOnboardingError,
+  } = useDriverStore();
+  const getStepFromUrl = () => {
+    const params = new URLSearchParams(location.search);
+    const stepParam = Number.parseInt(params.get('step') || '', 10);
+    return Number.isInteger(stepParam) && stepParam >= 1 && stepParam <= 10 ? stepParam : 1;
+  };
+  const [currentStep, setCurrentStep] = useState(getStepFromUrl);
   const totalSteps = 10;
   const [showReviewModal, setShowReviewModal] = useState(false);
-
-  const [formData, setFormData] = useState({
-    // Step 1
-    companyName: '',
-    companyType: '',
-    country: '',
-    street: '',
-    zipCode: '',
-    city: '',
-    stateProvince: '',
-    taxId: '',
-    businessRegistration: '',
-    // Step 2
-    priorExp: '',
-    electricVehicles: '',
-    femaleChauffeurs: '',
-    chauffeurCount: '',
-    firstClassCount: '',
-    businessVansCount: '',
-    businessVansCount2: '',
-    fleetDescription: '',
-    // Step 3
-    sameAsRep: false,
-    chauffeurFirstName: '',
-    chauffeurLastName: '',
-    chauffeurEmail: '',
-    chauffeurPhone: '',
-    driverLicenseId: '',
-    // Step 4
-    vehicleYear: '',
-    vehicleBrand: '',
-    vehicleClass: '',
-    vehicleColor: '',
-    passengerCount: '',
-    luggageCount: '',
-    wifi: '',
-    smoking: '',
-    numberPlate: '',
-    vin: '',
-    // Step 8
-    contractPlace: '',
-    contractAgreed: false,
-    showErrors: false,
-    // Step 9
-    cardHolderName: '',
-    cardNumber: '',
-    cardExpiry: '',
-    cardCvc: '',
-    // Step 10
-    availability: {
-      Mon: true,
-      Tue: false,
-      Wed: true,
-      Thu: true,
-      Fri: true,
-      Sun: true
-    }
-  });
-
   const updateDoc = (key, value) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+    updateOnboardingForm(key, value);
   };
 
-  const nextStep = () => {
+  useEffect(() => {
+    fetchOnboarding();
+  }, [fetchOnboarding]);
+
+  const nextStep = async () => {
+    if (currentStep === 7) {
+      setCurrentStep(currentStep + 1);
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (currentStep === 9) {
+      setCurrentStep(currentStep + 1);
+      window.scrollTo(0, 0);
+      return;
+    }
     if (currentStep === 8) {
-      if (!formData.contractPlace) {
+      if (!onboardingForm.contractPlace) {
         updateDoc('showErrors', true);
         return;
       }
@@ -89,12 +63,22 @@ export default function DriverOnboardingPage() {
       updateDoc('showErrors', false);
     }
 
+    clearOnboardingError();
+    const saved = await saveOnboardingStep(currentStep);
+    if (!saved?.success) {
+      return;
+    }
+
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     } else if (currentStep === totalSteps) {
       // Final submit
-      console.log('Final Submit', formData);
+      const result = await submitOnboardingForm();
+      if (!result?.success) {
+        return;
+      }
+
       setShowReviewModal(true);
     }
   };
@@ -108,16 +92,16 @@ export default function DriverOnboardingPage() {
 
   const renderStep = () => {
     switch (currentStep) {
-      case 1: return <Step1 formData={formData} updateDoc={updateDoc} />;
-      case 2: return <Step2 formData={formData} updateDoc={updateDoc} />;
-      case 3: return <Step3 formData={formData} updateDoc={updateDoc} />;
-      case 4: return <Step4 formData={formData} updateDoc={updateDoc} />;
+      case 1: return <Step1 formData={onboardingForm} updateDoc={updateDoc} />;
+      case 2: return <Step2 formData={onboardingForm} updateDoc={updateDoc} />;
+      case 3: return <Step3 formData={onboardingForm} updateDoc={updateDoc} />;
+      case 4: return <Step4 formData={onboardingForm} updateDoc={updateDoc} />;
       case 5: return <Step5 />;
-      case 6: return <Step6 />;
+      case 6: return <Step6 formData={onboardingForm} updateDoc={updateDoc} />;
       case 7: return <Step7 />;
-      case 8: return <Step8 formData={formData} updateDoc={updateDoc} />;
-      case 9: return <Step9 formData={formData} updateDoc={updateDoc} />;
-      case 10: return <Step10 formData={formData} updateDoc={updateDoc} />;
+      case 8: return <Step8 formData={onboardingForm} updateDoc={updateDoc} />;
+      case 9: return <Step9 formData={onboardingForm} updateDoc={updateDoc} />;
+      case 10: return <Step10 formData={onboardingForm} updateDoc={updateDoc} />;
       default: return <div className="p-10 text-center text-gray-500">More steps coming soon...</div>;
     }
   };
@@ -172,7 +156,10 @@ export default function DriverOnboardingPage() {
                 <span className="text-[14px] text-gray-600">My Profile</span>
                 <div className="ml-auto w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer text-red-500">
+              <div 
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 cursor-pointer text-red-500"
+                onClick={() => { logout(); navigate('/driver/login'); }}
+              >
                 <AiOutlineLogout className="text-red-500" size={20} />
                 <span className="text-[14px]">Logout</span>
                 <div className="ml-auto w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
@@ -206,6 +193,16 @@ export default function DriverOnboardingPage() {
           </div>
 
           <div className="bg-transparent">
+            {isOnboardingLoading && (
+              <div className="mb-6 rounded-xl border border-gray-100 bg-white px-5 py-4 text-[14px] text-gray-500">
+                Loading onboarding details...
+              </div>
+            )}
+            {onboardingError && (
+              <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-[14px] text-red-600">
+                {onboardingError}
+              </div>
+            )}
             {renderStep()}
 
             {/* Navigation Buttons */}
@@ -220,9 +217,12 @@ export default function DriverOnboardingPage() {
               )}
               <button
                 onClick={nextStep}
-                className="px-10 py-3.5 rounded-full bg-[#1b2d5d] text-[15px] font-medium text-white hover:bg-[#132042] transition-colors w-full sm:w-auto sm:min-w-[160px] flex-1 sm:flex-none"
+                disabled={isOnboardingSaving || isOnboardingLoading}
+                className={`px-10 py-3.5 rounded-full text-[15px] font-medium text-white transition-colors w-full sm:w-auto sm:min-w-[160px] flex-1 sm:flex-none ${
+                  isOnboardingSaving || isOnboardingLoading ? 'bg-[#1b2d5d]/70 cursor-not-allowed' : 'bg-[#1b2d5d] hover:bg-[#132042]'
+                }`}
               >
-                {currentStep === 10 ? 'Submit Application' : 'Next'}
+                {isOnboardingSaving ? 'Saving...' : currentStep === 10 ? 'Submit Application' : 'Next'}
               </button>
             </div>
           </div>

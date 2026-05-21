@@ -1,19 +1,49 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { LuLock } from 'react-icons/lu';
+import { FiInfo, FiCheck } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
+import { useAuthStore } from '../../stores/authStore';
+import { usePasswordResetForm } from '../../hooks/usePasswordResetForm';
 
 export default function DriverResetPasswordPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    password: '',
-    confirmPassword: '',
+  const location = useLocation();
+
+  const emailFromState = location.state?.email ?? '';
+  const { resetPassword, isLoading, error, clearError } = useAuthStore();
+  const {
+    form,
+    success,
+    setSuccess,
+    hasError,
+    errorMessage,
+    updateField,
+    validateResetForm,
+    setSubmissionError,
+  } = usePasswordResetForm({
+    storeError: error,
+    clearStoreError: clearError,
+    email: emailFromState,
+    sessionExpiredMessage: 'Session expired. Please restart the reset flow.',
   });
 
-  const handleReset = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    navigate('/driver/onboarding');
+
+    if (!validateResetForm()) {
+      return;
+    }
+
+    const result = await resetPassword(emailFromState, form.password, form.confirmPassword);
+
+    if (result?.success) {
+      setSuccess(true);
+      setTimeout(() => navigate('/driver/login'), 2500);
+      return;
+    }
+
+    setSubmissionError(result?.message || 'Password reset failed. Please try again.');
   };
 
   return (
@@ -33,52 +63,68 @@ export default function DriverResetPasswordPage() {
               Your new password must be different from previous used password.
             </p>
 
-            <form onSubmit={handleReset} className="mt-10 space-y-6">
-              <div>
-                <label className="text-[14px] font-medium text-[#111] ml-1">Password</label>
-                <div className="relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border border-gray-200 bg-white transition-colors">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <LuLock className="text-gray-400" size={18} />
-                  </div>
-                  <input
-                    type="password"
-                    placeholder="********"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
-                  />
+            {success ? (
+              <div className="mt-10 flex flex-col items-start gap-3">
+                <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                  <FiCheck size={22} className="text-green-600" />
                 </div>
+                <p className="text-[16px] font-semibold text-gray-800">Password updated successfully!</p>
+                <p className="text-[14px] text-gray-500">Redirecting you to login…</p>
               </div>
-
-              <div>
-                <label className="text-[14px] font-medium text-[#111] ml-1">Confirm Password</label>
-                <div className="relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border border-gray-200 bg-white transition-colors">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <LuLock className="text-gray-400" size={18} />
+            ) : (
+              <form onSubmit={handleReset} className="mt-10 space-y-6">
+                <div>
+                  <label className="text-[14px] font-medium text-[#111] ml-1">Password</label>
+                  <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <LuLock className="text-gray-400" size={18} />
+                    </div>
+                    <input
+                      type="password"
+                      placeholder="********"
+                      value={form.password}
+                      onChange={updateField('password')}
+                      className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
+                    />
                   </div>
-                  <input
-                    type="password"
-                    placeholder="********"
-                    value={form.confirmPassword}
-                    onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-                    className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
-                  />
                 </div>
-              </div>
 
-              <div className="ml-1 text-[13px] text-gray-500">
-                Both passwords must match.
-              </div>
+                <div>
+                  <label className="text-[14px] font-medium text-[#111] ml-1">Confirm Password</label>
+                  <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <LuLock className="text-gray-400" size={18} />
+                    </div>
+                    <input
+                      type="password"
+                      placeholder="********"
+                      value={form.confirmPassword}
+                      onChange={updateField('confirmPassword')}
+                      className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
+                    />
+                  </div>
+                </div>
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042]"
-                >
-                  Reset Password
-                </button>
-              </div>
-            </form>
+                {hasError ? (
+                  <div className="flex items-center text-red-500 text-[13px] ml-1">
+                    <FiInfo size={14} className="mr-1.5 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                ) : (
+                  <div className="ml-1 text-[13px] text-gray-500">Both passwords must match.</div>
+                )}
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full rounded-full bg-[#1b2d5d] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#132042] disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Resetting...' : 'Reset Password'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </section>
 

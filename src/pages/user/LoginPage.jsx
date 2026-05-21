@@ -1,30 +1,36 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LuLock, LuMail } from 'react-icons/lu';
 import { FiInfo } from 'react-icons/fi';
 import AuthSidePanel from '../../components/AuthSidePanel';
+import { useAuthStore } from '../../stores/authStore';
+import { useCredentialForm } from '../../hooks/useCredentialForm';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
-  const [hasError, setHasError] = useState(false); // Toggle to simulate error
+  const { loginUser, isLoading, error, clearError } = useAuthStore();
+  const {
+    form,
+    hasError,
+    errorMessage,
+    updateField,
+    validateCredentials,
+    setSubmissionError,
+  } = useCredentialForm({ storeError: error, clearStoreError: clearError });
 
-  const updateField = (key) => (e) => {
-    setForm((prev) => ({ ...prev, [key]: e.target.value }));
-    if (hasError) setHasError(false);
-  };
-
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Simulate error for demonstration purposes if email/password isn't matched
-    if (!form.email || !form.password) {
-      setHasError(true);
+    if (!validateCredentials()) {
       return;
     }
-    navigate('/otp-verification');
+
+    const result = await loginUser(form);
+
+    if (result?.success) {
+      navigate('/');
+      return;
+    }
+
+    setSubmissionError(result?.message || 'Login failed. Please try again.');
   };
 
   return (
@@ -74,7 +80,7 @@ export default function LoginPage() {
                   {hasError && (
                     <div className="flex items-center text-red-500 text-[13px]">
                       <FiInfo size={14} className="mr-1" />
-                      <span>Invalid Password</span>
+                      <span>{errorMessage}</span>
                     </div>
                   )}
                   <button
@@ -90,9 +96,10 @@ export default function LoginPage() {
               <div className="pt-4">
                 <button
                   type="submit"
+                  disabled={isLoading}
                   className="w-full rounded-full bg-[#1b2d5d] text-white py-4 text-[15px] font-semibold hover:bg-[#16254c] transition-colors shadow-lg shadow-blue-900/20"
                 >
-                  Login
+                  {isLoading ? 'Logging in...' : 'Login'}
                 </button>
               </div>
 

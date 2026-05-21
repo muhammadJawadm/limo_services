@@ -5,8 +5,10 @@ import { BsInfoCircle } from 'react-icons/bs';
 import { MdOutlineEmail } from 'react-icons/md';
 import { LuUser } from 'react-icons/lu';
 import { FloatingInput, PhoneInput } from './FormInputs';
+import { updateBookingStep4 } from '../../services/bookingService';
+import { persistBookingSession } from '../../utils/bookingSession';
 
-export default function PassengerFormPanel() {
+export default function PassengerFormPanel({ bookingId, bookingDetails }) {
   const navigate = useNavigate();
 
   // Book for someone else toggle
@@ -34,6 +36,58 @@ export default function PassengerFormPanel() {
 
   // Trip notes
   const [notes, setNotes] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleContinue = async () => {
+    if (!bookingId) {
+      setSubmitError('Booking id is missing. Please start a new booking.');
+      return;
+    }
+
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    const passengerDetails = {
+      firstName: pFirstName.trim(),
+      lastName: pLastName.trim(),
+      email: pEmail.trim(),
+      phone: `${pDial}${pPhone}`.trim(),
+    };
+
+    const isGuest = Boolean(bookingDetails?.isGuest);
+    let bookerDetails = null;
+    if (isGuest && !bookForSomeoneElse) {
+      bookerDetails = { ...passengerDetails };
+    } else if (bookForSomeoneElse) {
+      bookerDetails = {
+        firstName: bFirstName.trim(),
+        lastName: bLastName.trim(),
+        email: bEmail.trim(),
+        phone: `${bDial}${bPhone}`.trim(),
+      };
+    }
+
+    const payload = {
+      passengerDetails,
+      specialInstructions: notes.trim(),
+    };
+
+    if (bookerDetails) {
+      payload.bookerDetails = bookerDetails;
+    }
+
+    const result = await updateBookingStep4(bookingId, payload);
+    if (!result?.success) {
+      setSubmitError(result?.message || 'Failed to update passenger details.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    persistBookingSession({ bookingDraft: result?.data ?? null });
+    setIsSubmitting(false);
+    navigate('/payment');
+  };
 
   return (
     <div className="w-full md:w-[62%] flex flex-col gap-5 rounded-2xl ">
@@ -149,12 +203,16 @@ export default function PassengerFormPanel() {
         />
 
         {/* Continue to Payment */}
+        {submitError ? (
+          <p className="text-sm text-red-500 mt-3">{submitError}</p>
+        ) : null}
         <div className="flex justify-end mt-4">
           <button
-            onClick={() => navigate('/payment')}
+            onClick={handleContinue}
             className="flex items-center gap-2 bg-[#1a2b5e] text-white text-sm font-bold px-8 py-3 rounded-full hover:bg-[#253576] transition-colors"
+            disabled={isSubmitting}
           >
-            Continue to Payment <FiChevronRight size={16} />
+            {isSubmitting ? 'Saving...' : 'Continue to Payment'} <FiChevronRight size={16} />
           </button>
         </div>
       </div>

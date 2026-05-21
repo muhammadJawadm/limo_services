@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from '../../components/user-homepage/Navbar';
 import Footer from '../../components/Footer';
-import { LOREM_IPSUM_1, LOREM_IPSUM_2 } from '../../components/loremIpsum';
+import { LOREM_IPSUM_1, LOREM_IPSUM_2 } from '../../constants/legalPlaceholder';
 
 export default function PrivacyPage() {
   return (

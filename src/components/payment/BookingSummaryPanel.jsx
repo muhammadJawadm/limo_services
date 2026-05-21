@@ -1,13 +1,71 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { TbArrowRight } from 'react-icons/tb';
 import { BsInfoCircle } from 'react-icons/bs';
 import { MdDeleteOutline } from 'react-icons/md';
 import childSeatIcon from '../../assets/childicon.png';
-import { tripDetails } from './constants';
+import { formatBookingDate } from '../../utils/bookingFormatters';
 
-export default function BookingSummaryPanel({ isHourlyRide }) {
+export default function BookingSummaryPanel({ isHourlyRide, bookingDetails }) {
   const [summaryOpen, setSummaryOpen] = useState(false);
+
+  const tripPrice = Number(bookingDetails?.tripPrice ?? bookingDetails?.vehicleCategory?.baseFare ?? 0);
+  const childSeatFee = Number(bookingDetails?.childSeatsFee ?? 0);
+  const tollsFee = Number(bookingDetails?.tollCharges ?? 0);
+  const totalPrice = Number(bookingDetails?.totalAmount ?? tripPrice + childSeatFee + tollsFee);
+
+  const childSeatsCount = useMemo(() => {
+    const seats = bookingDetails?.childSeats;
+    if (!seats) {
+      return 0;
+    }
+
+    return Number(seats.infant ?? 0) + Number(seats.toddler ?? 0) + Number(seats.booster ?? 0);
+  }, [bookingDetails?.childSeats]);
+
+  const tripRows = useMemo(() => {
+    if (!bookingDetails) {
+      return [];
+    }
+
+    const rows = [];
+    if (bookingDetails.pickupLocation) {
+      rows.push({ label: 'Pick Up', value: bookingDetails.pickupLocation });
+    }
+
+    (bookingDetails.stopLocations || []).forEach((stop, index) => {
+      rows.push({ label: `Stop ${index + 1}`, value: stop });
+    });
+
+    if (bookingDetails.dropoffLocation) {
+      rows.push({ label: 'Drop-Off', value: bookingDetails.dropoffLocation });
+    }
+
+    rows.push({
+      label: 'Date & Time',
+      value: `${formatBookingDate(bookingDetails.date)} ${bookingDetails.time || ''}`.trim(),
+    });
+
+    if (bookingDetails.vehicleCategory?.name) {
+      rows.push({ label: 'Vehicle', value: bookingDetails.vehicleCategory.name });
+    }
+
+    rows.push({ label: 'Passenger', value: `${bookingDetails.noOfPassengers ?? 0}` });
+    rows.push({ label: 'Luggage', value: `${bookingDetails.luggage ?? 0}` });
+
+    if (bookingDetails.childSeats) {
+      const seats = bookingDetails.childSeats;
+      const parts = [];
+      if (seats.infant) parts.push(`${seats.infant} Infant`);
+      if (seats.toddler) parts.push(`${seats.toddler} Toddler`);
+      if (seats.booster) parts.push(`${seats.booster} Booster`);
+      if (parts.length > 0) {
+        rows.push({ label: 'Child Seats', value: parts.join(', ') });
+      }
+    }
+
+    return rows;
+  }, [bookingDetails]);
 
   return (
     <div className="w-full md:w-[38%] flex flex-col gap-4">
@@ -29,27 +87,19 @@ export default function BookingSummaryPanel({ isHourlyRide }) {
             <TbArrowRight size={15} className="text-[#1a2b5e]" />
             <span>Pickup Trip Details</span>
           </div>
-          <span className="text-lg font-bold text-gray-900">$110</span>
+          <span className="text-lg font-bold text-gray-900">${totalPrice.toFixed(2)}</span>
         </div>
 
         {/* Expanded trip details */}
         {summaryOpen && (
           <div className="border-t border-gray-100 px-5 py-4">
             <div className="flex flex-col gap-2">
-              {tripDetails.map((row, i) => {
-                if (row.label === 'No. of Hours' && !isHourlyRide) {
-                  return null;
-                }
-
-                return (
-                  <div key={i} className="flex items-start justify-start gap-4 mt-1">
-                    <span className="text-xs font-bold text-black w-24 flex-shrink-0">{row.label}</span>
-                    <span className="text-xs text-gray-700 text-left">
-                      {isHourlyRide && row.label === 'No. of Hours' ? '3 hours' : row.value}
-                    </span>
-                  </div>
-                );
-              })}
+              {tripRows.map((row, i) => (
+                <div key={i} className="flex items-start justify-start gap-4 mt-1">
+                  <span className="text-xs font-bold text-black w-24 flex-shrink-0">{row.label}</span>
+                  <span className="text-xs text-gray-700 text-left">{row.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -65,32 +115,32 @@ export default function BookingSummaryPanel({ isHourlyRide }) {
             <TbArrowRight size={15} className="text-[#1a2b5e]" />
             <span>Pickup</span>
           </div>
-          <span className="text-lg font-bold text-gray-900">$110</span>
+          <span className="text-lg font-bold text-gray-900">${tripPrice.toFixed(2)}</span>
         </div>
 
         {/* Child Seat */}
         <div className="flex items-center justify-between py-4 border-b border-gray-100">
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <img src={childSeatIcon} className="w-4 h-4" alt="child seat" />
-            <span>Child Seat x 1</span>
+            <span>Child Seat x {childSeatsCount}</span>
             <button className="ml-1 text-red-400 hover:text-red-600 transition-colors">
               <MdDeleteOutline size={20} />
             </button>
           </div>
-          <span className="text-md  text-gray-400">$15</span>
+          <span className="text-md  text-gray-400">${childSeatFee.toFixed(2)}</span>
         </div>
 
-        {/* Tolls */}
+        {/* Toll Charges */}
         <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <span className="text-sm text-gray-700">Tolls Charges</span>
-          <span className="text-md  text-gray-400">$15</span>
+          <span className="text-sm text-gray-700">Toll Charges</span>
+          <span className="text-md  text-gray-400">${tollsFee.toFixed(2)}</span>
         </div>
 
         {/* Total */}
         <div className="flex items-center justify-between pt-3 mt-1 border-b pb-2">
           <span className="text-sm text-gray-700">Total Price</span>
           <span className="text-2xl font-bold text-gray-900">
-            <span className="text-base font-semibold mr-0.5">$</span>160.64
+            <span className="text-base font-semibold mr-0.5">$</span>{totalPrice.toFixed(2)}
           </span>
         </div>
 

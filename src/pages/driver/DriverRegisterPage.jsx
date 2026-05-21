@@ -12,7 +12,7 @@ export default function DriverRegisterPage() {
 
   const handleNext = (e) => {
     e.preventDefault();
-    navigate('/driver/register/details');
+    navigate('/driver/register/details', { state: { location: address } });
   };
 
   const handleAddressChange = (e) => {

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/user/HomePage';
 import SelectVehiclePage from './pages/user/SelectVehiclePage';
 import AdditionalDetailsPage from './pages/user/AdditionalDetailsPage';
@@ -14,8 +15,6 @@ import UserDashboardPage from './pages/user/UserDashboardPage';
 import TermsPage from './pages/user/TermsPage';
 import PrivacyPage from './pages/user/PrivacyPage';
 import SupportPage from './pages/user/SupportPage';
-
-// Driver Pages
 import DriverRegisterPage from './pages/driver/DriverRegisterPage';
 import DriverRegisterDetailsPage from './pages/driver/DriverRegisterDetailsPage';
 import DriverLoginPage from './pages/driver/DriverLoginPage';
@@ -25,10 +24,27 @@ import DriverResetPasswordPage from './pages/driver/DriverResetPasswordPage';
 import DriverOnboardingPage from './pages/driver/DriverOnboardingPage';
 import DriverProfilePage from './pages/driver/DriverProfilePage';
 import DriverDashboardPage from './pages/driver/DriverDashboardPage';
+import { useSocket } from './hooks/useSocket';
+
+function SocketBootstrap() {
+  useSocket();
+  return null;
+}
 
 export default function App() {
   return (
     <BrowserRouter>
+      <SocketBootstrap />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            borderRadius: '8px',
+            background: '#1a1a1a',
+            color: '#fff',
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/select-vehicle" element={<SelectVehiclePage />} />
@@ -41,12 +57,10 @@ export default function App() {
         <Route path="/otp-verification" element={<OTPVerificationPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/forget-password" element={<ForgetPasswordPage />} />
-        <Route path="/dashboard" element={<UserDashboardPage />} />        
-        {/* Info Pages */}
+        <Route path="/dashboard" element={<UserDashboardPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/support" element={<SupportPage />} />
-        {/* Driver Routes */}
         <Route path="/driver/register" element={<DriverRegisterPage />} />
         <Route path="/driver/register/details" element={<DriverRegisterDetailsPage />} />
         <Route path="/driver/onboarding" element={<DriverOnboardingPage />} />

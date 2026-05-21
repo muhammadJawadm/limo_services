@@ -1,8 +1,18 @@
 import { FiChevronDown, FiX } from 'react-icons/fi';
 import { GoArrowSwitch } from "react-icons/go";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
+import { formatTableDate } from '../../utils/bookingFormatters';
 
-export default function ReturnTripModal({ isOpen, onClose }) {
+export default function ReturnTripModal({ isOpen, onClose, bookingDetails }) {
+  const stops = bookingDetails?.stopLocations || [];
+  const childSeats = bookingDetails?.childSeats || {
+    infant: bookingDetails?.childSeatInfant ?? 0,
+    toddler: bookingDetails?.childSeatToddler ?? 0,
+    booster: bookingDetails?.childSeatBooster ?? 0,
+  };
+
+  const passengerEmail = bookingDetails?.passengerDetails?.email || bookingDetails?.user?.email || '--';
+
   if (!isOpen) return null;
 
   return (
@@ -27,21 +37,25 @@ export default function ReturnTripModal({ isOpen, onClose }) {
             {/* Row: Pickup Time */}
             <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Pickup Time:</div>
-               <div className="text-gray-600 sm:text-[#666]">12:00 AM</div>
+              <div className="text-gray-600 sm:text-[#666]">{bookingDetails?.time || '--'}</div>
             </div>
 
             {/* Row: Pickup Date */}
             <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Pickup Date:</div>
-               <div className="text-gray-600 sm:text-[#666]">02/12/2026</div>
+              <div className="text-gray-600 sm:text-[#666]">{formatTableDate(bookingDetails?.date)}</div>
             </div>
 
             {/* Row: Routing Info */}
             <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                <div className="font-semibold sm:font-medium text-[#111] mb-1.5 sm:mb-0">Routing Info:</div>
                <div className="flex flex-col gap-1.5 sm:gap-2 text-gray-600 sm:text-[#666]">
-                 <p className="leading-snug relative pl-5 before:absolute before:left-0 before:top-1.5 before:w-2 before:h-2 before:bg-green-500 before:rounded-full">USA Vein Clinics, Telegraph Road, USA</p>
-                 <p className="leading-snug relative pl-5 before:absolute before:left-0 before:top-1.5 before:w-2 before:h-2 before:bg-red-500 before:rounded-full">USA Vein Clinics, Telegraph Road, USA</p>
+                 <p className="leading-snug relative pl-5 before:absolute before:left-0 before:top-1.5 before:w-2 before:h-2 before:bg-green-500 before:rounded-full">
+                   {bookingDetails?.pickupLocation || 'Pickup location'}
+                 </p>
+                 <p className="leading-snug relative pl-5 before:absolute before:left-0 before:top-1.5 before:w-2 before:h-2 before:bg-red-500 before:rounded-full">
+                   {bookingDetails?.dropoffLocation || 'Drop-off location'}
+                 </p>
                </div>
             </div>
 
@@ -56,13 +70,13 @@ export default function ReturnTripModal({ isOpen, onClose }) {
             {/* Row: Trip Duration */}
             <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0 mt-2 sm:mt-0">
                <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0 sm:mt-2">Trip Duration:</div>
-               <div className="text-gray-600 sm:text-[#666] sm:mt-2">25 mints</div>
+              <div className="text-gray-600 sm:text-[#666] sm:mt-2">{bookingDetails?.hours ? `${bookingDetails.hours} hours` : '--'}</div>
             </div>
 
             {/* Row: Passenger */}
             <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Passenger:</div>
-               <div className="text-gray-600 sm:text-[#666] break-all">jaysonsmith@gmail.com</div>
+              <div className="text-gray-600 sm:text-[#666] break-all">{passengerEmail}</div>
             </div>
 
             {/* Row: Child Seats */}
@@ -70,15 +84,15 @@ export default function ReturnTripModal({ isOpen, onClose }) {
                <div className="font-semibold sm:font-medium text-[#111] mb-2 sm:mb-0 flex items-center">Child Seats:</div>
                <div className="flex flex-wrap gap-2 sm:gap-3">
                  <div className="flex flex-1 min-w-[120px] items-center justify-between sm:justify-start gap-2 rounded-xl sm:rounded-full border border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 bg-white shadow-sm cursor-pointer hover:border-[#1b2d5d] transition-colors">
-                   <span className="text-[#444] text-[13px] sm:text-[14px]">0 Infant</span>
+                   <span className="text-[#444] text-[13px] sm:text-[14px]">{childSeats.infant ?? 0} Infant</span>
                    <FiChevronDown className="text-gray-400" />
                  </div>
                  <div className="flex flex-1 min-w-[120px] items-center justify-between sm:justify-start gap-2 rounded-xl sm:rounded-full border border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 bg-white shadow-sm cursor-pointer hover:border-[#1b2d5d] transition-colors">
-                   <span className="text-[#444] text-[13px] sm:text-[14px]">1 Toddler</span>
+                   <span className="text-[#444] text-[13px] sm:text-[14px]">{childSeats.toddler ?? 0} Toddler</span>
                    <FiChevronDown className="text-gray-400" />
                  </div>
                  <div className="flex flex-1 min-w-[120px] items-center justify-between sm:justify-start gap-2 rounded-xl sm:rounded-full border border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 bg-white shadow-sm cursor-pointer hover:border-[#1b2d5d] transition-colors">
-                   <span className="text-[#444] text-[13px] sm:text-[14px]">0 Booster</span>
+                   <span className="text-[#444] text-[13px] sm:text-[14px]">{childSeats.booster ?? 0} Booster</span>
                    <FiChevronDown className="text-gray-400" />
                  </div>
                </div>
@@ -89,7 +103,7 @@ export default function ReturnTripModal({ isOpen, onClose }) {
                <div className="font-semibold sm:font-medium text-[#111] mb-2 sm:mb-0 flex items-center">Vehicle Type:</div>
                <div className="w-full sm:w-[220px]">
                  <div className="flex w-full items-center justify-between rounded-xl sm:rounded-full border border-gray-200 px-3 sm:px-4 py-2 sm:py-2.5 text-[#444] bg-white shadow-sm cursor-pointer hover:border-[#1b2d5d] transition-colors text-[13px] sm:text-[14px]">
-                   <span>Business Sedan</span>
+                   <span>{bookingDetails?.vehicleCategory?.name || 'Vehicle'}</span>
                    <FiChevronDown className="text-gray-400" />
                  </div>
                </div>
@@ -102,14 +116,14 @@ export default function ReturnTripModal({ isOpen, onClose }) {
                  <div className="flex flex-1 items-center justify-between sm:justify-start gap-2 text-[#222] bg-gray-50/50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none">
                    <span className="text-[13px] sm:text-[15px]">Passengers</span>
                    <div className="flex items-center gap-2 rounded-xl sm:rounded-full border border-gray-200 px-3 py-1.5 sm:px-4 sm:py-2 sm:ml-2 bg-white shadow-sm cursor-pointer hover:border-[#1b2d5d] transition-colors">
-                     <span className="text-[#444] font-medium sm:font-normal text-[13px] sm:text-[14px]">3</span>
+                     <span className="text-[#444] font-medium sm:font-normal text-[13px] sm:text-[14px]">{bookingDetails?.noOfPassengers ?? 0}</span>
                      <FiChevronDown className="text-gray-400" />
                    </div>
                  </div>
                  <div className="flex flex-1 items-center justify-between sm:justify-start gap-2 text-[#222] bg-gray-50/50 sm:bg-transparent p-2 sm:p-0 rounded-lg sm:rounded-none">
                    <span className="text-[13px] sm:text-[15px]">Luggage</span>
                    <div className="flex items-center gap-2 rounded-xl sm:rounded-full border border-gray-200 px-3 py-1.5 sm:px-4 sm:py-2 sm:ml-2 bg-white shadow-sm cursor-pointer hover:border-[#1b2d5d] transition-colors">
-                     <span className="text-[#444] font-medium sm:font-normal text-[13px] sm:text-[14px]">3</span>
+                     <span className="text-[#444] font-medium sm:font-normal text-[13px] sm:text-[14px]">{bookingDetails?.luggage ?? 0}</span>
                      <FiChevronDown className="text-gray-400" />
                    </div>
                  </div>

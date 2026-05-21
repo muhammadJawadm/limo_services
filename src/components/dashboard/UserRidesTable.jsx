@@ -1,26 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiPlus, FiSearch, FiEye, FiEdit } from 'react-icons/fi';
 import blackcaricon from '../../assets/blackcaricon.png';
 import { MdOutlineLocationOn } from 'react-icons/md';
+import { getMyBookings, cancelBooking } from '../../services/bookingService';
+import { useUserStore } from '../../stores/userStore';
+import { formatTableDate } from '../../utils/bookingFormatters';
 
 const RIDE_TABS = ['Upcoming Ride', 'Past Rides', 'Cancelled Rides'];
 
-const BASE_ROWS = [
-  {
-    confNo: '0022',
-    date: '02-14-2026',
-    time: '12:00 AM',
-    passenger: 'Jayson Smith',
-    total: '$145.00',
-  },
-  {
-    confNo: '0022',
-    date: '02-14-2026',
-    time: '12:00 AM',
-    passenger: 'Doe Smith',
-    total: '$145.00',
-  },
-];
+const tabToApiMap = {
+	'Upcoming Ride': 'upcoming',
+	'Past Rides': 'past',
+	'Cancelled Rides': 'cancelled',
+};
 
 function StatusPill({ tab }) {
   if (tab === 'Cancelled Rides') {
@@ -38,31 +30,81 @@ function StatusPill({ tab }) {
   );
 }
 
-function RoutingInfo() {
+function RoutingInfo({ booking }) {
+  const stops = booking?.stopLocations || [];
   return (
     <div className="space-y-1 text-xs sm:text-[14px] md:text-[15px] text-gray-500 leading-5 sm:leading-6 min-w-[200px]">
       <p className="flex items-center gap-2">
         <MdOutlineLocationOn className="text-green-500 flex-shrink-0" size={20} />
-        USA Vein Clinics, Telegraph Road, USA
+        {booking?.pickupLocation || 'Pickup location'}
       </p>
-      <p className="flex items-center gap-2">
-        <MdOutlineLocationOn className="text-yellow-500 flex-shrink-0" size={20} />
-        USA Vein Clinics, Telegraph Road, USA
-      </p>
+      {stops[0] ? (
+        <p className="flex items-center gap-2">
+          <MdOutlineLocationOn className="text-yellow-500 flex-shrink-0" size={20} />
+          {stops[0]}
+        </p>
+      ) : null}
       <p className="flex items-center gap-2">
         <MdOutlineLocationOn className="text-red-500 flex-shrink-0" size={20} />
-        USA Vein Clinics, Telegraph Road, USA
+        {booking?.dropoffLocation || 'Drop-off location'}
       </p>
     </div>
   );
 }
 
-export default function UserRidesTable({ setIsNewReservationModalOpen, openRideDetails, setIsReturnTripModalOpen }) {
+export default function UserRidesTable({ setIsNewReservationModalOpen, openRideDetails, setIsReturnTripModalOpen, setSelectedBooking }) {
   const [activeRideTab, setActiveRideTab] = useState('Upcoming Ride');
+  const [bookings, setBookings] = useState([]);
+  const [bookingError, setBookingError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentTab, setCurrentTab] = useState('upcoming');
+  const [cancellingId, setCancellingId] = useState(null);
+  const { setCurrentBookingTab } = useUserStore();
 
-  const rows = useMemo(() => {
-    return BASE_ROWS.map((row) => ({ ...row, tab: activeRideTab }));
-  }, [activeRideTab]);
+  useEffect(() => {
+    const loadBookings = async () => {
+      setIsLoading(true);
+      setBookingError('');
+      const result = await getMyBookings({ tab: currentTab });
+      if (!result?.success) {
+        setBookingError(result?.message || 'Failed to load rides.');
+        setBookings([]);
+        setIsLoading(false);
+        return;
+      }
+
+      setBookings(result?.data ?? []);
+      setIsLoading(false);
+    };
+
+    loadBookings();
+  }, [currentTab]);
+
+  const handleTabChange = (tab) => {
+    setActiveRideTab(tab);
+    setCurrentTab(tabToApiMap[tab]);
+    setCurrentBookingTab(tabToApiMap[tab]);
+  };
+
+  const handleCancelRide = async (bookingId) => {
+    if (!confirm('Are you sure you want to cancel this booking?')) {
+      return;
+    }
+
+    setCancellingId(bookingId);
+    const result = await cancelBooking(bookingId);
+    setCancellingId(null);
+
+    if (result?.success) {
+      // Reload bookings to reflect the cancellation
+      const reloadResult = await getMyBookings({ tab: currentTab });
+      if (reloadResult?.success) {
+        setBookings(reloadResult?.data ?? []);
+      }
+    } else {
+      setBookingError(result?.message || 'Failed to cancel booking.');
+    }
+  };
 
   return (
     <section className="bg-[#efefef] flex-1 flex flex-col">
@@ -86,7 +128,7 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
             {RIDE_TABS.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveRideTab(tab)}
+                onClick={() => handleTabChange(tab)}
                 className={`flex-1 min-w-[120px] whitespace-nowrap px-4 py-2.5 sm:py-3 text-xs sm:px-6 sm:text-[15px] transition-colors ${activeRideTab === tab
                   ? 'bg-[#1b2d5d] text-white'
                   : 'text-gray-500 hover:bg-gray-50'
@@ -99,7 +141,7 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
 
           <div className="flex flex-row items-center gap-2 sm:gap-3 w-full lg:w-auto">
             <div className="flex-1 lg:flex-none text-center rounded-full border border-gray-300 bg-white px-3 py-2 sm:py-2.5 text-xs sm:px-6 sm:text-[15px] text-gray-500 whitespace-nowrap">
-              Trip Count: 2
+              Trip Count: {bookings.length}
             </div>
             <label className="flex flex-[2] lg:flex-none items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 sm:px-5 sm:py-2.5 focus-within:border-gray-400 transition-colors">
               <input
@@ -114,6 +156,12 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
 
         {/* Table Container */}
         <div className="overflow-x-auto rounded-xl bg-white shadow-sm border border-gray-200">
+          {bookingError ? (
+            <div className="px-4 py-4 text-sm text-red-500">{bookingError}</div>
+          ) : null}
+          {isLoading ? (
+            <div className="px-4 py-4 text-sm text-gray-500">Loading rides...</div>
+          ) : null}
           <table className="w-full min-w-[1000px] xl:min-w-[1150px] border-collapse">
             <thead>
               <tr className="bg-[#111] text-left text-xs sm:text-[15px] text-white">
@@ -131,46 +179,59 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
             </thead>
 
             <tbody>
-              {rows.map((row, idx) => (
-                <tr key={`${row.confNo}-${idx}`} className="border-b border-gray-100 last:border-0 text-xs sm:text-[14px] text-gray-600 hover:bg-gray-50 transition-colors">
-                  <td className="px-4 lg:px-5 py-5 align-top pt-6">{row.confNo}</td>
+              {bookings.map((row) => (
+                <tr key={row.id} className="border-b border-gray-100 last:border-0 text-xs sm:text-[14px] text-gray-600 hover:bg-gray-50 transition-colors">
+                  <td className="px-4 lg:px-5 py-5 align-top pt-6">{row.confNumber || '--'}</td>
                   <td className="px-4 lg:px-5 py-5 leading-6 align-top pt-6 whitespace-nowrap text-gray-800 font-medium">
-                    <p>{row.date}</p>
-                    <p className="text-gray-500 font-normal">{row.time}</p>
+                    <p>{formatTableDate(row.date)}</p>
+                    <p className="text-gray-500 font-normal">{row.time || '--'}</p>
                   </td>
-                  <td className="px-4 lg:px-5 py-5 align-top pt-6 whitespace-nowrap">{row.passenger}</td>
+                  <td className="px-4 lg:px-5 py-5 align-top pt-6 whitespace-nowrap">
+                    {row.passengerDetails?.firstName || row.user?.firstName || '--'} {row.passengerDetails?.lastName || row.user?.lastName || ''}
+                  </td>
                   <td className="px-4 lg:px-5 py-5 align-top pt-6">
-                    <RoutingInfo />
+                    <RoutingInfo booking={row} />
                   </td>
                   <td className="px-4 lg:px-5 py-5 align-top pt-6">
-                    <StatusPill tab={row.tab} />
+                    <StatusPill tab={activeRideTab} />
                   </td>
-                  <td className="px-4 lg:px-5 py-5 align-top pt-6 font-medium text-gray-800">{row.total}</td>
-                  {row.tab === 'Upcoming Ride' && (
+                  <td className="px-4 lg:px-5 py-5 align-top pt-6 font-medium text-gray-800">${Number(row.totalAmount ?? 0).toFixed(2)}</td>
+                  {activeRideTab === 'Upcoming Ride' && (
                     <td className="px-4 lg:px-5 py-5 align-top pt-6">
-                      <span className="text-gray-500 hover:text-red-500 cursor-pointer transition-colors">Cancel</span>
+                      <span
+                        onClick={() => handleCancelRide(row.id || row._id)}
+                        disabled={cancellingId === (row.id || row._id)}
+                        className={`text-gray-500 hover:text-red-500 cursor-pointer transition-colors ${
+                          cancellingId === (row.id || row._id) ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                      >
+                        {cancellingId === (row.id || row._id) ? 'Cancelling...' : 'Cancel'}
+                      </span>
                     </td>
                   )}
                   <td className="px-4 lg:px-5 py-5 align-top pt-6">
                     <div className="flex flex-col sm:flex-row items-center sm:justify-center gap-4 sm:gap-5 whitespace-nowrap text-gray-500 font-medium">
                       <span
                         className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                        onClick={() => openRideDetails(true, false)}
+                        onClick={() => openRideDetails(row, true, Boolean(row.flightNumber))}
                       >
                         <img src={blackcaricon} alt="car" className="w-[15px] h-[15px] object-contain opacity-70" />
                         Return Trip
                       </span>
                       <span
                         className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                        onClick={() => setIsReturnTripModalOpen(true)}
+                        onClick={() => {
+                          setSelectedBooking(row);
+                          setIsReturnTripModalOpen(true);
+                        }}
                       >
                         <FiEye size={16} />
                         View
                       </span>
-                      {row.tab === 'Upcoming Ride' && (
+                      {activeRideTab === 'Upcoming Ride' && (
                         <span
                           className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                          onClick={() => openRideDetails(false, true)}
+                          onClick={() => openRideDetails(row, false, Boolean(row.flightNumber))}
                         >
                           <FiEdit size={16} />
                           Edit

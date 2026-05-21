@@ -1,6 +1,6 @@
 import { FiChevronDown } from 'react-icons/fi';
 import { LuCar } from 'react-icons/lu';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CancelTripModal from './CancelTripModal';
 import { FaArrowLeft } from "react-icons/fa6";
 import blackcaricon from '../../assets/blackcaricon.png'
@@ -8,6 +8,15 @@ import { AiOutlineDollarCircle } from "react-icons/ai";
 import { CiLocationOn } from "react-icons/ci";
 import { MdOutlinePayment } from "react-icons/md";
 import { FiFileText } from "react-icons/fi";
+import { useUserStore } from '../../stores/userStore';
+import { cancelBooking, updateBookingFull } from '../../services/bookingService';
+import { formatTableDate } from '../../utils/bookingFormatters';
+import {
+  buildEditableBookingState,
+  getNormalizedCharges,
+  getNormalizedChildSeats,
+  getRideStatusMeta,
+} from '../../utils/rideDisplay';
 
 export default function RideDetailsModal({
   isOpen,
@@ -15,8 +24,99 @@ export default function RideDetailsModal({
   isReturnTrip = false,
   hasFlightInfo = true,
   onOpenMessage,
+  bookingDetails,
 }) {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const { currentBookingTab } = useUserStore();
+
+  const passenger = bookingDetails?.passengerDetails || bookingDetails?.user || {};
+  const bookingTypeLabel = bookingDetails?.type === 'hourly' ? 'Hourly' : 'Point to Point';
+  const { statusText, statusColor, isUpcoming } = getRideStatusMeta(bookingDetails, currentBookingTab);
+  const childSeats = getNormalizedChildSeats(bookingDetails);
+  const charges = getNormalizedCharges(bookingDetails);
+  const totalAmount = Number(bookingDetails?.totalAmount ?? 0);
+  const stops = bookingDetails?.stopLocations || [];
+
+  const [editableBooking, setEditableBooking] = useState({});
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const prevBookingIdRef = useRef(null);
+  const initialBookingRef = useRef(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  useEffect(() => {
+    const id = bookingDetails?.id || bookingDetails?._id || bookingDetails?.bookingId || null;
+    if (!id || prevBookingIdRef.current === id) return;
+    prevBookingIdRef.current = id;
+    const next = buildEditableBookingState(bookingDetails);
+    setTimeout(() => {
+      setEditableBooking(next);
+      initialBookingRef.current = next;
+    }, 0);
+  }, [bookingDetails]);
+
+  
+
+  useEffect(() => {
+    const initial = initialBookingRef.current || {};
+    const keys = ['pickupLocation','dropoffLocation','date','time','noOfPassengers','luggage','specialInstructions','passengerFirstName','passengerLastName','passengerPhone','passengerEmail'];
+    let changed = false;
+    for (const k of keys) {
+      const a = initial[k];
+      const b = editableBooking[k];
+      if ((a || '') !== (b || '')) { changed = true; break; }
+    }
+    const t = setTimeout(() => setHasChanges(changed), 0);
+    return () => clearTimeout(t);
+  }, [editableBooking]);
+
+  const bookingId = bookingDetails?.id || bookingDetails?._id || bookingDetails?.bookingId || null;
+
+  const handleConfirm = async () => {
+    if (!hasChanges || !bookingId) return;
+    setIsUpdating(true);
+    try {
+      const payload = {
+        pickupLocation: editableBooking.pickupLocation,
+        dropoffLocation: editableBooking.dropoffLocation,
+        date: editableBooking.date,
+        time: editableBooking.time,
+        noOfPassengers: Number(editableBooking.noOfPassengers || 0),
+        luggage: Number(editableBooking.luggage || 0),
+        specialInstructions: editableBooking.specialInstructions || '',
+      };
+
+      const result = await updateBookingFull(bookingId, payload);
+      setIsUpdating(false);
+      if (result?.success) {
+        // update initial snapshot so button disables after successful save
+        initialBookingRef.current = { ...(initialBookingRef.current || {}), ...payload };
+        setHasChanges(false);
+        onClose();
+      } else {
+        alert(result?.message || 'Failed to update booking.');
+      }
+    } catch {
+      setIsUpdating(false);
+      alert('Failed to update booking.');
+    }
+  };
+
+  const handleCancelRide = async () => {
+    const rideId = bookingDetails?.id ?? bookingDetails?._id;
+    if (!rideId) {
+      setIsCancelModalOpen(false);
+      return;
+    }
+
+    setIsCancelling(true);
+    const result = await cancelBooking(rideId);
+    setIsCancelling(false);
+    setIsCancelModalOpen(false);
+    if (result?.success) {
+      onClose();
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -43,12 +143,14 @@ export default function RideDetailsModal({
             >
               Message
             </button>
-            <button
-              onClick={() => setIsCancelModalOpen(true)}
-              className="rounded-full border border-gray-200 px-4 py-2 sm:px-6 sm:py-2.5 text-[13px] sm:text-sm font-medium text-[#666] transition-colors hover:bg-gray-50 focus:border-[#1b2d5d]"
-            >
-              Cancel <span className="hidden sm:inline">Trip</span>
-            </button>
+            {isUpcoming && (
+              <button
+                onClick={() => setIsCancelModalOpen(true)}
+                className="rounded-full border border-gray-200 px-4 py-2 sm:px-6 sm:py-2.5 text-[13px] sm:text-sm font-medium text-[#666] transition-colors hover:bg-gray-50 focus:border-[#1b2d5d]"
+              >
+                Cancel <span className="hidden sm:inline">Trip</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -66,24 +168,24 @@ export default function RideDetailsModal({
               <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[100px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
                   <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Confirmation#</div>
-                  <div className="text-[#111] font-semibold sm:font-medium text-left">45854</div>
+                  <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.confNumber || '--'}</div>
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
                   <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Booking Type:</div>
-                  <div className="text-[#111] font-semibold sm:font-medium text-left">Point to Point</div>
+                  <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingTypeLabel}</div>
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
                   <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Trip Status:</div>
                   <div className="text-[#111] font-semibold sm:font-medium text-left flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span> Cancelled
+                    <span className={`w-2 h-2 rounded-full ${statusColor}`}></span> {statusText}
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:contents pt-1 sm:pt-0">
                   <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Created At:</div>
-                  <div className="text-[#111] font-semibold sm:font-medium text-left">02/2/2026</div>
+                  <div className="text-[#111] font-semibold sm:font-medium text-left">{formatTableDate(bookingDetails?.createdAt)}</div>
                 </div>
               </div>
             </div>
@@ -97,22 +199,22 @@ export default function RideDetailsModal({
               <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[85px_1fr] md:grid-cols-[90px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
                   <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">First Name:</div>
-                  <div className="text-[#111] font-semibold sm:font-medium text-left">Jayson</div>
+                  <input value={editableBooking.passengerFirstName || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerFirstName: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
                   <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Last Name:</div>
-                  <div className="text-[#111] font-semibold sm:font-medium text-left">Smith</div>
+                  <input value={editableBooking.passengerLastName || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerLastName: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
                   <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Contract No:</div>
-                  <div className="text-[#111] font-semibold sm:font-medium text-left">01 (444) 784-4547</div>
+                  <input value={editableBooking.passengerPhone || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerPhone: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
                 <div className="flex flex-col sm:contents pt-1 sm:pt-0">
                   <div className="text-[#666] font-medium sm:font-normal sm:self-center mb-1 sm:mb-0">Email:</div>
-                  <div className="text-[#111] font-semibold sm:font-medium text-left break-all">jaysonsmith@gmail.com</div>
+                  <input value={editableBooking.passengerEmail || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerEmail: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left break-all bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
               </div>
             </div>
@@ -127,7 +229,7 @@ export default function RideDetailsModal({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
                   <span className="text-[13px] sm:text-[14px] font-medium sm:font-normal text-[#111]">Vehicle Type:</span>
                   <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-4 py-2 sm:py-1.5 w-full sm:w-[160px] text-[13px] text-[#666] shadow-sm hover:border-gray-300 transition-colors cursor-pointer">
-                    <span>Business Sedan</span>
+                    <span>{bookingDetails?.vehicleCategory?.name || 'Vehicle'}</span>
                     <FiChevronDown />
                   </div>
                 </div>
@@ -135,16 +237,14 @@ export default function RideDetailsModal({
                 <div className="flex flex-col lg:flex-row  sm:items-start justify-between gap-3 sm:gap-0">
                   <div className="flex items-center justify-between sm:justify-start gap-4 lg:gap-1 flex-1">
                     <span className="text-[13px] sm:text-[14px] text-[#111] whitespace-nowrap font-medium sm:font-normal">No. of Pax:</span>
-                    <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-4 py-2 sm:py-1 min-w-[70px] sm:w-[65px] text-[13px] text-[#222] font-medium sm:font-normal shadow-sm cursor-pointer hover:border-gray-300">
-                      <span>3</span>
-                      <FiChevronDown className="text-gray-400" />
+                    <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-4 py-2 sm:py-1 min-w-[70px] sm:w-[65px] text-[13px] text-[#222] font-medium sm:font-normal shadow-sm">
+                      <input type="number" min="0" value={editableBooking.noOfPassengers ?? 0} onChange={(e) => setEditableBooking(prev => ({ ...prev, noOfPassengers: e.target.value }))} className="w-full text-center bg-transparent outline-none" />
                     </div>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-3 lg:gap-1 flex-1">
                     <span className="text-[13px] sm:text-[14px] text-[#111] font-medium sm:font-normal">Luggage:</span>
-                    <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-4 py-2 sm:py-1 min-w-[70px] sm:w-[65px] text-[13px] text-[#222] font-medium sm:font-normal shadow-sm cursor-pointer hover:border-gray-300">
-                      <span>3</span>
-                      <FiChevronDown className="text-gray-400" />
+                    <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-4 py-2 sm:py-1 min-w-[70px] sm:w-[65px] text-[13px] text-[#222] font-medium sm:font-normal shadow-sm">
+                      <input type="number" min="0" value={editableBooking.luggage ?? 0} onChange={(e) => setEditableBooking(prev => ({ ...prev, luggage: e.target.value }))} className="w-full text-center bg-transparent outline-none" />
                     </div>
                   </div>
                 </div>
@@ -153,15 +253,15 @@ export default function RideDetailsModal({
                   <span className="text-[13px] sm:text-[14px] text-[#111] font-medium sm:font-normal block mb-2 sm:mb-1">Child Seats:</span>
                   <div className="flex flex-col lg:flex-row ">
                     <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300">
-                      <span className="truncate mr-1">0 Infant</span>
+                      <span className="truncate mr-1">{childSeats.infant ?? 0} Infant</span>
                       <FiChevronDown className="shrink-0" />
                     </div>
                     <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300">
-                      <span className="truncate mr-1">1 Toddler</span>
+                      <span className="truncate mr-1">{childSeats.toddler ?? 0} Toddler</span>
                       <FiChevronDown className="shrink-0" />
                     </div>
                     <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300 col-span-2 sm:col-span-1">
-                      <span className="truncate mr-1">0 Booster</span>
+                      <span className="truncate mr-1">{childSeats.booster ?? 0} Booster</span>
                       <FiChevronDown className="shrink-0" />
                     </div>
                   </div>
@@ -181,12 +281,14 @@ export default function RideDetailsModal({
               <div className="flex flex-col gap-4 sm:grid sm:grid-cols-[80px_1fr] md:grid-cols-[90px_1fr] sm:gap-y-4 text-[13px] sm:text-[14px]">
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                   <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Pick-up:</div>
-                  <div className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 before:absolute before:left-0 before:top-1.5 before:w-1.5 before:h-1.5 before:bg-green-500 before:rounded-full">USA Vein Clinics, Telegraph Road, USA</div>
+                  <input value={editableBooking.pickupLocation || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, pickupLocation: e.target.value }))} className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                   <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Stop 1:</div>
-                  <div className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 before:absolute before:left-0 before:top-1.5 before:w-1.5 before:h-1.5 before:bg-yellow-500 before:rounded-full">USA Vein Clinics, Telegraph Road, USA</div>
+                  <div className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 before:absolute before:left-0 before:top-1.5 before:w-1.5 before:h-1.5 before:bg-yellow-500 before:rounded-full">
+                    {stops[0] || 'No stops'}
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
@@ -198,17 +300,17 @@ export default function RideDetailsModal({
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                   <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Drop-off:</div>
-                  <div className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 before:absolute before:left-0 before:top-1.5 before:w-1.5 before:h-1.5 before:bg-red-500 before:rounded-full">USA Vein Clinics, Telegraph Road, USA</div>
+                  <input value={editableBooking.dropoffLocation || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, dropoffLocation: e.target.value }))} className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
                   <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Date:</div>
-                  <div className="text-gray-700 sm:text-[#666]">02/12/2026</div>
+                  <input type="date" value={editableBooking.date || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, date: e.target.value }))} className="text-gray-700 sm:text-[#666] bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
                 <div className="flex flex-col sm:contents pt-1 sm:pt-0">
                   <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Time:</div>
-                  <div className="text-gray-700 sm:text-[#666]">12:00 AM</div>
+                  <input type="time" value={editableBooking.time || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, time: e.target.value }))} className="text-gray-700 sm:text-[#666] bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
               </div>
             </div>
@@ -222,19 +324,19 @@ export default function RideDetailsModal({
               <div className="space-y-4 sm:space-y-4 text-[13px] sm:text-[14px]">
                 <div className="flex justify-between items-center group">
                   <span className="text-[#666] font-medium sm:font-normal">Trip Price</span>
-                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">$95.00</span>
+                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">${Number(charges.tripPrice ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center group">
                   <span className="text-[#666] font-medium sm:font-normal">Child</span>
-                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">$15.00</span>
+                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">${Number(charges.childSeatsFee ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-gray-100 pb-4 sm:pb-4 group">
                   <span className="text-[#666] font-medium sm:font-normal">Others:</span>
-                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">$30.00</span>
+                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">${Number(charges.otherFees ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 sm:pt-3 text-[#b0b0b0]">
                   <span className="text-gray-700 font-semibold sm:font-normal">Payment</span>
-                  <span className="text-[22px] sm:text-2xl font-bold text-[#1b2d5d]">$130.00</span>
+                  <span className="text-[22px] sm:text-2xl font-bold text-[#1b2d5d]">${Number(totalAmount).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -248,35 +350,25 @@ export default function RideDetailsModal({
                 {/* Payment Info Card */}
                 <div className="rounded-xl sm:rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] bg-white h-full">
                   <h3 className="mb-4 text-base sm:text-lg font-bold flex items-center gap-2">
-                    <MdOutlinePayment className='w-[22px] h-[22px] sm:w-6 sm:h-6 opacity-80 text-[#222]' />
-                    Payment Info
+                        <MdOutlinePayment className='w-[22px] h-[22px] sm:w-6 sm:h-6 opacity-80 text-[#222]' />
+                        Payment Info
                   </h3>
-                  <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[125px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Card Holder Name:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">Jayson smith</div>
-                    </div>
+                      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[150px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
+                        <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
+                          <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Status:</div>
+                          <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.paymentStatus || '--'}</div>
+                        </div>
 
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Card Number:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left tracking-wider">4411 4901 **** 7845</div>
-                    </div>
+                        <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
+                          <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Intent:</div>
+                          <div className="text-[#111] font-semibold sm:font-medium text-left break-all">{bookingDetails?.paymentIntentId || '--'}</div>
+                        </div>
 
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Expiry Date:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">02/28</div>
-                    </div>
-
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">CVC:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">***</div>
-                    </div>
-
-                    <div className="flex flex-col sm:contents pt-1 sm:pt-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Billing Address:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left leading-relaxed">Usaquen, Bogota, Colombia</div>
-                    </div>
-                  </div>
+                        <div className="flex flex-col sm:contents pt-1 sm:pt-0">
+                          <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Method:</div>
+                          <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.paymentMethodId || '--'}</div>
+                        </div>
+                      </div>
                 </div>
 
                 {/* Flight Information Card */}
@@ -286,30 +378,13 @@ export default function RideDetailsModal({
                     Flight Information
                   </h3>
                   <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[140px_1fr] md:grid-cols-[150px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">First Name:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">Jayson</div>
-                    </div>
-
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Last Name:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">Smith</div>
-                    </div>
 
                     <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
                       <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Airline Name or Code:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">4512</div>
+                      <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.flightNumber || '--'}</div>
                     </div>
 
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Contract No:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">01 (444) 784-4547</div>
-                    </div>
-
-                    <div className="flex flex-col sm:contents pt-1 sm:pt-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Email:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left break-all">jaysmith@gmail.com</div>
-                    </div>
+              
                   </div>
                 </div>
 
@@ -320,7 +395,7 @@ export default function RideDetailsModal({
                     Chauffeur / Trip Notes
                   </h3>
                   <div className="text-gray-700 sm:text-[#8c8c8c] text-[13px] sm:text-[14px] min-h-[50px] bg-gray-50/50 p-3 sm:bg-transparent sm:p-0 rounded-lg sm:rounded-none">
-                    lorem impsum...
+                    {bookingDetails?.specialInstructions || '--'}
                   </div>
                 </div>
               </>
@@ -333,30 +408,20 @@ export default function RideDetailsModal({
                     <MdOutlinePayment className='w-[22px] h-[22px] sm:w-6 sm:h-6 opacity-80 text-[#222]' />
                     Payment Info
                   </h3>
-                  <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[125px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
+                  <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[150px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
                     <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Card Holder Name:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">Jayson smith</div>
+                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Status:</div>
+                      <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.paymentStatus || '--'}</div>
                     </div>
 
                     <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Card Number:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left tracking-wider">4411 4901 **** 7845</div>
-                    </div>
-
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Expiry Date:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">02/28</div>
-                    </div>
-
-                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">CVC:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left">***</div>
+                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Intent:</div>
+                      <div className="text-[#111] font-semibold sm:font-medium text-left break-all">{bookingDetails?.paymentIntentId || '--'}</div>
                     </div>
 
                     <div className="flex flex-col sm:contents pt-1 sm:pt-0">
-                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Billing Address:</div>
-                      <div className="text-[#111] font-semibold sm:font-medium text-left leading-relaxed">Usaquen, Bogota, Colombia</div>
+                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Method:</div>
+                      <div className="text-[#111] font-semibold sm:font-medium text-left break-all">{bookingDetails?.paymentMethodId || '--'}</div>
                     </div>
                   </div>
                 </div>
@@ -368,7 +433,7 @@ export default function RideDetailsModal({
                     Chauffeur / Trip Notes
                   </h3>
                   <div className="text-gray-700 sm:text-[#8c8c8c] text-[13px] sm:text-[14px] min-h-[50px] bg-gray-50/50 p-3 sm:bg-transparent sm:p-0 rounded-lg sm:rounded-none">
-                    lorem impsum...
+                    {bookingDetails?.specialInstructions || '--'}
                   </div>
                 </div>
               </>
@@ -378,25 +443,27 @@ export default function RideDetailsModal({
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 border-t border-gray-100 sm:border-0 bg-white justify-between sm:justify-end gap-3 px-5 py-4 sm:px-8 sm:pb-8 sm:pt-0">
+          <div className="flex shrink-0 border-t border-gray-100 sm:border-0 bg-white justify-between sm:justify-end gap-3 px-5 py-4 sm:px-8 sm:pb-8 sm:pt-0">
           <button
             onClick={onClose}
             className="flex-[1] sm:flex-none w-full sm:w-auto rounded-full bg-gray-100 sm:bg-gray-500 px-6 sm:px-10 py-3.5 text-[15px] sm:text-base font-semibold sm:font-medium text-gray-700 sm:text-white transition-colors hover:bg-gray-200 sm:hover:bg-gray-600 sm:mr-3 border border-gray-200 sm:border-0 shadow-sm sm:shadow-md"
           >
             Close
           </button>
-          <button className="flex-[1.5] sm:flex-none w-full sm:w-auto rounded-full bg-[#1b2d5d] px-6 sm:px-10 py-3.5 text-[15px] sm:text-base font-semibold sm:font-medium text-white transition-all hover:bg-[#132042] shadow-md hover:shadow-lg active:scale-[0.98]">
-            Confirm
+          <button onClick={handleConfirm} disabled={!hasChanges || isUpdating} className="flex-[1.5] sm:flex-none w-full sm:w-auto rounded-full bg-[#1b2d5d] px-6 sm:px-10 py-3.5 text-[15px] sm:text-base font-semibold sm:font-medium text-white transition-all hover:bg-[#132042] shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed">
+            {isUpdating ? 'Updating...' : 'Confirm Changes'}
           </button>
         </div>
 
       </div>
 
-      <CancelTripModal
-        isOpen={isCancelModalOpen}
-        onClose={() => setIsCancelModalOpen(false)}
-        onConfirm={() => setIsCancelModalOpen(false)}
-      />
+      {isUpcoming && (
+        <CancelTripModal
+          isOpen={isCancelModalOpen}
+          onClose={() => !isCancelling && setIsCancelModalOpen(false)}
+          onConfirm={handleCancelRide}
+        />
+      )}
     </div>
   );
 }
