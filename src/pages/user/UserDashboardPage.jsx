@@ -86,6 +86,7 @@ export default function UserDashboardPage() {
                     openRideDetails={openRideDetails}
                     setIsReturnTripModalOpen={setIsReturnTripModalOpen}
                     setSelectedBooking={setSelectedBooking}
+                    onOpenMessage={handleOpenMessages}
                   />
                 )}
 

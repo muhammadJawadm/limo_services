@@ -63,7 +63,9 @@ export const buildStepPayload = (stepNumber, formData) => {
 			return buildRequiredDocumentsPayload(formData.requiredDocuments)
 
 		case 7:
-			return {}
+			return {
+				modules: [],
+			}
 
 		case 8:
 			return {

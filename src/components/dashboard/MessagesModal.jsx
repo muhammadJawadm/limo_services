@@ -86,7 +86,7 @@ export default function MessagesModal({ isOpen, onClose, rideId, bookingDetails 
           )}
 
           {rideId && !isLoading && !error && messages.map((message) => {
-            const isOwn = message?.senderId === userId || message?.senderRole === role;
+            const isOwn = Boolean(message?.isOwn);
 
             return (
               <div

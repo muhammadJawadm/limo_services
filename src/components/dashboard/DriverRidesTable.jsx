@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FiEye, FiPlus, FiLoader } from 'react-icons/fi';
+import { FiEye, FiLoader, FiMessageSquare } from 'react-icons/fi';
 import blackcaricon from '../../assets/blackcaricon.png';
 import { MdOutlineLocationOn } from 'react-icons/md';
 import { useDriverStore } from '../../stores/driverStore';
@@ -51,7 +51,7 @@ function RoutingInfo({ pickup, dropoff, stop }) {
     );
 }
 
-export default function DriverRidesTable({ openRideDetails }) {
+export default function DriverRidesTable({ openRideDetails, onOpenMessage }) {
     const [activeRideTab, setActiveRideTab] = useState('Upcoming Ride');
     const { rides, isLoading, pagination, fetchRides, cancelRide } = useDriverStore();
 
@@ -185,6 +185,12 @@ export default function DriverRidesTable({ openRideDetails }) {
                                                 )}
                                                 <td className="px-2 py-5">
                                                     <div className="flex justify-center items-center gap-3 whitespace-nowrap">
+                                                        <span
+                                                            className="flex cursor-pointer items-center gap-1 hover:text-[#1b2d5d] transition-colors"
+                                                            onClick={() => onOpenMessage?.(ride)}
+                                                        >
+                                                            <FiMessageSquare size={16} /> Message
+                                                        </span>
                                                         <span
                                                             className="flex cursor-pointer items-center gap-1 hover:text-[#1b2d5d] transition-colors"
                                                             onClick={() => openRideDetails(ride, false)}

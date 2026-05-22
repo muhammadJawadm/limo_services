@@ -27,7 +27,12 @@ export default function DriverLoginPage() {
     const result = await loginDriver(form);
 
     if (result?.success) {
-      navigate('/driver/onboarding');
+      if(result?.user?.onboardingCompleted) {
+      navigate('/driver/dashboard');
+      }
+        else {
+          navigate('/driver/onboarding');
+        }
       return;
     }
 
@@ -51,7 +56,7 @@ export default function DriverLoginPage() {
               Enter your email and password to login in your account.
             </p>
 
-            <form onSubmit={handleLogin} className="mt-10 space-y-6">
+            <form onSubmit={handleLogin} className="mt-10 space-y-4">
               <div>
                 <label className="text-[14px] font-medium text-[#111] ml-1">Email Address</label>
                 <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>

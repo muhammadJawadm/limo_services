@@ -36,8 +36,11 @@ export default function DriverDashboardPage() {
         setIsRideDetailsModalOpen(true);
     };
 
-    const handleOpenMessages = () => {
-        setIsRideDetailsModalOpen(false); // Optionally close details modal when opening chat
+    const handleOpenMessages = (ride = selectedRide) => {
+        if (ride) {
+            setSelectedRide(ride);
+        }
+        setIsRideDetailsModalOpen(false);
         setIsMessagesModalOpen(true);
     };
 
@@ -65,6 +68,7 @@ export default function DriverDashboardPage() {
                                 {activeTopNavTab === 'Ride Details' && (
                                     <DriverRidesTable 
                                         openRideDetails={openRideDetails}
+                                        onOpenMessage={handleOpenMessages}
                                         setIsReturnTripModalOpen={setIsReturnTripModalOpen}
                                     />
                                 )}

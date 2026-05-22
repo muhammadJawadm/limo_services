@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiPlus, FiSearch, FiEye, FiEdit } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiMessageSquare } from 'react-icons/fi';
 import blackcaricon from '../../assets/blackcaricon.png';
 import { MdOutlineLocationOn } from 'react-icons/md';
 import { getMyBookings, cancelBooking } from '../../services/bookingService';
@@ -52,7 +52,7 @@ function RoutingInfo({ booking }) {
   );
 }
 
-export default function UserRidesTable({ setIsNewReservationModalOpen, openRideDetails, setIsReturnTripModalOpen, setSelectedBooking }) {
+export default function UserRidesTable({ setIsNewReservationModalOpen, openRideDetails, setSelectedBooking, onOpenMessage }) {
   const [activeRideTab, setActiveRideTab] = useState('Upcoming Ride');
   const [bookings, setBookings] = useState([]);
   const [bookingError, setBookingError] = useState('');
@@ -213,28 +213,30 @@ export default function UserRidesTable({ setIsNewReservationModalOpen, openRideD
                     <div className="flex flex-col sm:flex-row items-center sm:justify-center gap-4 sm:gap-5 whitespace-nowrap text-gray-500 font-medium">
                       <span
                         className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
+                        onClick={() => {
+                          setSelectedBooking?.(row);
+                          onOpenMessage?.(row);
+                        }}
+                      >
+                        <FiMessageSquare size={16} />
+                        Message
+                      </span>
+
+                      <span
+                        className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
                         onClick={() => openRideDetails(row, true, Boolean(row.flightNumber))}
                       >
                         <img src={blackcaricon} alt="car" className="w-[15px] h-[15px] object-contain opacity-70" />
                         Return Trip
                       </span>
-                      <span
-                        className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                        onClick={() => {
-                          setSelectedBooking(row);
-                          setIsReturnTripModalOpen(true);
-                        }}
-                      >
-                        <FiEye size={16} />
-                        View
-                      </span>
+
                       {activeRideTab === 'Upcoming Ride' && (
                         <span
                           className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
                           onClick={() => openRideDetails(row, false, Boolean(row.flightNumber))}
                         >
                           <FiEdit size={16} />
-                          Edit
+                          View
                         </span>
                       )}
                     </div>

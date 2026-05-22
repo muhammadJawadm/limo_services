@@ -12,6 +12,8 @@ import { useDriverStore } from '../../stores/driverStore';
 import { Step1, Step2, Step3, Step4, Step5, Step6, Step7, Step8, Step9, Step10 } from '../../components/onboarding/steps';
 import { useAuthStore } from '../../stores/authStore';
 
+const visibleSteps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
 export default function DriverOnboardingPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,10 +32,12 @@ export default function DriverOnboardingPage() {
   const getStepFromUrl = () => {
     const params = new URLSearchParams(location.search);
     const stepParam = Number.parseInt(params.get('step') || '', 10);
-    return Number.isInteger(stepParam) && stepParam >= 1 && stepParam <= 10 ? stepParam : 1;
+    return visibleSteps.includes(stepParam) ? stepParam : visibleSteps[0];
   };
   const [currentStep, setCurrentStep] = useState(getStepFromUrl);
-  const totalSteps = 10;
+  const currentStepIndex = visibleSteps.indexOf(currentStep);
+  const totalSteps = visibleSteps.length;
+  const isLastVisibleStep = currentStepIndex === visibleSteps.length - 1;
   const [showReviewModal, setShowReviewModal] = useState(false);
   const updateDoc = (key, value) => {
     updateOnboardingForm(key, value);
@@ -44,22 +48,11 @@ export default function DriverOnboardingPage() {
   }, [fetchOnboarding]);
 
   const nextStep = async () => {
-    if (currentStep === 7) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo(0, 0);
-      return;
-    }
-    if (currentStep === 9) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo(0, 0);
-      return;
-    }
     if (currentStep === 8) {
-      if (!onboardingForm.contractPlace) {
+      if (!onboardingForm.contractPlace?.trim() || !onboardingForm.contractAgreed) {
         updateDoc('showErrors', true);
         return;
       }
-      // If valid, and want to go to next step
       updateDoc('showErrors', false);
     }
 
@@ -69,10 +62,10 @@ export default function DriverOnboardingPage() {
       return;
     }
 
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+    if (!isLastVisibleStep) {
+      setCurrentStep(visibleSteps[currentStepIndex + 1]);
       window.scrollTo(0, 0);
-    } else if (currentStep === totalSteps) {
+    } else {
       // Final submit
       const result = await submitOnboardingForm();
       if (!result?.success) {
@@ -84,8 +77,8 @@ export default function DriverOnboardingPage() {
   };
 
   const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+    if (currentStepIndex > 0) {
+      setCurrentStep(visibleSteps[currentStepIndex - 1]);
       window.scrollTo(0, 0);
     }
   };
@@ -100,7 +93,7 @@ export default function DriverOnboardingPage() {
       case 6: return <Step6 formData={onboardingForm} updateDoc={updateDoc} />;
       case 7: return <Step7 />;
       case 8: return <Step8 formData={onboardingForm} updateDoc={updateDoc} />;
-      case 9: return <Step9 formData={onboardingForm} updateDoc={updateDoc} />;
+      case 9: return <Step9 />;
       case 10: return <Step10 formData={onboardingForm} updateDoc={updateDoc} />;
       default: return <div className="p-10 text-center text-gray-500">More steps coming soon...</div>;
     }
@@ -116,13 +109,12 @@ export default function DriverOnboardingPage() {
 
         {/* Stepper Center */}
         <div className="hidden lg:flex flex-1 max-w-4xl mx-auto items-center justify-center px-1 xl:px-4">
-          {Array.from({ length: totalSteps }).map((_, idx) => {
-            const stepNum = idx + 1;
-            const isCompleted = currentStep > stepNum;
-            const isCurrent = currentStep === stepNum;
+          {visibleSteps.map((stepNum, idx) => {
+            const isCompleted = currentStepIndex > idx;
+            const isCurrent = currentStepIndex === idx;
 
             return (
-              <div key={idx} className="flex items-center">
+              <div key={stepNum} className="flex items-center">
                 <div className={`w-6 h-6 xl:w-8 xl:h-8 rounded-full flex items-center justify-center text-[11.5px] xl:text-[13px] font-medium transition-colors
                   ${isCompleted ? 'bg-[#1b2d5d] text-white' : isCurrent ? 'bg-white border-2 border-[#1b2d5d] text-[#1b2d5d]' : 'bg-white border border-gray-200 text-gray-400'}
                 `}>
@@ -185,9 +177,9 @@ export default function DriverOnboardingPage() {
 
             {/* Mobile Stepper */}
             <div className="flex lg:hidden mt-6 items-center flex-wrap gap-2">
-              <span className="text-sm font-medium text-gray-500">Step {currentStep} of {totalSteps}</span>
+              <span className="text-sm font-medium text-gray-500">Step {currentStepIndex + 1} of {totalSteps}</span>
               <div className="w-full h-1.5 bg-gray-200 rounded-full mt-2">
-                <div className="h-full bg-[#1b2d5d] rounded-full transition-all duration-300" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
+                <div className="h-full bg-[#1b2d5d] rounded-full transition-all duration-300" style={{ width: `${((currentStepIndex + 1) / totalSteps) * 100}%` }}></div>
               </div>
             </div>
           </div>
@@ -206,8 +198,8 @@ export default function DriverOnboardingPage() {
             {renderStep()}
 
             {/* Navigation Buttons */}
-            <div className={`mt-12 flex flex-col sm:flex-row items-center ${currentStep > 1 ? 'sm:justify-between' : 'sm:justify-start'} gap-4 w-full`}>
-              {currentStep > 1 && (
+            <div className={`mt-12 flex flex-col sm:flex-row items-center ${currentStepIndex > 0 ? 'sm:justify-between' : 'sm:justify-start'} gap-4 w-full`}>
+              {currentStepIndex > 0 && (
                 <button
                   onClick={prevStep}
                   className="px-10 py-3.5 rounded-full border border-gray-300 bg-white text-[15px] font-medium text-gray-700 hover:bg-gray-50 transition-colors w-full sm:w-auto sm:min-w-[160px] flex-1 sm:flex-none"
@@ -222,7 +214,7 @@ export default function DriverOnboardingPage() {
                   isOnboardingSaving || isOnboardingLoading ? 'bg-[#1b2d5d]/70 cursor-not-allowed' : 'bg-[#1b2d5d] hover:bg-[#132042]'
                 }`}
               >
-                {isOnboardingSaving ? 'Saving...' : currentStep === 10 ? 'Submit Application' : 'Next'}
+                {isOnboardingSaving ? 'Saving...' : isLastVisibleStep ? 'Submit Application' : 'Next'}
               </button>
             </div>
           </div>

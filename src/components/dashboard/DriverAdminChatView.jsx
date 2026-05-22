@@ -5,7 +5,7 @@ import driverAvatarFallback from '../../assets/driver1.png';
 import useDriverAdminChat from '../../hooks/useDriverAdminChat';
 
 export default function DriverAdminChatView() {
-  const { role, userId, messages, isLoading, isSending, error, isConnected, sendMessage } = useDriverAdminChat();
+  const { messages, isLoading, isSending, error, isConnected, sendMessage } = useDriverAdminChat();
   const [messageText, setMessageText] = useState('');
   const endRef = useRef(null);
 
@@ -59,7 +59,7 @@ export default function DriverAdminChatView() {
           )}
 
           {!isLoading && !error && messages.map((message) => {
-            const isOwn = message?.senderId === userId || message?.senderRole === role;
+            const isOwn = Boolean(message?.isOwn);
 
             return (
               <div

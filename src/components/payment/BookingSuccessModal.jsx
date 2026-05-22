@@ -198,13 +198,13 @@ export default function BookingSuccessModal({ show, bookingDetails }) {
           </div>
         </div>
 
-        {/* Back to home */}
+        {/* Go to Dashboard */}
         <div className="flex justify-center mt-6 sm:mt-8">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="bg-[#1a2b5e] text-white text-sm font-bold px-10 sm:px-14 py-3.5 sm:py-3 w-full sm:w-auto rounded-xl sm:rounded-full hover:bg-[#253576] transition-colors"
           >
-            Back to home
+            Go to Dashboard
           </button>
         </div>
       </div>
