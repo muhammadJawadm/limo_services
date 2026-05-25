@@ -92,8 +92,11 @@ export default function useDriverAdminChat() {
 			const incomingMessage = payload?.data || payload?.message || payload;
 			appendMessage(incomingMessage);
 
-			const preview = incomingMessage?.text || 'You have a new message';
-			toast.success(`Admin: ${preview}`, { duration: 4000 });
+			// Only show notification for incoming messages, not sender's own messages
+			if (incomingMessage?.senderId !== userId) {
+				const preview = incomingMessage?.text || 'You have a new message';
+				toast.success(`Admin: ${preview}`, { duration: 4000 });
+			}
 		};
 
 		const handleNotification = (notification) => {

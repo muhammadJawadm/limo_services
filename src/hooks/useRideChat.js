@@ -108,10 +108,16 @@ export default function useRideChat(rideId) {
       if (!isMounted) return;
 
       console.log('📨 New message received:', message);
-      const senderName = message?.sender?.name || message?.sender?.fullName || 'New message';
-      const preview = message?.text || 'You have a new message';
-      toast.success(`${senderName}: ${preview}`, { duration: 4000 });
-      appendMessage(normalizeMessage(message, userId));
+      const normalizedMsg = normalizeMessage(message, userId);
+      
+      // Only show notification for incoming messages, not sender's own messages
+      if (message.senderId !== userId) {
+        const senderName = message?.sender?.name || message?.sender?.fullName || 'New message';
+        const preview = message?.text || 'You have a new message';
+        toast.success(`${senderName}: ${preview}`, { duration: 4000 });
+      }
+      
+      appendMessage(normalizedMsg);
     });
 
     return () => {

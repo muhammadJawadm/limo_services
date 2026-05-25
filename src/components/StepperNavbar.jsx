@@ -1,5 +1,7 @@
 import { BsCheck2 } from 'react-icons/bs';
+import { useNavigate, Link } from 'react-router-dom';
 import logoImg from '../assets/navbarlogo.png';
+import { useAuthStore } from '../stores/authStore';
 
 const steps = [
   { label: 'Ride Details' },
@@ -8,6 +10,13 @@ const steps = [
 ];
 
 export default function StepperNavbar({ currentStep = 1 }) {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuthStore();
+
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
+    || user?.name
+    || user?.email
+    || 'Account';
   return (
     <nav className="sticky top-0 z-[9999] flex items-center justify-between px-3 md:px-8 py-3 bg-white shadow-sm border-b border-gray-100 w-full overflow-hidden">
       {/* Logo */}
@@ -53,12 +62,21 @@ export default function StepperNavbar({ currentStep = 1 }) {
         })}
       </div>
 
-      {/* Login Button */}
-      <button className="bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-xs md:text-sm font-semibold px-3 md:px-5 py-2 md:py-3 rounded-3xl shadow whitespace-nowrap"
-        onClick={() => navigate('/login')}
-      >
-        Login
-      </button>
+      {/* Auth Button */}
+      {isAuthenticated ? (
+        <Link
+          to="/dashboard"
+          className="hidden sm:inline-flex items-center rounded-3xl border border-[#1B2D5D] bg-white px-4 py-2 text-sm font-semibold text-[#1B2D5D] shadow-sm hover:bg-[#1B2D5D] hover:text-white transition-colors"
+        >
+          {displayName}
+        </Link>
+      ) : (
+        <button className="bg-[#1B2D5D] hover:bg-blue-800 transition-colors text-white text-xs md:text-sm font-semibold px-3 md:px-5 py-2 md:py-3 rounded-3xl shadow whitespace-nowrap"
+          onClick={() => navigate('/login')}
+        >
+          Login
+        </button>
+      )}
     </nav>
   );
 }

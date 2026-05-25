@@ -66,8 +66,9 @@ export default function VehicleCard({
               >−</button>
               <span className="text-white text-xs font-semibold w-4 text-center">{passengerCount}</span>
               <button
-                onClick={(e) => { e.stopPropagation(); setPassengerCount(c => c + 1); }}
-                className="w-5 h-5 rounded-full bg-white/20 text-white text-sm flex items-center justify-center hover:bg-white/30"
+                onClick={(e) => { e.stopPropagation(); setPassengerCount(c => Math.min(vehicle.passengers ?? Infinity, c + 1)); }}
+                disabled={passengerCount >= (vehicle.passengers ?? Infinity)}
+                className={`w-5 h-5 rounded-full bg-white/20 text-white text-sm flex items-center justify-center ${passengerCount >= (vehicle.passengers ?? Infinity) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/30'}`}
               >+</button>
             </div>
 
@@ -81,8 +82,9 @@ export default function VehicleCard({
               >−</button>
               <span className="text-white text-xs font-semibold w-4 text-center">{luggageCount}</span>
               <button
-                onClick={(e) => { e.stopPropagation(); setLuggageCount(c => c + 1); }}
-                className="w-5 h-5 rounded-full bg-white/20 text-white text-sm flex items-center justify-center hover:bg-white/30"
+                onClick={(e) => { e.stopPropagation(); setLuggageCount(c => Math.min(vehicle.luggage ?? Infinity, c + 1)); }}
+                disabled={luggageCount >= (vehicle.luggage ?? Infinity)}
+                className={`w-5 h-5 rounded-full bg-white/20 text-white text-sm flex items-center justify-center ${luggageCount >= (vehicle.luggage ?? Infinity) ? 'opacity-40 cursor-not-allowed' : 'hover:bg-white/30'}`}
               >+</button>
             </div>
 

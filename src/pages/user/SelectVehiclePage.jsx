@@ -19,8 +19,8 @@ export default function SelectVehiclePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedId, setSelectedId] = useState('');
-  const [passengerCount, setPassengerCount] = useState(3);
-  const [luggageCount, setLuggageCount] = useState(3);
+  const [passengerCount, setPassengerCount] = useState(1);
+  const [luggageCount, setLuggageCount] = useState(1);
   const [vehicleOptions, setVehicleOptions] = useState([]);
   const [vehiclesError, setVehiclesError] = useState('');
   const [bookingError, setBookingError] = useState('');
@@ -111,6 +111,22 @@ export default function SelectVehiclePage() {
     setSelectedId(vehicleId);
     setBookingError('');
 
+    // Clamp counts to vehicle capacities if available
+    const vehicle = vehicleOptions.find((v) => v.id === vehicleId);
+    let newPassengers = bookingCounts.noOfPassengers ?? passengerCount;
+    let newLuggage = bookingCounts.luggage ?? luggageCount;
+
+    if (vehicle) {
+      newPassengers = Math.min(newPassengers, vehicle.passengers ?? newPassengers);
+      newPassengers = Math.max(1, newPassengers);
+      newLuggage = Math.min(newLuggage, vehicle.luggage ?? newLuggage);
+      newLuggage = Math.max(0, newLuggage);
+    }
+
+    // reflect clamped values in local state
+    setPassengerCount(newPassengers);
+    setLuggageCount(newLuggage);
+
     if (!bookingId) {
       setBookingError('Booking id is missing. Please start a new booking.');
       return false;
@@ -119,9 +135,10 @@ export default function SelectVehiclePage() {
     setIsUpdatingBooking(true);
     const result = await updateBookingStep2(bookingId, {
       vehicleCategoryId: vehicleId,
-      noOfPassengers: bookingCounts.noOfPassengers ?? passengerCount,
-      luggage: bookingCounts.luggage ?? luggageCount,
+      noOfPassengers: newPassengers,
+      luggage: newLuggage,
     });
+
     if (!result?.success) {
       setBookingError(result?.message || 'Failed to update vehicle selection.');
       setIsUpdatingBooking(false);
