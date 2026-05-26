@@ -75,9 +75,9 @@ export default function PaymentPage() {
       <div className="flex flex-col md:flex-row flex-1 gap-6 px-4 md:px-16 py-6 max-w-7xl mx-auto w-full">
         <BookingSummaryPanel isHourlyRide={isHourlyRide} bookingDetails={bookingDetails} />
 
-        {intentError ? (
+        {/* {intentError ? (
           <p className="text-sm text-red-500">{intentError}</p>
-        ) : null}
+        ) : null} */}
 
         {isCreatingIntent ? (
           <div className="w-full md:w-[62%] flex items-center justify-center text-sm text-gray-500">

@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './stores/authStore';
 import HomePage from './pages/user/HomePage';
 import SelectVehiclePage from './pages/user/SelectVehiclePage';
 import AdditionalDetailsPage from './pages/user/AdditionalDetailsPage';
@@ -31,6 +32,21 @@ function SocketBootstrap() {
   return null;
 }
 
+function RequireAuth({ children, redirectTo, allowedRoles = [] }) {
+  const location = useLocation();
+  const { isAuthenticated, role } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
+  }
+
+  return children;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -57,7 +73,14 @@ export default function App() {
         <Route path="/otp-verification" element={<OTPVerificationPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/forget-password" element={<ForgetPasswordPage />} />
-        <Route path="/dashboard" element={<UserDashboardPage />} />
+        <Route
+          path="/dashboard"
+          element={(
+            <RequireAuth redirectTo="/login">
+              <UserDashboardPage />
+            </RequireAuth>
+          )}
+        />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/support" element={<SupportPage />} />
@@ -69,7 +92,14 @@ export default function App() {
         <Route path="/driver/forget-password" element={<DriverForgetPasswordPage />} />
         <Route path="/driver/otp-verification" element={<DriverOTPVerificationPage />} />
         <Route path="/driver/reset-password" element={<DriverResetPasswordPage />} />
-        <Route path="/driver/dashboard" element={<DriverDashboardPage />} />
+        <Route
+          path="/driver/dashboard"
+          element={(
+            <RequireAuth redirectTo="/driver/login" allowedRoles={["driver"]}>
+              <DriverDashboardPage />
+            </RequireAuth>
+          )}
+        />
       </Routes>
     </BrowserRouter>
   );

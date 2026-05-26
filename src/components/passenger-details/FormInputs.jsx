@@ -1,7 +1,7 @@
 import { FiChevronDown } from 'react-icons/fi';
 import usflag from '../../assets/us.png';
 
-export function FloatingInput({ icon, placeholder, value, onChange, type = 'text' }) {
+export function FloatingInput({ icon, placeholder, value, onChange, type = 'text', required = false }) {
   return (
     <div className="relative flex items-center border rounded-full px-3 py-3 gap-2 bg-white focus-within:border-[#1a2b5e] transition-colors">
       {icon && <span className="text-gray-400 flex-shrink-0">{icon}</span>}
@@ -10,13 +10,14 @@ export function FloatingInput({ icon, placeholder, value, onChange, type = 'text
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        required={required}
         className="flex-1 text-sm text-gray-700 outline-none placeholder-gray-400 bg-transparent min-w-0"
       />
     </div>
   );
 }
 
-export function PhoneInput({ value, onChange, dialCode, onDialChange }) {
+export function PhoneInput({ value, onChange, dialCode, onDialChange, required = false }) {
   return (
     <div className="relative flex items-center border border-gray-200 rounded-3xl overflow-hidden bg-white focus-within:border-[#1a2b5e] transition-colors">
       {/* Country selector */}
@@ -29,6 +30,7 @@ export function PhoneInput({ value, onChange, dialCode, onDialChange }) {
         placeholder="+1"
         value={value}
         onChange={onChange}
+        required={required}
         className="flex-1 text-sm text-gray-700 outline-none placeholder-gray-400 bg-transparent px-3 py-3 min-w-0"
       />
     </div>
