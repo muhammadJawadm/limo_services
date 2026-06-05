@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PrimaryButton from './PrimaryButton'
 import { createBookingStep1 } from '../services/bookingService'
-import { hasAuthToken } from '../utils/authStorage'
+// import { hasAuthToken } from '../utils/authStorage'
 import {
 	normalizeBookingDate,
 	normalizeBookingTime,
@@ -57,7 +57,6 @@ export default function BookingForm() {
 			date: normalizeBookingDate(dateValue.trim()),
 			time: normalizeBookingTime(timeValue),
 			flightNumber: flightNumber.trim(),
-			isGuest: !hasAuthToken(),
 		}
 
 		if (activeTab === 'hourly') {

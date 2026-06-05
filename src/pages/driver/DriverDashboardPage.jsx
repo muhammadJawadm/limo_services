@@ -8,120 +8,135 @@ import LogoutModal from '../../components/dashboard/LogoutModal';
 import DriverDetailsModal from '../../components/dashboard/DriverDetailsModal';
 import MessagesModal from '../../components/dashboard/MessagesModal';
 import RideAlertsView from '../../components/dashboard/RideAlertsView';
-import PassengerView from '../../components/dashboard/PassengerView';
 import PassengerEditModal from '../../components/dashboard/PassengerEditModal';
 import ReturnTripModal from '../../components/dashboard/ReturnTripModal';
 import DriverProfileDetailsView from '../../components/dashboard/DriverProfileDetailsView';
 import DriverAdminChatView from '../../components/dashboard/DriverAdminChatView';
 
 export default function DriverDashboardPage() {
-    const navigate = useNavigate();
-    const { logout } = useAuthStore();
-    const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard'); // 'Dashboard' | 'Notification' | 'Admin Chat'
-    const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details'); // 'Ride Details' | 'Profile Details'
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const navigate = useNavigate();
+	const { logout } = useAuthStore();
 
-    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-    const [isRideDetailsModalOpen, setIsRideDetailsModalOpen] = useState(false);
-    const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
-    const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
-    const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
-    const [selectedRideConfig, setSelectedRideConfig] = useState({ hasFlightInfo: false, isViewMode: false });
-    const [selectedRide, setSelectedRide] = useState(null);
+	const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard');
+	const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details');
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Helper functions
-    const openRideDetails = (ride, isViewMode = false) => {
-        setSelectedRide(ride);
-        setSelectedRideConfig({ hasFlightInfo: Boolean(ride?.flightNumber), isViewMode });
-        setIsRideDetailsModalOpen(true);
-    };
+	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+	const [isRideDetailsModalOpen, setIsRideDetailsModalOpen] = useState(false);
+	const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
+	const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
+	const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
 
-    const handleOpenMessages = (ride = selectedRide) => {
-        if (ride) {
-            setSelectedRide(ride);
-        }
-        setIsRideDetailsModalOpen(false);
-        setIsMessagesModalOpen(true);
-    };
+	const [selectedRideConfig, setSelectedRideConfig] = useState({
+		hasFlightInfo: false,
+		isViewMode: false,
+		rideTab: 'upcoming',
+	});
 
-    return (
-        <div className="relative h-screen bg-[#efefef] text-[#111111] overflow-hidden w-full">
-            <div className="mx-auto max-w-full lg:flex h-full">
-                <DriverSidebar 
-                    activeSidebarTab={activeSidebarTab}
-                    setActiveSidebarTab={setActiveSidebarTab}
-                    isMobileMenuOpen={isMobileMenuOpen}
-                    setIsMobileMenuOpen={setIsMobileMenuOpen}
-                    setIsLogoutModalOpen={setIsLogoutModalOpen}
-                />
+	const [selectedRide, setSelectedRide] = useState(null);
 
-                <main className="h-full bg-white flex-1 flex flex-col w-full overflow-hidden">
-                    <DriverTopNav 
-                        activeSidebarTab={activeSidebarTab} 
-                        activeTopNavTab={activeTopNavTab} 
-                        setActiveTopNavTab={setActiveTopNavTab} 
-                    />
+	const openRideDetails = (ride, isViewMode = false, rideTab = 'upcoming') => {
+		setSelectedRide(ride);
+		setSelectedRideConfig({
+			hasFlightInfo: Boolean(ride?.flightNumber),
+			isViewMode,
+			rideTab,
+		});
+		setIsRideDetailsModalOpen(true);
+	};
 
-                    <div className="flex-1 overflow-y-auto">
-                        {activeSidebarTab === 'Dashboard' ? (
-                            <>
-                                {activeTopNavTab === 'Ride Details' && (
-                                    <DriverRidesTable 
-                                        openRideDetails={openRideDetails}
-                                        onOpenMessage={handleOpenMessages}
-                                        setIsReturnTripModalOpen={setIsReturnTripModalOpen}
-                                    />
-                                )}
+	const handleOpenReturnTrip = (ride) => {
+		setSelectedRide(ride);
+		setIsReturnTripModalOpen(true);
+	};
 
-                                {activeTopNavTab === 'Passenger' && (
-                                    <div className="px-4 sm:px-6 lg:px-8 pb-6">
-                                        <PassengerView onEditPassenger={() => setIsPassengerEditModalOpen(true)} />
-                                    </div>
-                                )}
+	const handleOpenMessages = (ride = selectedRide) => {
+		if (ride) {
+			setSelectedRide(ride);
+		}
 
-                                {activeTopNavTab === 'Profile Details' && (
-                                    <DriverProfileDetailsView />
-                                )}
-                            </>
-                        ) : activeSidebarTab === 'Notification' ? (
-                            <RideAlertsView role="driver" />
-                        ) : (
-                            <DriverAdminChatView />
-                        )}
-                    </div>
+		setIsRideDetailsModalOpen(false);
+		setIsMessagesModalOpen(true);
+	};
 
-                </main>
-            </div>
+	return (
+		<div className="relative h-screen bg-[#efefef] text-[#111111] overflow-hidden w-full">
+			<div className="mx-auto max-w-full lg:flex h-full">
+				<DriverSidebar
+					activeSidebarTab={activeSidebarTab}
+					setActiveSidebarTab={setActiveSidebarTab}
+					isMobileMenuOpen={isMobileMenuOpen}
+					setIsMobileMenuOpen={setIsMobileMenuOpen}
+					setIsLogoutModalOpen={setIsLogoutModalOpen}
+				/>
 
-            {/* Modals */}
-            <LogoutModal
-                isOpen={isLogoutModalOpen}
-                onClose={() => setIsLogoutModalOpen(false)}
-                onConfirm={() => { logout(); navigate('/driver/login'); }}
-            />
-            <DriverDetailsModal
-                isOpen={isRideDetailsModalOpen}
-                onClose={() => setIsRideDetailsModalOpen(false)}
-                hasFlightInfo={selectedRideConfig.hasFlightInfo}
-                isViewMode={selectedRideConfig.isViewMode}
-                onOpenMessage={handleOpenMessages}
-                bookingDetails={selectedRide}
-            />
-            <MessagesModal
-                isOpen={isMessagesModalOpen}
-                onClose={() => setIsMessagesModalOpen(false)}
-                rideId={selectedRide?.id || selectedRide?._id || selectedRide?.bookingId || null}
-                bookingDetails={selectedRide}
-            />
-            <PassengerEditModal
-                isOpen={isPassengerEditModalOpen}
-                onClose={() => setIsPassengerEditModalOpen(false)}
-            />
-            <ReturnTripModal
-                isOpen={isReturnTripModalOpen}
-                onClose={() => setIsReturnTripModalOpen(false)}
-                bookingDetails={selectedRide}
-            />
-        </div>
-    );
+				<main className="h-full bg-white flex-1 flex flex-col w-full overflow-hidden">
+					<DriverTopNav
+						activeSidebarTab={activeSidebarTab}
+						activeTopNavTab={activeTopNavTab}
+						setActiveTopNavTab={setActiveTopNavTab}
+					/>
+
+					<div className="flex-1 overflow-y-auto">
+						{activeSidebarTab === 'Dashboard' ? (
+							<>
+								{activeTopNavTab === 'Ride Details' && (
+									<DriverRidesTable
+										openRideDetails={openRideDetails}
+										onOpenReturnTrip={handleOpenReturnTrip}
+										onOpenMessage={handleOpenMessages}
+									/>
+								)}
+
+								{activeTopNavTab === 'Profile Details' && (
+									<DriverProfileDetailsView />
+								)}
+							</>
+						) : activeSidebarTab === 'Notification' ? (
+							<RideAlertsView role="driver" />
+						) : (
+							<DriverAdminChatView />
+						)}
+					</div>
+				</main>
+			</div>
+
+			<LogoutModal
+				isOpen={isLogoutModalOpen}
+				onClose={() => setIsLogoutModalOpen(false)}
+				onConfirm={() => {
+					logout();
+					navigate('/driver/login');
+				}}
+			/>
+
+			<DriverDetailsModal
+				isOpen={isRideDetailsModalOpen}
+				onClose={() => setIsRideDetailsModalOpen(false)}
+				hasFlightInfo={selectedRideConfig.hasFlightInfo}
+				isViewMode={selectedRideConfig.isViewMode}
+				currentRideTab={selectedRideConfig.rideTab}
+				onOpenMessage={handleOpenMessages}
+				bookingDetails={selectedRide}
+			/>
+
+			<MessagesModal
+				isOpen={isMessagesModalOpen}
+				onClose={() => setIsMessagesModalOpen(false)}
+				rideId={selectedRide?.id || selectedRide?._id || selectedRide?.bookingId || null}
+				bookingDetails={selectedRide}
+			/>
+
+			<PassengerEditModal
+				isOpen={isPassengerEditModalOpen}
+				onClose={() => setIsPassengerEditModalOpen(false)}
+			/>
+
+			<ReturnTripModal
+				isOpen={isReturnTripModalOpen}
+				onClose={() => setIsReturnTripModalOpen(false)}
+				bookingDetails={selectedRide}
+			/>
+		</div>
+	);
 }

@@ -15,7 +15,7 @@ export const InputField = ({ label, type = 'text', placeholder, value, onChange,
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={`w-full appearance-none rounded-full border border-gray-200/80 bg-white py-3.5 ${icon ? 'pl-11' : 'pl-5'} pr-4 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] transition-colors`}
+        className={`w-full no-spinner appearance-none rounded-full border border-gray-200/80 bg-white py-3.5 ${icon ? 'pl-11' : 'pl-5'} pr-4 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] transition-colors`}
       />
     </div>
   </div>

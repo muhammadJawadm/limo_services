@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import usFlag from '../../assets/us.png';
+import SharedPhoneInput from '../SharedPhoneInput';
 import testpdf from '../../assets/testpdf.pdf';
 import { FaRegEnvelope } from 'react-icons/fa';
 import { CiUser } from 'react-icons/ci';
@@ -160,12 +160,18 @@ export default function DriverProfileDetailsView() {
                                 <Field label="Last Name" value={localData.lastName} editing={editing}
                                     onChange={(v) => set('lastName', v)}
                                     icon={<CiUser className="w-5 h-5" />} />
-                                <Field label="Email Address" value={localData.email} editing={editing}
-                                    onChange={(v) => set('email', v)} type="email"
+                                <Field label="Email Address" value={localData.email} 
                                     icon={<FaRegEnvelope className="w-5 h-5 opacity-60" />} />
-                                <Field label="Phone Number" value={localData.phone} editing={editing}
-                                    onChange={(v) => set('phone', v)}
-                                    icon={<img src={usFlag} alt="US" className="w-6 h-4 object-cover rounded-[2px]" />} />
+                                <div className="w-full">
+                                    <label className="block text-[14px] text-gray-700 mb-2">Phone Number</label>
+                                    <div className={editing ? "" : "pointer-events-none opacity-80"}>
+                                        <SharedPhoneInput
+                                            value={localData.phone}
+                                            onChange={(e) => set('phone', e.target.value)}
+                                            className={editing ? "" : "bg-gray-50 border-gray-100"}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <EditBar editing={editing} saving={saving} onEdit={handleEdit} onSave={handleSave} onCancel={handleCancel} />
                         </div>
@@ -252,9 +258,16 @@ export default function DriverProfileDetailsView() {
                                     onChange={(v) => set('chauffeurLastName', v)} />
                                 <Field label="Email" value={localData.chauffeurEmail} editing={editing}
                                     onChange={(v) => set('chauffeurEmail', v)} type="email" />
-                                <Field label="Mobile Phone" value={localData.chauffeurPhone} editing={editing}
-                                    onChange={(v) => set('chauffeurPhone', v)}
-                                    icon={<img src={usFlag} alt="US" className="w-6 h-4 object-cover rounded-[2px]" />} />
+                                <div className="w-full">
+                                    <label className="block text-[14px] text-gray-700 mb-2">Mobile Phone</label>
+                                    <div className={editing ? "" : "pointer-events-none opacity-80"}>
+                                        <SharedPhoneInput
+                                            value={localData.chauffeurPhone}
+                                            onChange={(e) => set('chauffeurPhone', e.target.value)}
+                                            className={editing ? "" : "bg-gray-50 border-gray-100"}
+                                        />
+                                    </div>
+                                </div>
                                 <Field label="Driver License ID" value={localData.driverLicenseId} editing={editing}
                                     onChange={(v) => set('driverLicenseId', v)} />
                             </div>

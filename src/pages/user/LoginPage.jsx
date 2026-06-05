@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { LuLock, LuMail } from 'react-icons/lu';
-import { FiInfo } from 'react-icons/fi';
+import { FiInfo, FiEye, FiEyeOff } from 'react-icons/fi';
 import AuthSidePanel from '../../components/AuthSidePanel';
 import { useAuthStore } from '../../stores/authStore';
 import { useCredentialForm } from '../../hooks/useCredentialForm';
-
+import { useState } from 'react';
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { loginUser, isLoading, error, clearError } = useAuthStore();
   const {
@@ -66,13 +67,22 @@ export default function LoginPage() {
                 <label className="text-[15px] font-medium text-gray-800 ml-1">Password</label>
                 <div className={`mt-1.5 flex items-center rounded-full bg-white px-5 py-3.5 shadow-sm border ${hasError ? 'border-red-200' : 'border-gray-50'}`}>
                   <span className="text-gray-400"><LuLock size={18} /></span>
+
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="*********"
                     value={form.password}
                     onChange={updateField('password')}
                     className="ml-3 w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="ml-2 text-gray-400 hover:text-[#1b2d5d] transition-colors"
+                  >
+                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
                 </div>
 
                 {/* Validation and Forgot Password Row */}

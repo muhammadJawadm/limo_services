@@ -29,7 +29,7 @@ export const Step5 = () => (
     </div>
 
     <div className="pt-4">
-      <p className="text-[14px] text-gray-500">For more information, you can visit our FAQ page <a href="#" className="font-medium text-[#1b2d5d] hover:underline">here</a>.</p>
+      <p className="text-[14px] text-gray-500">For more information, you can visit our FAQ page <a href="/faq" className="font-medium text-[#1b2d5d] hover:underline">here</a>.</p>
     </div>
   </div>
 );

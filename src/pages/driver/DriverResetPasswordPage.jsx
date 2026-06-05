@@ -1,14 +1,17 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LuLock } from 'react-icons/lu';
-import { FiInfo, FiCheck } from 'react-icons/fi';
+import { FiInfo, FiCheck, FiEye, FiEyeOff } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
 import { useAuthStore } from '../../stores/authStore';
 import { usePasswordResetForm } from '../../hooks/usePasswordResetForm';
-
+import { useState } from 'react';
 export default function DriverResetPasswordPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
 
   const emailFromState = location.state?.email ?? '';
   const { resetPassword, isLoading, error, clearError } = useAuthStore();
@@ -79,13 +82,22 @@ export default function DriverResetPasswordPage() {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <LuLock className="text-gray-400" size={18} />
                     </div>
+
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="********"
                       value={form.password}
                       onChange={updateField('password')}
-                      className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
+                      className="w-full bg-transparent py-3.5 pl-11 pr-12 text-[15px] text-gray-700 outline-none"
                     />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#1b2d5d] transition-colors"
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                 </div>
 
@@ -95,13 +107,22 @@ export default function DriverResetPasswordPage() {
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <LuLock className="text-gray-400" size={18} />
                     </div>
+
                     <input
-                      type="password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="********"
                       value={form.confirmPassword}
                       onChange={updateField('confirmPassword')}
-                      className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
+                      className="w-full bg-transparent py-3.5 pl-11 pr-12 text-[15px] text-gray-700 outline-none"
                     />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#1b2d5d] transition-colors"
+                    >
+                      {showConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                 </div>
 

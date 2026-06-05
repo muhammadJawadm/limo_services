@@ -4,6 +4,8 @@ import Navbar from '../../components/user-homepage/Navbar';
 import Footer from '../../components/Footer';
 import { createSupportRequest } from '../../services/supportService';
 
+import SharedPhoneInput from '../../components/SharedPhoneInput';
+
 export default function SupportPage() {
   const initialForm = { firstName: '', lastName: '', email: '', phone: '', description: '' };
   const [form, setForm] = useState(initialForm);
@@ -39,11 +41,11 @@ export default function SupportPage() {
       <main className="flex-grow pt-16 pb-24 px-4 md:px-8 flex flex-col items-center">
         <div className="w-full max-w-2xl bg-white shadow-sm border border-gray-100 rounded-3xl p-8 md:p-12 mt-8 md:mt-16">
           <h1 className="text-4xl md:text-5xl font-semibold text-center mb-6 text-gray-900">
-            Support
+            Contact Us
           </h1>
           
           <p className="text-center text-gray-500 text-sm md:text-base mb-10 max-w-md mx-auto">
-            If you are experiencing any issues, please let us know. We will try to solve them as soon as possible
+           how can we help you
           </p>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
@@ -102,15 +104,10 @@ export default function SupportPage() {
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-900 mb-2">
                   Phone
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
+                <SharedPhoneInput
                   value={form.phone}
                   onChange={handleChange}
-                  placeholder="1234567890"
                   required
-                  className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
               </div>
             </div>
@@ -143,9 +140,7 @@ export default function SupportPage() {
             </button>
           </form>
 
-          <div className="mt-8 text-center text-sm text-gray-500">
-            You can contract us on this number? <span className="font-semibold text-[#1e2a4a]">12345689</span>
-          </div>
+          
         </div>
       </main>
 

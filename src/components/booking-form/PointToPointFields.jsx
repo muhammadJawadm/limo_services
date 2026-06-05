@@ -20,6 +20,7 @@ export default function PointToPointFields({
 	flightNumber,
 	onFlightNumberChange,
 }) {
+	const today = new Date().toISOString().split('T')[0];
 	return (
 		<>
 			<div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm  gap-0 md:gap-3">
@@ -97,6 +98,7 @@ export default function PointToPointFields({
 					<input
 						id="point-date"
 						type="date"
+						min={today}
 						placeholder="dd----YYYY"
 						value={dateValue}
 						onChange={(e) => onDateChange(e.target.value)}
@@ -110,6 +112,7 @@ export default function PointToPointFields({
 					<input
 						id="point-time"
 						type="time"
+						min={today}
 						placeholder="12:11 pm"
 						value={timeValue}
 						onChange={(e) => onTimeChange(e.target.value)}

@@ -17,7 +17,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between gap-10 mb-10">
           {/* Left — Brand */}
           <div className="max-w-xs">
-            <h3 className="font-bold  text-lg text-white mb-3">Lemo Services</h3>
+            <h3 className="font-bold  text-lg text-white mb-3">Limo Services</h3>
             <p className=" text-sm leading-relaxed text-white">
               Limo Services offers luxury chauffeur-driven rides through a simple web platform, connecting riders with professional drivers for reliable, premium transportation.
             </p>
@@ -41,7 +41,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-gray-800 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-white text-xs">
-            Copyright © Lemo Services
+            Copyright © Limo Services
           </p>
           {/* Social Icons */}
           <div className="flex items-center gap-4">

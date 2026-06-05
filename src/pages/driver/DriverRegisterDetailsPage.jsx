@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LuUser, LuMail, LuLock } from 'react-icons/lu';
-import { FiChevronDown, FiInfo } from 'react-icons/fi';
+import { FiChevronDown, FiInfo, FiEye, FiEyeOff } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
-import usFlag from '../../assets/us.png';
+import SharedPhoneInput from '../../components/SharedPhoneInput';
 import { useAuthStore } from '../../stores/authStore';
-
+import { validatePassword } from '../../utils/validation';
 export default function DriverRegisterDetailsPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const locationFromPrev = location.state?.location ?? '';
-
+  const [showPassword, setShowPassword] = useState(false);
   const { registerDriver, isLoading, error, clearError } = useAuthStore();
 
   const [form, setForm] = useState({
@@ -41,7 +41,11 @@ export default function DriverRegisterDetailsPage() {
     if (!form.lastName.trim()) return setFormError('Last name is required.');
     if (!form.email.trim()) return setFormError('Email address is required.');
     if (!form.phone.trim()) return setFormError('Phone number is required.');
-    if (!form.password) return setFormError('Password is required.');
+    const passwordError = validatePassword(form.password);
+
+    if (passwordError) {
+      return setFormError(passwordError);
+    }
 
     const fullPhone = form.phone.startsWith('+') ? form.phone : `+1${form.phone}`;
 
@@ -132,18 +136,12 @@ export default function DriverRegisterDetailsPage() {
 
               <div>
                 <label className="text-[14px] font-medium text-[#111] ml-1">Phone Number</label>
-                <div className={`relative mt-1.5 flex items-center rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white px-2 py-1.5 focus-within:border-[#1b2d5d] transition-colors`}>
-                  <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-full cursor-pointer hover:bg-gray-200 transition-colors">
-                    <img src={usFlag} alt="US" className="w-5 h-5 object-cover rounded-full" />
-                    <FiChevronDown className="text-[#4d4d4d]" />
-                  </div>
-                  <span className="text-[#4d4d4d] text-[15px] ml-2">+1</span>
-                  <input
-                    type="text"
+                <div className="mt-1.5">
+                  <SharedPhoneInput
                     value={form.phone}
                     onChange={updateField('phone')}
-                    placeholder="(555) 000-0000"
-                    className="flex-1 bg-transparent border-none text-[15px] text-gray-700 outline-none px-2 py-2"
+                    hasError={hasError}
+                    required
                   />
                 </div>
               </div>
@@ -154,13 +152,26 @@ export default function DriverRegisterDetailsPage() {
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <LuLock className="text-gray-400" size={18} />
                   </div>
+
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="*********"
                     value={form.password}
-                    onChange={updateField('password')}
-                    className="w-full bg-transparent py-3.5 pl-11 pr-4 text-[15px] text-gray-700 outline-none"
+                    onChange={(e) =>
+                      updateField('password')({
+                        target: { value: e.target.value.replace(/\s/g, '') }
+                      })
+                    }
+                    className="w-full bg-transparent py-3.5 pl-11 pr-12 text-[15px] text-gray-700 outline-none"
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#1b2d5d] transition-colors"
+                  >
+                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
                 </div>
               </div>
 
@@ -171,18 +182,29 @@ export default function DriverRegisterDetailsPage() {
                 </div>
               )}
 
-              <div className="flex items-center gap-2 ml-1 mt-4">
-                <input
-                  type="checkbox"
-                  id="newsletter"
-                  checked={form.newsletter}
-                  onChange={updateField('newsletter')}
-                  className="w-4 h-4 rounded-full border-gray-300 text-[#1b2d5d] focus:ring-[#1b2d5d]"
-                  style={{ borderRadius: '50%', appearance: 'none', border: '1px solid #d1d5db' }}
-                />
-                <label htmlFor="newsletter" className="text-[14px] text-gray-500 cursor-pointer">
+              <div
+                className="flex items-center gap-2 ml-1 mt-4 cursor-pointer select-none"
+                onClick={() =>
+                  setForm((prev) => ({
+                    ...prev,
+                    newsletter: !prev.newsletter,
+                  }))
+                }
+              >
+                <div
+                  className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${form.newsletter
+                      ? 'border-[#1b2d5d] bg-[#1b2d5d]'
+                      : 'border-gray-300 bg-white'
+                    }`}
+                >
+                  {form.newsletter && (
+                    <div className="w-2 h-2 rounded-full bg-white" />
+                  )}
+                </div>
+
+                <span className="text-[14px] text-gray-500">
                   I want to receive notification & Newsletters
-                </label>
+                </span>
               </div>
 
               <div className="pt-2">

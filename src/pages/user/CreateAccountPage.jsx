@@ -1,29 +1,51 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiChevronDown, FiInfo } from 'react-icons/fi';
+import { FiChevronDown, FiInfo, FiEye, FiEyeOff } from 'react-icons/fi';
 import { LuBuilding2, LuLock, LuMail, LuUser } from 'react-icons/lu';
 import AuthSidePanel from '../../components/AuthSidePanel';
-import usFlag from '../../assets/us.png';
+import SharedPhoneInput from '../../components/SharedPhoneInput';
 import buildingIcon from '../../assets/company.png';
 import { useAuthStore } from '../../stores/authStore';
+import { validatePassword } from '../../utils/validation';
 
-function InputRow({ icon, type = 'text', placeholder, value, onChange, hasError }) {
+function InputRow({
+  icon,
+  type = 'text',
+  placeholder,
+  value,
+  onChange,
+  hasError,
+  showToggle = false,
+  showValue = false,
+  onToggleShow,
+}) {
   return (
     <div className={`flex items-center rounded-full bg-white px-5 py-3.5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border ${hasError ? 'border-red-200' : 'border-gray-50'}`}>
       <span className="text-gray-400">{icon}</span>
+
       <input
-        type={type}
+        type={showToggle ? (showValue ? 'text' : 'password') : type}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         className="ml-3 w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
       />
+
+      {showToggle && (
+        <button
+          type="button"
+          onClick={onToggleShow}
+          className="ml-2 text-gray-400 hover:text-[#1b2d5d] transition-colors"
+        >
+          {showValue ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+        </button>
+      )}
     </div>
   );
 }
-
 export default function CreateAccountPage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const { registerUser, isLoading, error, clearError } = useAuthStore();
 
   const [form, setForm] = useState({
@@ -54,7 +76,11 @@ export default function CreateAccountPage() {
     if (!form.lastName.trim()) return setFormError('Last name is required.');
     if (!form.email.trim()) return setFormError('Email address is required.');
     if (!form.phone.trim()) return setFormError('Phone number is required.');
-    if (!form.password) return setFormError('Password is required.');
+    const passwordError = validatePassword(form.password);
+
+    if (passwordError) {
+      return setFormError(passwordError);
+    }
 
     const fullPhone = form.phone.startsWith('+') ? form.phone : `+1${form.phone}`;
 
@@ -131,18 +157,12 @@ export default function CreateAccountPage() {
 
               <div>
                 <label className="text-[15px] font-medium text-gray-800 ml-1">Phone Number</label>
-                <div className={`mt-1.5 flex items-center rounded-full bg-white px-5 py-3 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] border ${hasError ? 'border-red-200' : 'border-gray-50'}`}>
-                  <div className="flex items-center bg-gray-100 rounded-full px-2 py-1">
-                    <img src={usFlag} alt="US" className="w-5 h-5 rounded-full object-cover" />
-                    <FiChevronDown size={32} className="ml-1 text-gray-600" />
-                  </div>
-                  <span className="ml-3 text-sm text-gray-500">+1</span>
-                  <input
-                    type="tel"
+                <div className="mt-1.5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] rounded-full">
+                  <SharedPhoneInput
                     value={form.phone}
                     onChange={updateField('phone')}
-                    placeholder="(555) 000-0000"
-                    className="ml-3 w-full bg-transparent text-sm text-gray-700 outline-none"
+                    hasError={hasError}
+                    required
                   />
                 </div>
               </div>
@@ -152,11 +172,17 @@ export default function CreateAccountPage() {
                 <div className="mt-1.5">
                   <InputRow
                     icon={<LuLock size={18} />}
-                    type="password"
                     placeholder="*********"
                     value={form.password}
-                    onChange={updateField('password')}
+                    onChange={(e) =>
+                      updateField('password')({
+                        target: { value: e.target.value.replace(/\s/g, '') }
+                      })
+                    }
                     hasError={hasError}
+                    showToggle
+                    showValue={showPassword}
+                    onToggleShow={() => setShowPassword((prev) => !prev)}
                   />
                 </div>
               </div>

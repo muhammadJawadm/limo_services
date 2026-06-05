@@ -77,19 +77,28 @@ export const Step9 = () => {
               <div className="text-[13px] text-gray-500">Payouts for completed rides</div>
             </div>
           </div>
-          <div className={`rounded-full px-3 py-1 text-xs border ${status.onboarded ? 'border-green-300 text-green-600' : 'border-amber-300 text-amber-600'}`}>
-            {status.onboarded ? 'Onboarding Complete' : 'Setup Required'}
-          </div>
+          {isLoading ? (
+            <div className="text-[13px] text-gray-500">Checking status...</div>
+          ) : (
+            <div className={`rounded-full px-3 py-1 text-xs border ${status.onboarded ? 'border-green-300 text-green-600' : 'border-amber-300 text-amber-600'}`}>
+              {status.onboarded ? 'Onboarding Complete' : 'Setup Required'}
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-xl p-4 border border-gray-100 flex items-center justify-between">
-          <div>
-            <div className="text-[15px] font-medium text-[#111]">Payout setup</div>
-            <div className="text-[13px] text-gray-500">
-              {isLoading ? 'Checking status...' : status.onboarded ? 'Your account is ready.' : 'Complete the Stripe onboarding flow.'}
+          
+          {isLoading ? (
+            <div className="text-[13px] text-gray-500">Checking status...</div>
+          ) : (
+            <div>
+              <div className="text-[15px] font-medium text-[#111]">Payout setup</div>
+              <div className="text-[13px] text-gray-500">
+                {status.onboarded ? 'Your account is ready.' : 'Complete the Stripe onboarding flow.'}
+              </div>
             </div>
-          </div>
-          {!status.onboarded && 
+          )}
+          {!status.onboarded && !isLoading && (
           <button
             onClick={handleCreateLink}
             disabled={isCreatingLink}
@@ -97,14 +106,15 @@ export const Step9 = () => {
           >
             {isCreatingLink ? 'Opening...' : status.onboarded ? 'Manage' : 'Set up payouts'}
             <FiExternalLink size={14} />
-          </button>}
+          </button>)}
+          
         </div>
 
-        {status.onboarded && (
+        {/* {status.onboarded && (
           <div className="flex items-center gap-2 text-[13px] text-green-600">
             <FiCheck size={14} /> Stripe onboarding complete.
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

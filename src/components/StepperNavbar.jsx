@@ -5,7 +5,6 @@ import { useAuthStore } from '../stores/authStore';
 
 const steps = [
   { label: 'Ride Details' },
-  { label: 'Passenger Details' },
   { label: 'Payment' },
 ];
 

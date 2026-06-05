@@ -67,10 +67,10 @@ export async function updateBookingStep3(id, payload) {
 }
 
 export async function updateBookingStep4(id, payload) {
-	return withDataResponse(
-		() => api.patch(`/api/bookings/${id}/step4`, payload),
-		'Failed to update passenger details.',
-	)
+  return withDataResponse(
+    () => api.patch(`/api/bookings/${id}/step4`, payload),
+    'Failed to update booker details.',
+  )
 }
 
 export async function updateBookingStep5(id, payload) {

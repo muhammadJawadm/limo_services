@@ -5,20 +5,32 @@ import driverAvatarFallback from '../../assets/driver1.png';
 import useRideChat from '../../hooks/useRideChat';
 
 export default function MessagesModal({ isOpen, onClose, rideId, bookingDetails }) {
-  const { role, userId, messages, isLoading, error, isConnected, sendMessage } = useRideChat(rideId);
+  console.log('MessagesModal Props:', { isOpen, rideId, bookingDetails });
+  const { role, messages, isLoading, error, isConnected, sendMessage } = useRideChat(rideId);
   const [messageText, setMessageText] = useState('');
   const endRef = useRef(null);
 
   const headerName = useMemo(() => {
-    const driver = bookingDetails?.driver || bookingDetails?.driverDetails || bookingDetails?.chauffeur || {};
-    const passenger = bookingDetails?.passenger || bookingDetails?.passengerDetails || bookingDetails?.bookerDetails || {};
+    const driver = bookingDetails?.assignedDriver || {};
+    const passenger = bookingDetails?.passenger || {};
 
     if (role === 'driver') {
-      return [passenger.firstName, passenger.lastName].filter(Boolean).join(' ') || 'Passenger';
+      return passenger?.name || 'Passenger';
     }
 
     return [driver.firstName, driver.lastName].filter(Boolean).join(' ') || 'Driver';
   }, [bookingDetails, role]);
+
+  const ProfileAvatar = useMemo(() => {
+    const driver = bookingDetails?.assignedDriver || {};
+
+    if (role === 'driver') {
+      return  null;
+    }
+
+    return driver.profilePictureUrl ||null;
+  }, [bookingDetails, role]);
+
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -41,12 +53,17 @@ export default function MessagesModal({ isOpen, onClose, rideId, bookingDetails 
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 sm:px-8">
           <div className="flex items-center gap-4">
             <div className="relative h-12 w-12 shrink-0 rounded-2xl bg-gray-200 shadow-sm overflow-hidden">
-              <img
-                src={driverAvatar}
-                onError={(e) => { e.target.src = driverAvatarFallback; }}
-                alt="Driver Avatar"
-                className="h-full w-full object-cover"
-              />
+              {ProfileAvatar ? (
+                <img
+                  src={ProfileAvatar}
+                  onError={(e) => { e.target.src = driverAvatarFallback; }}
+                  alt="Driver Avatar"
+                  className="h-full w-full object-cover"
+                />
+              ) : (<div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                <h2>{
+                  [headerName.charAt(0)] }</h2>
+              </div>)}
             </div>
             <div>
               <h3 className="text-lg font-bold text-[#111]">{headerName}</h3>

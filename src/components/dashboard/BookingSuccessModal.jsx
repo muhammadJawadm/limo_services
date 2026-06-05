@@ -1,5 +1,5 @@
 import successicon from '../../assets/successicon.png';
-export default function BookingSuccessModal({ isOpen, onClose }) {
+export default function BookingSuccessModal({ isOpen, onClose , bookingId}) {
   if (!isOpen) return null;
 
   return (
@@ -9,7 +9,7 @@ export default function BookingSuccessModal({ isOpen, onClose }) {
 
         <h3 className="mb-2 text-[26px] font-bold text-[#111111]">Ride Booked</h3>
         <p className="mb-4 text-sm font-medium text-[#666]">
-          787878, 4848
+          {bookingId}
         </p>
         
         <p className="text-[15px] text-[#666666] leading-relaxed mb-8">

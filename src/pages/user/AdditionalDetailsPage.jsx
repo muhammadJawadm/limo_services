@@ -231,7 +231,7 @@ export default function AdditionalDetailsPage() {
                     <img src={plane} className="w-6 h-6" alt="plane" />
                   </div>
                   <p className="text-white font-bold text-lg">
-                    ${Number(vehicleDetails?.baseFare ?? bookingDetails?.totalAmount ?? 0).toFixed(2)}
+                    ${Number(bookingDetails?.totalAmount ?? vehicleDetails?.baseFare ?? 0).toFixed(2)}
                   </p>
                 </div>
               </div>

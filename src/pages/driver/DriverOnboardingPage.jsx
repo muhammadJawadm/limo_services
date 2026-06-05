@@ -14,6 +14,99 @@ import { useAuthStore } from '../../stores/authStore';
 
 const visibleSteps = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
+const isEmpty = (value) => {
+  return value === undefined || value === null || String(value).trim() === '';
+};
+
+const validateOnboardingStep = (step, form) => {
+  if (step === 1) {
+    const requiredFields = [
+      'companyName',
+      'companyType',
+      'country',
+      'street',
+      'zipCode',
+      'city',
+      'stateProvince',
+      'taxId',
+      'businessRegistration',
+    ];
+
+    const hasMissingField = requiredFields.some((field) => isEmpty(form[field]));
+
+    if (hasMissingField) {
+      return 'Please fill all required company information before continuing.';
+    }
+  }
+
+  if (step === 2) {
+    const requiredFields = [
+      'priorExp',
+      'electricVehicles',
+      'femaleChauffeurs',
+      'chauffeurCount',
+      'firstClassCount',
+      'businessVansCount',
+      'fleetDescription',
+    ];
+
+    const hasMissingField = requiredFields.some((field) => isEmpty(form[field]));
+
+    if (hasMissingField) {
+      return 'Please fill all required fleet information before continuing.';
+    }
+  }
+
+  if (step === 3) {
+    if (form.sameAsRep) {
+      return '';
+    }
+
+    const requiredFields = [
+      'chauffeurFirstName',
+      'chauffeurLastName',
+      'chauffeurEmail',
+      'chauffeurPhone',
+      'driverLicenseId',
+    ];
+
+    const hasMissingField = requiredFields.some((field) => isEmpty(form[field]));
+
+    if (hasMissingField) {
+      return 'Please fill all required chauffeur information before continuing.';
+    }
+  }
+
+  if (step === 4) {
+    const requiredFields = [
+      'vehicleYear',
+      'vehicleBrand',
+      'vehicleClass',
+      'vehicleColor',
+      'passengerCount',
+      'luggageCount',
+      'wifi',
+      'smoking',
+      'numberPlate',
+      'vin',
+    ];
+
+    const hasMissingField = requiredFields.some((field) => isEmpty(form[field]));
+
+    if (hasMissingField) {
+      return 'Please fill all required vehicle information before continuing.';
+    }
+  }
+
+  if (step === 8) {
+    if (isEmpty(form.contractPlace) || !form.contractAgreed) {
+      return 'Please enter contract place and accept the agreement before continuing.';
+    }
+  }
+
+  return '';
+};
+
 export default function DriverOnboardingPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,8 +132,13 @@ export default function DriverOnboardingPage() {
   const totalSteps = visibleSteps.length;
   const isLastVisibleStep = currentStepIndex === visibleSteps.length - 1;
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [validationError, setValidationError] = useState('');
   const updateDoc = (key, value) => {
     updateOnboardingForm(key, value);
+
+    if (key !== 'showErrors' && validationError) {
+      setValidationError('');
+    }
   };
 
   useEffect(() => {
@@ -48,15 +146,20 @@ export default function DriverOnboardingPage() {
   }, [fetchOnboarding]);
 
   const nextStep = async () => {
-    if (currentStep === 8) {
-      if (!onboardingForm.contractPlace?.trim() || !onboardingForm.contractAgreed) {
-        updateDoc('showErrors', true);
-        return;
-      }
-      updateDoc('showErrors', false);
+    const stepError = validateOnboardingStep(currentStep, onboardingForm);
+
+    if (stepError) {
+      setValidationError(stepError);
+      updateDoc('showErrors', true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
 
+    setValidationError('');
+    updateDoc('showErrors', false);
+
     clearOnboardingError();
+
     const saved = await saveOnboardingStep(currentStep);
     if (!saved?.success) {
       return;
@@ -66,7 +169,6 @@ export default function DriverOnboardingPage() {
       setCurrentStep(visibleSteps[currentStepIndex + 1]);
       window.scrollTo(0, 0);
     } else {
-      // Final submit
       const result = await submitOnboardingForm();
       if (!result?.success) {
         return;
@@ -193,6 +295,11 @@ export default function DriverOnboardingPage() {
             {onboardingError && (
               <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-[14px] text-red-600">
                 {onboardingError}
+              </div>
+            )}
+            {validationError && (
+              <div className="mb-6 rounded-xl border border-red-100 bg-red-50 px-5 py-4 text-[14px] text-red-600">
+                {validationError}
               </div>
             )}
             {renderStep()}

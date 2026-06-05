@@ -133,7 +133,7 @@ export default function PassengerEditModal({ isOpen, onClose }) {
            <label className="mb-2 block text-sm text-[#666]">Specific Priority for this passenger Notes:</label>
            <textarea
              className="h-[100px] w-full resize-none rounded-2xl border border-gray-200 p-4 text-[15px] text-[#111] outline-none placeholder:text-gray-400 focus:border-[#1b2d5d]"
-             defaultValue="Lorem ipsum"
+             defaultValue="Special notes regarding the passenger's preferences"
            />
         </div>
 

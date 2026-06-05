@@ -1,11 +1,14 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LuLock } from 'react-icons/lu';
-import { FiInfo, FiCheck } from 'react-icons/fi';
+import { useState } from 'react';
+import { FiInfo, FiCheck, FiEye, FiEyeOff } from 'react-icons/fi';
 import AuthSidePanel from '../../components/AuthSidePanel';
 import { useAuthStore } from '../../stores/authStore';
 import { usePasswordResetForm } from '../../hooks/usePasswordResetForm';
 
 export default function ResetPasswordPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -68,13 +71,22 @@ export default function ResetPasswordPage() {
                   <label className="text-[15px] font-medium text-gray-800 ml-1">Password</label>
                   <div className={`mt-1.5 flex items-center rounded-full bg-white px-5 py-3.5 shadow-sm border ${hasError ? 'border-red-200' : 'border-gray-50'}`}>
                     <span className="text-gray-400"><LuLock size={18} /></span>
+
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="*********"
                       value={form.password}
                       onChange={updateField('password')}
                       className="ml-3 w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
                     />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="ml-2 text-gray-400 hover:text-[#1b2d5d] transition-colors"
+                    >
+                      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                 </div>
 
@@ -82,13 +94,22 @@ export default function ResetPasswordPage() {
                   <label className="text-[15px] font-medium text-gray-800 ml-1">Confirm Password</label>
                   <div className={`mt-1.5 flex items-center rounded-full bg-white px-5 py-3.5 shadow-sm border ${hasError ? 'border-red-200' : 'border-gray-50'}`}>
                     <span className="text-gray-400"><LuLock size={18} /></span>
+
                     <input
-                      type="password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="*********"
                       value={form.confirmPassword}
                       onChange={updateField('confirmPassword')}
                       className="ml-3 w-full bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
                     />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="ml-2 text-gray-400 hover:text-[#1b2d5d] transition-colors"
+                    >
+                      {showConfirmPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                    </button>
                   </div>
                 </div>
 

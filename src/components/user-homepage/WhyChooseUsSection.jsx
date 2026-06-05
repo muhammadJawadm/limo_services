@@ -29,6 +29,13 @@ const cards = [
 ];
 
 export default function WhyChooseUsSection() {
+  const handleBookNowClick = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <section className="py-20 px-8 md:px-16 bg-gray-100 text-center">
       <h2 className="text-2xl md:text-3xl font-bold text-[#1a2b5e] mb-2">Why Choose Us?</h2>
@@ -67,7 +74,7 @@ export default function WhyChooseUsSection() {
 
             {/* Book Now button — overflows bottom-left corner */}
             <div className="absolute -bottom-1 left-1 z-[2]">
-              <PrimaryButton size="lg">
+              <PrimaryButton size="lg" onClick={handleBookNowClick} >
                 Book Now <FaArrowRight className="text-lg" />
               </PrimaryButton>
             </div>

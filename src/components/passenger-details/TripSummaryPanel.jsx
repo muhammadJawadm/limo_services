@@ -129,9 +129,7 @@ export default function TripSummaryPanel({ isHourlyRide, setShowDeleteConfirm, b
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <img src={childSeatIcon} className="w-4 h-4" alt="child seat" />
             <span>Child Seat x {childSeatsCount}</span>
-            <button onClick={() => setShowDeleteConfirm(true)} className="ml-1 text-red-400 hover:text-red-600 transition-colors">
-              <MdDeleteOutline size={20} />
-            </button>
+            
           </div>
           <span className="text-md  text-gray-400">${childSeatFee.toFixed(2)}</span>
         </div>

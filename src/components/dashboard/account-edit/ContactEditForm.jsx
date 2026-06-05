@@ -1,4 +1,5 @@
 import AccountEditFormActions from './AccountEditFormActions'
+import SharedPhoneInput from '../../SharedPhoneInput'
 
 export default function ContactEditForm({ formData, onInputChange, onSubmit, onClose, isSaving, saveError, saveSuccess }) {
 	return (
@@ -18,12 +19,9 @@ export default function ContactEditForm({ formData, onInputChange, onSubmit, onC
 				</div>
 				<div>
 					<label className="mb-2 block text-sm text-[#666]">Phone Number</label>
-					<input
-						type="text"
-						name="phone"
+					<SharedPhoneInput
 						value={formData.phone}
 						onChange={onInputChange}
-						className="w-full rounded-full border border-gray-200 px-4 py-3 text-[15px] text-[#111] outline-none placeholder:text-gray-400 focus:border-[#1b2d5d]"
 					/>
 				</div>
 			</div>

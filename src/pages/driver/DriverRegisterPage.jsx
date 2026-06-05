@@ -8,15 +8,24 @@ import driverSideImg from '../../assets/driverside.png';
 export default function DriverRegisterPage() {
   const navigate = useNavigate();
   const [address, setAddress] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(true); 
-
+  const [showSuggestions, setShowSuggestions] = useState(true);
+  const [addressError, setAddressError] = useState('');
   const handleNext = (e) => {
     e.preventDefault();
-    navigate('/driver/register/details', { state: { location: address } });
+
+    if (!address.trim()) {
+      setAddressError('Address is required.');
+      return;
+    }
+
+    navigate('/driver/register/details', {
+      state: { location: address.trim() },
+    });
   };
 
   const handleAddressChange = (e) => {
     setAddress(e.target.value);
+    setAddressError('');
     setShowSuggestions(e.target.value.length > 0);
   };
 
@@ -58,12 +67,12 @@ export default function DriverRegisterPage() {
                     onFocus={() => setShowSuggestions(address.length > 0)}
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     placeholder="Search Address..."
-                    className="w-full rounded-full border border-gray-300/80 bg-white py-3.5 pl-11 pr-10 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d]"
-                  />
+                    className={`w-full rounded-full border bg-white py-3.5 pl-11 pr-10 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] ${addressError ? 'border-red-300' : 'border-gray-300/80'
+                      }`} />
                   {address && (
                     <button
                       type="button"
-                      onClick={() => { setAddress(''); setShowSuggestions(false); }}
+                      onClick={() => { setAddress(''); setShowSuggestions(false); setAddressError(''); }}
                       className="absolute inset-y-0 right-0 pr-4 flex items-center text-red-500 hover:text-red-700"
                     >
                       <FiX size={18} />
@@ -71,21 +80,34 @@ export default function DriverRegisterPage() {
                   )}
                 </div>
 
+                {addressError && (
+                  <p className="mt-2 text-sm text-red-500">{addressError}</p>
+                )}
+
                 {/* Suggestions Dropdown */}
                 {showSuggestions && (
-                  <div className="absolute z-10 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                  <div className="absolute z-10 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-y-auto max-h-[260px]">
                     {mockSuggestions.map((item, index) => (
                       <div
                         key={item.id}
-                        onClick={() => { setAddress(item.main); setShowSuggestions(false); }}
-                        className={`flex items-start gap-4 px-5 py-3.5 cursor-pointer hover:bg-gray-50 ${index !== mockSuggestions.length - 1 ? 'border-b border-gray-100' : ''}`}
+                        onMouseDown={() => {
+                          setAddress(`${item.main}, ${item.sub}`);
+                          setShowSuggestions(false);
+                        }}
+                        className={`flex items-start gap-4 px-5 py-3.5 cursor-pointer hover:bg-gray-50 ${index !== mockSuggestions.length - 1 ? 'border-b border-gray-100' : ''
+                          }`}
                       >
                         <div className="mt-0.5 text-gray-400">
                           <LuMapPin size={18} />
                         </div>
+
                         <div className="flex flex-col">
-                          <span className="text-[14px] font-medium text-gray-900">{item.main}</span>
-                          <span className="text-[12.5px] text-gray-400 mt-0.5">{item.sub}</span>
+                          <span className="text-[14px] font-medium text-gray-900">
+                            {item.main}
+                          </span>
+                          <span className="text-[12.5px] text-gray-400 mt-0.5">
+                            {item.sub}
+                          </span>
                         </div>
                       </div>
                     ))}

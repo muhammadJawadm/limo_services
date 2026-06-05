@@ -9,7 +9,7 @@ import { buildReservationPayload } from './reservation/reservationPayload'
 import TripDetailsSection from './reservation/TripDetailsSection'
 import AdditionalInfoSection from './reservation/AdditionalInfoSection'
 import VehicleInfoSection from './reservation/VehicleInfoSection'
-import PassengerInfoSection from './reservation/PassengerInfoSection'
+// import PassengerInfoSection from './reservation/PassengerInfoSection'
 import PaymentInfoSection from './reservation/PaymentInfoSection'
 import ReservationFooter from './reservation/ReservationFooter'
 
@@ -33,7 +33,6 @@ export default function NewReservationModal({ isOpen, onClose }) {
 		tripDetails: true,
 		additionalInfo: true,
 		vehicleInfo: true,
-		passengerInfo: true,
 		cardInfo: true,
 	})
 
@@ -132,10 +131,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
 			return
 		}
 
-		const paymentResult = await createPaymentIntent(bookingId, {
-			bookerEmail: bookingPayload.bookerDetails.email || null,
-			bookerPhone: bookingPayload.bookerDetails.phone || null,
-		})
+		const paymentResult = await createPaymentIntent(bookingId);
 
 		if (!paymentResult?.success) {
 			setIsBooking(false)
@@ -196,10 +192,6 @@ export default function NewReservationModal({ isOpen, onClose }) {
 									selectedVehicleId={selectedVehicleId}
 									onSelectVehicle={setSelectedVehicleId}
 								/>
-								<PassengerInfoSection
-									isOpen={openSections.passengerInfo}
-									onToggle={() => toggleSection('passengerInfo')}
-								/>
 								<PaymentInfoSection
 									isOpen={openSections.cardInfo}
 									onToggle={() => toggleSection('cardInfo')}
@@ -236,7 +228,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
 				</div>
 			</div>
 
-			<BookingSuccessModal isOpen={isSuccessModalOpen} onClose={handleCloseModal} />
+			<BookingSuccessModal isOpen={isSuccessModalOpen} onClose={handleCloseModal} bookingId={paymentBookingDetails?.id}  />
 		</>
 	)
 }

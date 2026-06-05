@@ -4,7 +4,13 @@ import { FaArrowLeft } from 'react-icons/fa6';
 import { AiOutlineDollarCircle } from 'react-icons/ai';
 import { CiLocationOn } from 'react-icons/ci';
 import { useDriverStore } from '../../stores/driverStore';
-import { confirmDriverRidePickup, getDriverRideById, updateRideStatus } from '../../services/driverService';
+import {
+  acceptDriverRide,
+  declineDriverRide,
+  confirmDriverRidePickup,
+  getDriverRideById,
+  updateRideStatus
+} from '../../services/driverService';
 import CancelTripModal from './CancelTripModal';
 
 const safeNameParts = (fullName) => {
@@ -18,13 +24,16 @@ export default function DriverDetailsModal({
   onClose,
   hasFlightInfo = true,
   isViewMode = false,
+  currentRideTab: currentRideTabProp = 'upcoming',
   onOpenMessage,
   bookingDetails,
 }) {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [fullBookingDetails, setFullBookingDetails] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const { currentRideTab, cancelRide, fetchRides } = useDriverStore();
+  const [isDeclining, setIsDeclining] = useState(false);
+  const { currentRideTab: storeRideTab, cancelRide, fetchRides } = useDriverStore();
+  const currentRideTab = currentRideTabProp || storeRideTab || 'upcoming';
 
   useEffect(() => {
     if (!isOpen || !bookingDetails?.id) return;
@@ -73,12 +82,28 @@ export default function DriverDetailsModal({
   const statusLabel = currentRideTab === 'past'
     ? 'Past'
     : currentRideTab === 'cancelled'
-    ? 'Cancelled'
-    : details?.rideStatus ? details.rideStatus.charAt(0).toUpperCase() + details.rideStatus.slice(1) : 'Upcoming';
+      ? 'Cancelled'
+      : details?.rideStatus ? details.rideStatus.charAt(0).toUpperCase() + details.rideStatus.slice(1) : 'Upcoming';
   const rideStatus = (details?.rideStatus || '').toLowerCase();
-  const isRideActionable = currentRideTab !== 'past' && currentRideTab !== 'cancelled' && rideStatus !== 'cancelled' && rideStatus !== 'completed';
-  const isPickupConfirmed = rideStatus === 'ongoing' || rideStatus === 'confirmed';
-  const primaryActionLabel = isPickupConfirmed ? 'Complete Ride' : 'Confirm Pickup';
+  const isUpcomingTab = currentRideTab === 'upcoming';
+
+  const isNewAssignedRide = isUpcomingTab && rideStatus === 'upcoming';
+  const isAcceptedRide = isUpcomingTab && rideStatus === 'confirmed';
+  const isOngoingRide = isUpcomingTab && rideStatus === 'ongoing';
+
+  const isRideActionable =
+    isUpcomingTab &&
+    rideStatus !== 'cancelled' &&
+    rideStatus !== 'completed';
+
+  const canAcceptOrDecline = isNewAssignedRide;
+  const canCancelRide = isRideActionable;
+
+  const primaryActionLabel = isOngoingRide
+    ? 'Complete Ride'
+    : isAcceptedRide
+      ? 'Confirm Pickup'
+      : 'Accept';
   const createdAt = details?.createdAt ? new Date(details.createdAt).toLocaleDateString() : '—';
   const pickupLocation = details?.routingInformation?.pickupLocation || details?.pickupLocation || 'Pickup location';
   const dropoffLocation = details?.routingInformation?.dropoffLocation || details?.dropoffLocation || 'Drop-off location';
@@ -97,24 +122,57 @@ export default function DriverDetailsModal({
   const handlePrimaryAction = async () => {
     if (!bookingId) return;
 
+    const confirmed = window.confirm(`Are you sure you want to ${primaryActionLabel.toLowerCase()}?`);
+    if (!confirmed) return;
+
     setIsUpdating(true);
 
     try {
-      const result = isPickupConfirmed
-        ? await updateRideStatus(bookingId, 'completed')
-        : await confirmDriverRidePickup(bookingId);
+      let result;
+
+      if (isOngoingRide) {
+        result = await updateRideStatus(bookingId, 'completed');
+      } else if (isAcceptedRide) {
+        result = await confirmDriverRidePickup(bookingId);
+      } else {
+        result = await acceptDriverRide(bookingId);
+      }
 
       if (result?.success) {
-        await fetchRides({ tab: currentRideTab ?? 'upcoming', page: 1, scope: 'mine' }).catch(() => {});
+        await fetchRides({ tab: currentRideTab ?? 'upcoming', page: 1, scope: 'mine' }).catch(() => { });
         onClose();
         return;
       }
 
-      alert(result?.message || (isPickupConfirmed ? 'Failed to complete ride.' : 'Failed to confirm pickup.'));
+      alert(result?.message || `Failed to ${primaryActionLabel.toLowerCase()}.`);
     } catch {
-      alert(isPickupConfirmed ? 'Failed to complete ride.' : 'Failed to confirm pickup.');
+      alert(`Failed to ${primaryActionLabel.toLowerCase()}.`);
     } finally {
       setIsUpdating(false);
+    }
+  };
+  const handleDeclineRide = async () => {
+    if (!bookingId) return;
+
+    const confirmed = window.confirm('Are you sure you want to decline this ride?');
+    if (!confirmed) return;
+
+    setIsDeclining(true);
+
+    try {
+      const result = await declineDriverRide(bookingId);
+
+      if (result?.success) {
+        await fetchRides({ tab: currentRideTab ?? 'upcoming', page: 1, scope: 'mine' }).catch(() => { });
+        onClose();
+        return;
+      }
+
+      alert(result?.message || 'Failed to decline ride.');
+    } catch {
+      alert('Failed to decline ride.');
+    } finally {
+      setIsDeclining(false);
     }
   };
 
@@ -129,12 +187,12 @@ export default function DriverDetailsModal({
 
           <div className="flex items-center gap-3">
             <button
-              onClick={onOpenMessage}
+              onClick={() => onOpenMessage?.(details)}
               className="rounded-full bg-[#1b2d5d] px-6 py-2 text-[14px] font-medium text-white transition-colors hover:bg-[#132042]"
             >
               Message
             </button>
-            {isRideActionable && !isViewMode && (
+            {canCancelRide && (
               <button
                 onClick={() => setIsCancelModalOpen(true)}
                 className="rounded-full border border-gray-200 px-5 py-2 text-[14px] font-medium text-[#666] transition-colors hover:bg-gray-50 bg-white"
@@ -165,7 +223,7 @@ export default function DriverDetailsModal({
               <div className="rounded-[16px] border border-gray-200 p-5 sm:p-6 bg-white">
                 <h3 className="mb-5 text-[17px] font-bold text-[#111] flex items-center gap-2">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#111]"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                  Passenger Info
+                  User Info
                 </h3>
                 <div className="grid grid-cols-[90px_1fr] gap-y-3.5 text-[14px]">
                   <div className="text-[#666]">First Name:</div>
@@ -261,22 +319,7 @@ export default function DriverDetailsModal({
               </div>
 
               <div className="lg:col-span-4 flex flex-col gap-5 sm:gap-6">
-                <div className="rounded-[16px] border border-gray-200 p-5 sm:p-6 bg-white">
-                  <h3 className="mb-5 text-[17px] font-bold text-[#111] flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#111]"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    Guest Info
-                  </h3>
-                  <div className="grid grid-cols-[90px_1fr] gap-y-3.5 text-[14px]">
-                    <div className="text-[#666]">First Name:</div>
-                    <div className="text-[#111]">{passengerFirstName}</div>
-                    <div className="text-[#666]">Last Name:</div>
-                    <div className="text-[#111]">{passengerLastName}</div>
-                    <div className="text-[#666]">Contract No:</div>
-                    <div className="text-[#111]">{passengerPhone}</div>
-                    <div className="text-[#666]">Email</div>
-                    <div className="text-[#111] break-all">{passengerEmail}</div>
-                  </div>
-                </div>
+                
 
                 {hasFlightInfo ? (
                   <div className="rounded-[16px] border border-gray-200 p-5 sm:p-6 bg-white min-h-[220px]">
@@ -305,11 +348,21 @@ export default function DriverDetailsModal({
           </div>
         </div>
 
-        {!isViewMode && isRideActionable && (
-          <div className="flex shrink-0 bg-white justify-end px-6 py-5 sm:px-8 sm:py-6">
+        {isRideActionable && (
+          <div className="flex shrink-0 bg-white justify-end gap-3 px-6 py-5 sm:px-8 sm:py-6">
+            {canAcceptOrDecline && (
+              <button
+                onClick={handleDeclineRide}
+                disabled={isDeclining || isUpdating}
+                className="rounded-full border border-red-200 bg-white px-8 py-3 w-full sm:w-auto text-[15px] font-medium text-red-500 transition-all hover:bg-red-50 shadow-sm disabled:opacity-60"
+              >
+                {isDeclining ? 'Declining...' : 'Decline'}
+              </button>
+            )}
+
             <button
               onClick={handlePrimaryAction}
-              disabled={isUpdating}
+              disabled={isUpdating || isDeclining}
               className="rounded-full bg-[#1b2d5d] px-8 py-3 w-full sm:w-auto text-[15px] font-medium text-white transition-all hover:bg-[#132042] shadow-sm disabled:opacity-60"
             >
               {isUpdating ? 'Processing...' : primaryActionLabel}
@@ -331,7 +384,7 @@ export default function DriverDetailsModal({
           const result = await cancelRide(rideId);
           setIsCancelModalOpen(false);
           if (result?.success) {
-            await fetchRides({ tab: currentRideTab ?? 'upcoming', page: 1, scope: 'mine' }).catch(() => {});
+            await fetchRides({ tab: currentRideTab ?? 'upcoming', page: 1, scope: 'mine' }).catch(() => { });
             onClose();
           } else {
             alert(result?.message || 'Failed to cancel ride.');

@@ -41,13 +41,10 @@ export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed 
 
     if (paymentIntent?.status === 'succeeded') {
       console.log('Payment succeeded with PaymentIntent:', paymentIntent);
-      // Extract booker email/phone for guest bookings
-      const bookerEmail = bookingDetails?.bookerDetails?.email || bookingDetails?.email;
-      const bookerPhone = bookingDetails?.bookerDetails?.phone || bookingDetails?.phone;
+      
 
       const confirmResult = await confirmPayment(bookingId, paymentIntent.id, {
-        bookerEmail: bookerEmail || null,
-        bookerPhone: bookerPhone || null,
+       bookerDetails: bookingDetails?.bookerDetails,
       });
       if (!confirmResult?.success) {
         console.error('Error confirming payment:', confirmResult);
@@ -106,7 +103,7 @@ export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed 
             <img src={wallet} alt="Wallet" className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-900">Created card</p>
+            <p className="text-sm font-semibold text-gray-900">Credit card</p>
             <p className="text-xs text-gray-400 mt-0.5">Save your info for faster booking</p>
             <div className="flex items-center gap-1 mt-1 bg-gray-200 px-2 py-1 rounded-lg w-full xl:w-[60%]">
               <BsInfoCircle size={11} className="text-[#1a2b5e] flex-shrink-0" />

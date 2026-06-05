@@ -1,15 +1,21 @@
-import { FiChevronDown } from 'react-icons/fi';
-import { LuCar } from 'react-icons/lu';
-import { useState, useEffect, useRef } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { FiChevronDown, FiFileText } from 'react-icons/fi';
+import { FaArrowLeft } from 'react-icons/fa6';
+import { AiOutlineDollarCircle } from 'react-icons/ai';
+import { CiLocationOn } from 'react-icons/ci';
+import { MdOutlinePayment } from 'react-icons/md';
+
+import { getStripePromise } from '../../config/stripe';
+import { createPaymentIntent } from '../../services/paymentService';
+import { cancelBooking, updateBookingFull, createFullBooking } from '../../services/bookingService';
+import { resolveBookingEntityId } from '../../utils/bookingId';
+
+import PaymentInfoSection from './reservation/PaymentInfoSection';
+import BookingSuccessModal from './BookingSuccessModal';
 import CancelTripModal from './CancelTripModal';
-import { FaArrowLeft } from "react-icons/fa6";
-import blackcaricon from '../../assets/blackcaricon.png'
-import { AiOutlineDollarCircle } from "react-icons/ai";
-import { CiLocationOn } from "react-icons/ci";
-import { MdOutlinePayment } from "react-icons/md";
-import { FiFileText } from "react-icons/fi";
+
+import blackcaricon from '../../assets/blackcaricon.png';
 import { useUserStore } from '../../stores/userStore';
-import { cancelBooking, updateBookingFull } from '../../services/bookingService';
 import { formatTableDate } from '../../utils/bookingFormatters';
 import {
   buildEditableBookingState,
@@ -30,14 +36,34 @@ export default function RideDetailsModal({
   const [isCancelling, setIsCancelling] = useState(false);
   const { currentBookingTab } = useUserStore();
 
-  const passenger = bookingDetails?.passengerDetails || bookingDetails?.user || {};
+
+  const stripePromise = useMemo(() => getStripePromise(), []);
+
+  const [isCreatingReturnTrip, setIsCreatingReturnTrip] = useState(false);
+  const [returnTripError, setReturnTripError] = useState('');
+  const [showReturnPaymentForm, setShowReturnPaymentForm] = useState(false);
+  const [returnPaymentClientSecret, setReturnPaymentClientSecret] = useState('');
+  const [returnPaymentBookingId, setReturnPaymentBookingId] = useState('');
+  const [returnPaymentBookingDetails, setReturnPaymentBookingDetails] = useState(null);
+  const [isReturnSuccessModalOpen, setIsReturnSuccessModalOpen] = useState(false);
+  // const passenger = bookingDetails?.passengerDetails || bookingDetails?.user || {};
   const bookingTypeLabel = bookingDetails?.type === 'hourly' ? 'Hourly' : 'Point to Point';
   const { statusText, statusColor, isUpcoming } = getRideStatusMeta(bookingDetails, currentBookingTab);
   const childSeats = getNormalizedChildSeats(bookingDetails);
   const charges = getNormalizedCharges(bookingDetails);
   const totalAmount = Number(bookingDetails?.totalAmount ?? 0);
   const stops = bookingDetails?.stopLocations || [];
+  const assignedDriver = bookingDetails?.assignedDriver || null;
 
+  const assignedDriverName =
+    assignedDriver?.fullName ||
+    [assignedDriver?.firstName, assignedDriver?.lastName]
+      .filter(Boolean)
+      .join(' ') ||
+    'Not assigned yet';
+
+  const assignedDriverPhone = assignedDriver?.phone || '—';
+  const assignedDriverEmail = assignedDriver?.email || '—';
   const [editableBooking, setEditableBooking] = useState({});
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -46,20 +72,31 @@ export default function RideDetailsModal({
   const [hasChanges, setHasChanges] = useState(false);
   useEffect(() => {
     const id = bookingDetails?.id || bookingDetails?._id || bookingDetails?.bookingId || null;
-    if (!id || prevBookingIdRef.current === id) return;
-    prevBookingIdRef.current = id;
-    const next = buildEditableBookingState(bookingDetails);
-    setTimeout(() => {
-      setEditableBooking(next);
-      initialBookingRef.current = next;
-    }, 0);
-  }, [bookingDetails]);
+    if (!id || prevBookingIdRef.current === `${id}-${isReturnTrip ? 'return' : 'normal'}`) return;
 
-  
+    prevBookingIdRef.current = `${id}-${isReturnTrip ? 'return' : 'normal'}`;
+
+    const next = buildEditableBookingState(bookingDetails);
+
+    const finalState = isReturnTrip
+      ? {
+        ...next,
+        pickupLocation: bookingDetails?.dropoffLocation || '',
+        dropoffLocation: bookingDetails?.pickupLocation || '',
+      }
+      : next;
+
+    setTimeout(() => {
+      setEditableBooking(finalState);
+      initialBookingRef.current = finalState;
+    }, 0);
+  }, [bookingDetails, isReturnTrip]);
+
+
 
   useEffect(() => {
     const initial = initialBookingRef.current || {};
-    const keys = ['pickupLocation','dropoffLocation','date','time','noOfPassengers','luggage','specialInstructions','passengerFirstName','passengerLastName','passengerPhone','passengerEmail'];
+    const keys = ['pickupLocation', 'dropoffLocation', 'date', 'time', 'noOfPassengers', 'luggage', 'specialInstructions', 'passengerFirstName', 'passengerLastName', 'passengerPhone', 'passengerEmail'];
     let changed = false;
     for (const k of keys) {
       const a = initial[k];
@@ -72,6 +109,169 @@ export default function RideDetailsModal({
 
   const bookingId = bookingDetails?.id || bookingDetails?._id || bookingDetails?.bookingId || null;
 
+  const buildReturnTripPayload = () => {
+    const originalStops = Array.isArray(bookingDetails?.stopLocations)
+      ? bookingDetails.stopLocations
+      : [];
+
+    const childSeatInfant =
+      bookingDetails?.childSeats?.infant ??
+      bookingDetails?.childSeatInfant ??
+      0;
+
+    const childSeatToddler =
+      bookingDetails?.childSeats?.toddler ??
+      bookingDetails?.childSeatToddler ??
+      0;
+
+    const childSeatBooster =
+      bookingDetails?.childSeats?.booster ??
+      bookingDetails?.childSeatBooster ??
+      0;
+
+    return {
+      type: bookingDetails?.type || 'ptop',
+
+      pickupLocation:
+        editableBooking.pickupLocation ||
+        bookingDetails?.dropoffLocation ||
+        '',
+
+      dropoffLocation:
+        editableBooking.dropoffLocation ||
+        bookingDetails?.pickupLocation ||
+        '',
+
+      stopLocations: [...originalStops].reverse(),
+
+      date: editableBooking.date || bookingDetails?.date,
+      time: editableBooking.time || bookingDetails?.time,
+
+      hours:
+        bookingDetails?.type === 'hourly'
+          ? Number(bookingDetails?.hours || 0)
+          : undefined,
+
+      vehicleCategoryId:
+        bookingDetails?.vehicleCategoryId ||
+        bookingDetails?.vehicleCategory?.id ||
+        bookingDetails?.vehicleCategory?._id,
+
+      noOfPassengers: Number(
+        editableBooking.noOfPassengers ||
+        bookingDetails?.noOfPassengers ||
+        0
+      ),
+
+      luggage: Number(
+        editableBooking.luggage ||
+        bookingDetails?.luggage ||
+        0
+      ),
+
+      childSeatRequired: Boolean(
+        childSeatInfant ||
+        childSeatToddler ||
+        childSeatBooster
+      ),
+
+      childSeats: {
+        infant: Number(childSeatInfant || 0),
+        toddler: Number(childSeatToddler || 0),
+        booster: Number(childSeatBooster || 0),
+      },
+
+      flightNumber: bookingDetails?.flightNumber || '',
+
+      specialInstructions:
+        editableBooking.specialInstructions ||
+        bookingDetails?.specialInstructions ||
+        '',
+
+      bookerDetails: {
+        firstName:
+          bookingDetails?.bookerDetails?.firstName ||
+          bookingDetails?.bookerFirstName ||
+          '',
+        lastName:
+          bookingDetails?.bookerDetails?.lastName ||
+          bookingDetails?.bookerLastName ||
+          '',
+        email:
+          bookingDetails?.bookerDetails?.email ||
+          bookingDetails?.bookerEmail ||
+          '',
+        phone:
+          bookingDetails?.bookerDetails?.phone ||
+          bookingDetails?.bookerPhone ||
+          '',
+      },
+    };
+  };
+
+  const handleCreateReturnTrip = async () => {
+    setReturnTripError('');
+
+    const payload = buildReturnTripPayload();
+
+    if (
+      !payload.pickupLocation ||
+      !payload.dropoffLocation ||
+      !payload.date ||
+      !payload.time ||
+      !payload.vehicleCategoryId
+    ) {
+      setReturnTripError('Return trip is missing required booking details.');
+      return;
+    }
+
+    if (payload.type === 'hourly' && !payload.hours) {
+      setReturnTripError('Return trip is missing hourly duration.');
+      return;
+    }
+
+    setIsCreatingReturnTrip(true);
+
+    const bookingResult = await createFullBooking(payload);
+
+    if (!bookingResult?.success) {
+      setIsCreatingReturnTrip(false);
+      setReturnTripError(bookingResult?.message || 'Failed to create return trip.');
+      return;
+    }
+
+    const createdBooking =
+      bookingResult?.data ??
+      bookingResult?.raw?.data ??
+      bookingResult?.raw ??
+      {};
+
+    const returnBookingId = resolveBookingEntityId(createdBooking);
+
+    if (!returnBookingId) {
+      setIsCreatingReturnTrip(false);
+      setReturnTripError('Return trip created, but payment setup could not be initialized.');
+      return;
+    }
+
+    const paymentResult = await createPaymentIntent(returnBookingId);
+
+    if (!paymentResult?.success) {
+      setIsCreatingReturnTrip(false);
+      setReturnTripError(paymentResult?.message || 'Failed to initialize return trip payment.');
+      return;
+    }
+
+    setReturnPaymentBookingId(returnBookingId);
+    setReturnPaymentBookingDetails({
+      ...payload,
+      ...createdBooking,
+      id: returnBookingId,
+    });
+    setReturnPaymentClientSecret(paymentResult?.data?.clientSecret || '');
+    setShowReturnPaymentForm(true);
+    setIsCreatingReturnTrip(false);
+  };
   const handleConfirm = async () => {
     if (!hasChanges || !bookingId) return;
     setIsUpdating(true);
@@ -101,7 +301,10 @@ export default function RideDetailsModal({
       alert('Failed to update booking.');
     }
   };
-
+  const handleReturnPaymentSuccess = (updatedBooking) => {
+    setReturnPaymentBookingDetails(updatedBooking);
+    setIsReturnSuccessModalOpen(true);
+  };
   const handleCancelRide = async () => {
     const rideId = bookingDetails?.id ?? bookingDetails?._id;
     if (!rideId) {
@@ -121,6 +324,7 @@ export default function RideDetailsModal({
   if (!isOpen) return null;
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-0 sm:p-4">
       <div className="relative flex h-full sm:h-auto max-h-none sm:max-h-[90vh] w-full max-w-[1000px] flex-col rounded-none sm:rounded-[30px] bg-white text-[#111111] shadow-2xl animate-in fade-in zoom-in duration-200">
 
@@ -135,7 +339,7 @@ export default function RideDetailsModal({
             </button>
             {isReturnTrip && <h2 className="ml-1 text-xl sm:text-2xl font-bold">Back</h2>}
           </div>
-
+{!isReturnTrip && (
           <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={onOpenMessage}
@@ -151,9 +355,8 @@ export default function RideDetailsModal({
                 Cancel <span className="hidden sm:inline">Trip</span>
               </button>
             )}
-          </div>
+          </div>)}
         </div>
-
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-8 sm:py-6 overscroll-contain [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 hover:[&::-webkit-scrollbar-thumb]:bg-[#111] [&::-webkit-scrollbar-thumb]:rounded-full pb-10 sm:pb-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
@@ -190,35 +393,46 @@ export default function RideDetailsModal({
               </div>
             </div>
 
-            {/* Passenger / Guest Info Card */}
+            {/* Driver Info Card */}
             <div className="rounded-xl sm:rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] bg-white h-full">
               <h3 className="mb-4 text-base sm:text-lg font-bold flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#222]"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                {isReturnTrip ? 'Guest Info' : 'Passenger Info'}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#222]">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Driver Info
               </h3>
+
               <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[85px_1fr] md:grid-cols-[90px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                  <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">First Name:</div>
-                  <input value={editableBooking.passengerFirstName || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerFirstName: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left bg-white border border-gray-200 rounded-md px-2 py-1" />
+                  <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Name:</div>
+                  <div className="text-[#111] font-semibold sm:font-medium text-left">
+                    {assignedDriverName}
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                  <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Last Name:</div>
-                  <input value={editableBooking.passengerLastName || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerLastName: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left bg-white border border-gray-200 rounded-md px-2 py-1" />
+                  <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Phone:</div>
+                  <div className="text-[#111] font-semibold sm:font-medium text-left">
+                    {assignedDriverPhone}
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                  <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Contract No:</div>
-                  <input value={editableBooking.passengerPhone || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerPhone: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left bg-white border border-gray-200 rounded-md px-2 py-1" />
+                  <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Email:</div>
+                  <div className="text-[#111] font-semibold sm:font-medium text-left break-all">
+                    {assignedDriverEmail}
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:contents pt-1 sm:pt-0">
-                  <div className="text-[#666] font-medium sm:font-normal sm:self-center mb-1 sm:mb-0">Email:</div>
-                  <input value={editableBooking.passengerEmail || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, passengerEmail: e.target.value }))} className="text-[#111] font-semibold sm:font-medium text-left break-all bg-white border border-gray-200 rounded-md px-2 py-1" />
+                  <div className="text-[#666] font-medium sm:font-normal mb-1 sm:mb-0">Status:</div>
+                  <div className="text-[#111] font-semibold sm:font-medium text-left">
+                    {assignedDriver ? 'Assigned' : 'Waiting'}
+                  </div>
                 </div>
               </div>
             </div>
-
             {/* Vehicle Info Card */}
             <div className="rounded-xl sm:rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)] bg-white border-t-4 sm:border-t-2 sm:border-t-[#dfdfdf] h-full">
               <h3 className="mb-4 text-base sm:text-lg font-bold flex items-center gap-2">
@@ -350,25 +564,25 @@ export default function RideDetailsModal({
                 {/* Payment Info Card */}
                 <div className="rounded-xl sm:rounded-2xl border border-gray-200 p-5 col-span-1 md:col-span-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)] bg-white h-full">
                   <h3 className="mb-4 text-base sm:text-lg font-bold flex items-center gap-2">
-                        <MdOutlinePayment className='w-[22px] h-[22px] sm:w-6 sm:h-6 opacity-80 text-[#222]' />
-                        Payment Info
+                    <MdOutlinePayment className='w-[22px] h-[22px] sm:w-6 sm:h-6 opacity-80 text-[#222]' />
+                    Payment Info
                   </h3>
-                      <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[150px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
-                        <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                          <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Status:</div>
-                          <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.paymentStatus || '--'}</div>
-                        </div>
+                  <div className="flex flex-col gap-3 sm:grid sm:grid-cols-[150px_1fr] sm:gap-y-3 text-[13px] sm:text-[14px]">
+                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
+                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Status:</div>
+                      <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.paymentStatus || '--'}</div>
+                    </div>
 
-                        <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
-                          <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Intent:</div>
-                          <div className="text-[#111] font-semibold sm:font-medium text-left break-all">{bookingDetails?.paymentIntentId || '--'}</div>
-                        </div>
+                    <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-2 sm:pb-0">
+                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Intent:</div>
+                      <div className="text-[#111] font-semibold sm:font-medium text-left break-all">{bookingDetails?.paymentIntentId || '--'}</div>
+                    </div>
 
-                        <div className="flex flex-col sm:contents pt-1 sm:pt-0">
-                          <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Method:</div>
-                          <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.paymentMethodId || '--'}</div>
-                        </div>
-                      </div>
+                    <div className="flex flex-col sm:contents pt-1 sm:pt-0">
+                      <div className="font-medium sm:font-normal text-[#666] mb-1 sm:mb-0">Payment Method:</div>
+                      <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.paymentMethodId || '--'}</div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Flight Information Card */}
@@ -384,7 +598,7 @@ export default function RideDetailsModal({
                       <div className="text-[#111] font-semibold sm:font-medium text-left">{bookingDetails?.flightNumber || '--'}</div>
                     </div>
 
-              
+
                   </div>
                 </div>
 
@@ -440,19 +654,55 @@ export default function RideDetailsModal({
             )}
 
           </div>
+          {isReturnTrip && showReturnPaymentForm ? (
+            <div className="mt-5 rounded-xl sm:rounded-2xl border border-gray-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+              <PaymentInfoSection
+                isOpen={true}
+                onToggle={() => { }}
+                showPaymentForm={showReturnPaymentForm}
+                stripePromise={stripePromise}
+                paymentClientSecret={returnPaymentClientSecret}
+                paymentBookingId={returnPaymentBookingId}
+                paymentBookingDetails={returnPaymentBookingDetails}
+                onPaymentSuccess={handleReturnPaymentSuccess}
+              />
+            </div>
+          ) : null}
+
+          {isReturnTrip && returnTripError ? (
+            <p className="mt-4 text-sm text-red-500">{returnTripError}</p>
+          ) : null}
         </div>
 
         {/* Footer */}
-          <div className="flex shrink-0 border-t border-gray-100 sm:border-0 bg-white justify-between sm:justify-end gap-3 px-5 py-4 sm:px-8 sm:pb-8 sm:pt-0">
+        <div className="flex shrink-0 border-t border-gray-100 sm:border-0 bg-white justify-between sm:justify-end gap-3 px-5 py-4 sm:px-8 sm:pb-8 sm:pt-0">
           <button
             onClick={onClose}
             className="flex-[1] sm:flex-none w-full sm:w-auto rounded-full bg-gray-100 sm:bg-gray-500 px-6 sm:px-10 py-3.5 text-[15px] sm:text-base font-semibold sm:font-medium text-gray-700 sm:text-white transition-colors hover:bg-gray-200 sm:hover:bg-gray-600 sm:mr-3 border border-gray-200 sm:border-0 shadow-sm sm:shadow-md"
           >
             Close
           </button>
-          <button onClick={handleConfirm} disabled={!hasChanges || isUpdating} className="flex-[1.5] sm:flex-none w-full sm:w-auto rounded-full bg-[#1b2d5d] px-6 sm:px-10 py-3.5 text-[15px] sm:text-base font-semibold sm:font-medium text-white transition-all hover:bg-[#132042] shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed">
-            {isUpdating ? 'Updating...' : 'Confirm Changes'}
-          </button>
+          {isReturnTrip ? (
+            <button
+              onClick={handleCreateReturnTrip}
+              disabled={isCreatingReturnTrip || showReturnPaymentForm}
+              className="flex-[1.5] sm:flex-none w-full sm:w-auto rounded-full bg-[#1b2d5d] px-6 sm:px-10 py-3.5 text-[15px] sm:text-base font-semibold sm:font-medium text-white transition-all hover:bg-[#132042] shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isCreatingReturnTrip
+                ? 'Creating...'
+                : showReturnPaymentForm
+                  ? 'Payment Ready'
+                  : 'Create Return Trip'}
+            </button>
+          ) : (
+            <button
+              onClick={handleConfirm}
+              disabled={!hasChanges || isUpdating}
+              className="flex-[1.5] sm:flex-none w-full sm:w-auto rounded-full bg-[#1b2d5d] px-6 sm:px-10 py-3.5 text-[15px] sm:text-base font-semibold sm:font-medium text-white transition-all hover:bg-[#132042] shadow-md hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isUpdating ? 'Updating...' : 'Confirm Changes'}
+            </button>
+          )}
         </div>
 
       </div>
@@ -465,5 +715,15 @@ export default function RideDetailsModal({
         />
       )}
     </div>
+    <BookingSuccessModal
+    isOpen={isReturnSuccessModalOpen}
+    onClose={() => {
+      setIsReturnSuccessModalOpen(false);
+      onClose();
+    }}
+    bookingId={returnPaymentBookingDetails?.id}
+  />
+    </>
   );
+  
 }

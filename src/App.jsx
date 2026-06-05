@@ -25,6 +25,7 @@ import DriverResetPasswordPage from './pages/driver/DriverResetPasswordPage';
 import DriverOnboardingPage from './pages/driver/DriverOnboardingPage';
 import DriverProfilePage from './pages/driver/DriverProfilePage';
 import DriverDashboardPage from './pages/driver/DriverDashboardPage';
+import FaqPage from './pages/driver/FaqPage';
 import { useSocket } from './hooks/useSocket';
 
 function SocketBootstrap() {
@@ -63,6 +64,7 @@ export default function App() {
       />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/Faq" element={<FaqPage />} />
         <Route path="/select-vehicle" element={<SelectVehiclePage />} />
         <Route path="/additional-details" element={<AdditionalDetailsPage />} />
         <Route path="/passenger-details" element={<PassengerDetailsPage />} />

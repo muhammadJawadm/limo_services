@@ -28,7 +28,6 @@ export default function UserDashboardPage() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isRideDetailsModalOpen, setIsRideDetailsModalOpen] = useState(false);
   const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
-  const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
   const [isAccountEditModalOpen, setIsAccountEditModalOpen] = useState(false);
   const [accountEditType, setAccountEditType] = useState('passenger');
   const [isNewReservationModalOpen, setIsNewReservationModalOpen] = useState(false);
@@ -90,11 +89,6 @@ export default function UserDashboardPage() {
                   />
                 )}
 
-                {activeTopNavTab === 'Passenger' && (
-                  <div className="px-4 sm:px-6 lg:px-8 pb-6 bg-[#efefef] flex-1">
-                    <PassengerView onEditPassenger={() => setIsPassengerEditModalOpen(true)} />
-                  </div>
-                )}
 
                 {activeTopNavTab === 'Account Info' && (
                   <div className="px-4 sm:px-6 lg:px-8 pb-6 bg-[#efefef] flex-1">
@@ -137,10 +131,6 @@ export default function UserDashboardPage() {
         onClose={() => setIsMessagesModalOpen(false)}
         rideId={selectedBooking?.id || selectedBooking?._id || selectedBooking?.bookingId || null}
         bookingDetails={selectedBooking}
-      />
-      <PassengerEditModal
-        isOpen={isPassengerEditModalOpen}
-        onClose={() => setIsPassengerEditModalOpen(false)}
       />
       <AccountEditModal
         isOpen={isAccountEditModalOpen}

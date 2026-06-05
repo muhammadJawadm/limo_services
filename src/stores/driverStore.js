@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import {
 	getDriverRides as getDriverRidesRequest,
 	getDriverRideById as getDriverRideByIdRequest,
-	assignRideToMe as assignRideToMeRequest,
+	
 	updateRideStatus as updateRideStatusRequest,
 	cancelDriverRide as cancelDriverRideRequest,
 	getDriverProfile as getDriverProfileRequest,
@@ -185,13 +185,7 @@ export const useDriverStore = create((set, get) => ({
 		return result
 	},
 
-	assignRide: async (rideId) => {
-		set({ isLoading: true, error: null })
-		const result = await assignRideToMeRequest(rideId)
-		set({ isLoading: false })
-		if (!result.success) set({ error: result.message || 'Failed to assign ride.' })
-		return result
-	},
+	
 
 	updateRideStatus: async (rideId, rideStatus) => {
 		set({ isLoading: true, error: null })

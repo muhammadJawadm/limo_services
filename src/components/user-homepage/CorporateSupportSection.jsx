@@ -2,7 +2,7 @@ import footerBg from '../../assets/footer_bottom.png';
 import footerMan from '../../assets/footer_man.png';
 import { useState } from 'react';
 import shape from "../../assets/shape.png"
-import usFlag from "../../assets/us.png"
+import SharedPhoneInput from '../SharedPhoneInput';
 import PrimaryButton from '../PrimaryButton';
 import { createSupportRequest } from '../../services/supportService';
 
@@ -31,6 +31,10 @@ export default function CorporateSupportSection() {
 
     setSubmitSuccess('Your support request has been sent successfully.');
     setForm(initialForm);
+    setTimeout(() => {
+  setSubmitSuccess('');
+}, 2500);
+
     setIsSubmitting(false);
   };
 
@@ -56,13 +60,13 @@ export default function CorporateSupportSection() {
             <img
               src={shape}
               alt="Arrow"
-              className="absolute -right-50 md:-right-64 top-1/3 w-48 md:w-64 opacity-90"
+              className="absolute -right-50 md:-right-56 top-1/4 w-48 md:w-64 opacity-90"
             />
           </div>
         </div>
 
         {/* Right — Contact Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-2 md:p-10 w-full max-w-md shadow-xl relative z-20 pointer-events-auto">
+        <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-2 md:p-10 w-full max-w-lg shadow-xl relative z-20 pointer-events-auto">
           {/* Title & subtitle */}
           <h2 className="text-[#1a2b5e] font-bold text-2xl mb-2 text-center">
             Need Corporate Support?
@@ -103,21 +107,11 @@ export default function CorporateSupportSection() {
                 required
                 className="flex-1 px-5 py-3.5 rounded-full text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200"
               />
-              <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-3.5 flex-1">
-                {/* US Flag with dropdown chevron */}
-                <span className="text-xl leading-none flex-shrink-0"><img src={usFlag} alt="" /></span>
-                <svg className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-                <span className="text-sm text-gray-600 font-medium flex-shrink-0">+1</span>
-                <input
-                  name="phone"
+              <div className="flex-1">
+                <SharedPhoneInput
                   value={form.phone}
                   onChange={handleChange}
-                  placeholder="Phone number"
-                  type="tel"
                   required
-                  className="flex-1 text-sm bg-transparent text-gray-700 placeholder-gray-400 outline-none min-w-0 w-full"
                 />
               </div>
             </div>
@@ -127,7 +121,7 @@ export default function CorporateSupportSection() {
               name="description"
               value={form.description}
               onChange={handleChange}
-              placeholder="Lorem impsum..."
+              placeholder="Describe your issue"
               rows={6}
               required
               className="w-full px-5 py-4 rounded-2xl text-sm bg-gray-100 text-gray-700 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-200 resize-none"

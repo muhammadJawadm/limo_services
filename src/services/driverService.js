@@ -144,8 +144,11 @@ export async function getDriverRideById(rideId) {
 	})
 }
 
-export async function assignRideToMe(rideId) {
-	return withDataResponse(() => api.patch(`/api/driver/rides/${rideId}/assign`), 'Failed to assign ride.')
+export async function acceptDriverRide(rideId) {
+	return withDataResponse(
+		() => api.post(`/api/driver/rides/${rideId}/accept`),
+		'Failed to confirm ride.',
+	)
 }
 
 export async function confirmDriverRidePickup(rideId) {
@@ -166,5 +169,12 @@ export async function cancelDriverRide(rideId) {
 	return withDataResponse(
 		() => api.patch(`/api/driver/rides/${rideId}/cancel-trip`),
 		'Failed to cancel ride.',
+	)
+}
+
+export async function declineDriverRide(rideId) {
+	return withDataResponse(
+		() => api.post(`/api/driver/rides/${rideId}/decline`),
+		'Failed to decline ride.',
 	)
 }

@@ -124,7 +124,7 @@ export default function BookingSummaryPanel({ isHourlyRide, bookingDetails }) {
             <img src={childSeatIcon} className="w-4 h-4" alt="child seat" />
             <span>Child Seat x {childSeatsCount}</span>
             <button className="ml-1 text-red-400 hover:text-red-600 transition-colors">
-              <MdDeleteOutline size={20} />
+              {/* <MdDeleteOutline size={20} /> */}
             </button>
           </div>
           <span className="text-md  text-gray-400">${childSeatFee.toFixed(2)}</span>
