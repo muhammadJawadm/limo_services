@@ -29,7 +29,7 @@ export default function DriverLoginPage() {
     const result = await loginDriver(form);
 
     if (result?.success) {
-      if(result?.user?.onboardingCompleted) {
+      if(result?.user?.onboardingCompleted && result?.user?.isVerified) {
       navigate('/driver/dashboard');
       }
         else {

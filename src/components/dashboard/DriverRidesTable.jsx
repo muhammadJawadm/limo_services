@@ -99,6 +99,7 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 		if (!localLoading && !isLoading) {
 			setDisplayRides(Array.isArray(rides) ? rides : []);
 		}
+		console.log('Updated displayRides:', rides);
 	}, [rides, localLoading, isLoading]);
 
 	const handleTabClick = (label) => {
@@ -197,8 +198,8 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 								key={label}
 								onClick={() => handleTabClick(label)}
 								className={`flex-1 min-w-[120px] whitespace-nowrap px-4 py-2.5 sm:py-3 text-xs sm:px-6 sm:text-[15px] transition-colors ${activeRideTab === label
-										? 'bg-[#1b2d5d] text-white'
-										: 'text-gray-500 hover:bg-gray-50'
+									? 'bg-[#1b2d5d] text-white'
+									: 'text-gray-500 hover:bg-gray-50'
 									}`}
 							>
 								{label}
@@ -229,6 +230,7 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 							</thead>
 
 							<tbody>
+							
 								{displayRides.length === 0 ? (
 									<tr>
 										<td colSpan={6} className="py-12 text-center text-gray-400 text-[15px]">
@@ -305,8 +307,8 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 															<>
 																<span
 																	className={`flex cursor-pointer items-center gap-1 hover:text-[#1b2d5d] transition-colors ${confirmingRideId === rideId
-																			? 'opacity-50 pointer-events-none'
-																			: ''
+																		? 'opacity-50 pointer-events-none'
+																		: ''
 																		}`}
 																	onClick={() => handleConfirmRide(ride)}
 																>
@@ -316,8 +318,8 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 
 																<span
 																	className={`flex cursor-pointer items-center gap-1 hover:text-red-500 transition-colors ${decliningRideId === rideId
-																			? 'opacity-50 pointer-events-none'
-																			: ''
+																		? 'opacity-50 pointer-events-none'
+																		: ''
 																		}`}
 																	onClick={() => handleDeclineRide(ride)}
 																>
@@ -326,14 +328,15 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 																</span>
 															</>
 														)}
-
-														<span
-															className="flex cursor-pointer items-center gap-1 hover:text-[#1b2d5d] transition-colors"
-															onClick={() => onOpenMessage?.(ride)}
-														>
-															<FiMessageSquare size={16} />
-															Message
-														</span>
+														{!ride?.isGuest && (
+															<span
+																className="flex cursor-pointer items-center gap-1 hover:text-[#1b2d5d] transition-colors"
+																onClick={() => onOpenMessage?.(ride)}
+															>
+																<FiMessageSquare size={16} />
+																Message
+															</span>
+														)}
 
 
 														<span
