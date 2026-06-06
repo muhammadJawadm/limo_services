@@ -27,7 +27,12 @@ export default function LoginPage() {
     const result = await loginUser(form);
 
     if (result?.success) {
-      navigate('/');
+      if(result?.user?.role === 'driver') {
+      navigate('/driver/dashboard');
+      }
+else {      
+  navigate('/');
+}
       return;
     }
 

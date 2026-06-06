@@ -29,12 +29,17 @@ export default function DriverLoginPage() {
     const result = await loginDriver(form);
 
     if (result?.success) {
+      if(result?.user?.role === 'driver'){
       if(result?.user?.onboardingCompleted && result?.user?.isVerified) {
       navigate('/driver/dashboard');
       }
         else {
           navigate('/driver/onboarding');
         }
+      }
+else {      
+  navigate('/');
+}
       return;
     }
 
