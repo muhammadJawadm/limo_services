@@ -243,26 +243,26 @@ export default function DriverDetailsModal({
                   Charges & Fees
                 </h3>
                 <div className="flex flex-col text-[14px]">
-                  <div className="flex justify-between mb-3.5">
+                  {/* <div className="flex justify-between mb-3.5">
                     <span className="text-[#666]">Trip Price</span>
                     <span className="text-[#111] text-[15px]">${Number(tripPrice || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between mb-3.5">
+                  </div> */}
+                  {/* <div className="flex justify-between mb-3.5">
                     <span className="text-[#666]">Child</span>
                     <span className="text-[#111] text-[15px]">${Number(childSeatPrice || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between mb-3.5">
+                  </div> */}
+                  {/* <div className="flex justify-between mb-3.5">
                     <span className="text-[#666]">Toll Charges</span>
                     <span className="text-[#111] text-[15px]">${Number(tollCharges || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between mb-4">
+                  </div> */}
+                  {/* <div className="flex justify-between mb-4">
                     <span className="text-[#666]">Others</span>
                     <span className="text-[#111] text-[15px]">${Number(otherFees || 0).toFixed(2)}</span>
-                  </div>
+                  </div> */}
                   <div className="h-px bg-gray-200 w-full mb-4"></div>
                   <div className="flex justify-between items-center">
-                    <span className="text-[#666]">Payment</span>
-                    <span className="text-[20px] font-bold text-[#111]">${Number(paymentTotal || 0).toFixed(2)}</span>
+                    <span className="text-[#666]">Driver Payout</span>
+                    <span className="text-[20px] font-bold text-[#111]">${Number(paymentTotal-30 || 0).toFixed(2)}</span>
                   </div>
                 </div>
               </div>
