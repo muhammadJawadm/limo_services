@@ -185,13 +185,13 @@ export default function DriverDetailsModal({
             <span className="text-[15px] font-medium text-[#666] group-hover:text-[#111] transition-colors">Back</span>
           </div>
 
-          {/* <div className="flex items-center gap-3">
-            <button
+          <div className="flex items-center gap-3">
+            {/* <button
               onClick={() => onOpenMessage?.(details)}
               className="rounded-full bg-[#1b2d5d] px-6 py-2 text-[14px] font-medium text-white transition-colors hover:bg-[#132042]"
             >
               Message
-            </button>
+            </button> */}
             {canCancelRide && (
               <button
                 onClick={() => setIsCancelModalOpen(true)}
@@ -200,7 +200,7 @@ export default function DriverDetailsModal({
                 Cancel Trip
               </button>
             )}
-          </div> */}
+          </div> 
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 pb-6 sm:px-8 sm:pb-8 overscroll-contain [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full">
