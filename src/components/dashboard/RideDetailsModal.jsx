@@ -341,12 +341,12 @@ export default function RideDetailsModal({
           </div>
 {!isReturnTrip && (
           <div className="flex items-center gap-2 sm:gap-4">
-            <button
+            {/* <button
               onClick={onOpenMessage}
               className="rounded-full bg-[#1b2d5d] px-4 py-2 sm:px-6 sm:py-2.5 text-[13px] sm:text-sm font-medium text-white transition-colors hover:bg-[#132042]"
             >
               Message
-            </button>
+            </button> */}
             {isUpcoming && (
               <button
                 onClick={() => setIsCancelModalOpen(true)}
