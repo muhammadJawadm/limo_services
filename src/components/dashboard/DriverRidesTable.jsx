@@ -58,14 +58,16 @@ function RoutingInfo({ pickup, dropoff, stop }) {
 	);
 }
 
-export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, onOpenMessage }) {
+export default function DriverRidesTable({ openRideDetails, onOpenMessage }) {
 	const [activeRideTab, setActiveRideTab] = useState('Upcoming Ride');
-	const [displayRides, setDisplayRides] = useState([]);
 	const [localLoading, setLocalLoading] = useState(false);
 	const [confirmingRideId, setConfirmingRideId] = useState(null);
 	const [decliningRideId, setDecliningRideId] = useState(null);
 
-	const { rides, isLoading, pagination, fetchRides, cancelRide } = useDriverStore();
+	const rides = useDriverStore((s) => s.rides);
+	const isLoading = useDriverStore((s) => s.isLoading);
+	const pagination = useDriverStore((s) => s.pagination);
+	const fetchRides = useDriverStore((s) => s.fetchRides);
 
 	const currentApiTab = useMemo(
 		() => RIDE_TABS.find((t) => t.label === activeRideTab)?.apiTab ?? 'upcoming',
@@ -73,13 +75,14 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 	);
 
 	const isUpcomingTab = activeRideTab === 'Upcoming Ride';
+	const isTableLoading = localLoading || isLoading;
+	const displayRides = isTableLoading ? [] : (Array.isArray(rides) ? rides : []);
 
 	useEffect(() => {
 		let isMounted = true;
 
 		const loadRides = async () => {
 			setLocalLoading(true);
-			setDisplayRides([]);
 
 			await fetchRides({ tab: currentApiTab, page: 1, scope: 'mine' });
 
@@ -95,23 +98,14 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 		};
 	}, [currentApiTab, fetchRides]);
 
-	useEffect(() => {
-		if (!localLoading && !isLoading) {
-			setDisplayRides(Array.isArray(rides) ? rides : []);
-		}
-		console.log('Updated displayRides:', rides);
-	}, [rides, localLoading, isLoading]);
-
 	const handleTabClick = (label) => {
 		if (label === activeRideTab) return;
 
 		setActiveRideTab(label);
-		setDisplayRides([]);
 		setLocalLoading(true);
 	};
 
 	const reloadCurrentTab = async () => {
-		setDisplayRides([]);
 		setLocalLoading(true);
 
 		await fetchRides({
@@ -181,8 +175,6 @@ export default function DriverRidesTable({ openRideDetails, onOpenReturnTrip, on
 
 	// 	await reloadCurrentTab();
 	// };
-
-	const isTableLoading = localLoading || isLoading;
 
 	return (
 		<section className="bg-[#efefef] flex-1 flex flex-col">

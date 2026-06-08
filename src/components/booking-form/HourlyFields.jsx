@@ -1,6 +1,6 @@
 import { BsTrash, BsCheck2, BsAirplane } from 'react-icons/bs'
-import { MdOutlineLocationOn } from 'react-icons/md'
 import { LuCalendarDays, LuClock3 } from 'react-icons/lu'
+import BookingAddressRow from './BookingAddressRow'
 
 export default function HourlyFields({
 	pickupLocation,
@@ -26,35 +26,30 @@ export default function HourlyFields({
 	const today = new Date().toISOString().split('T')[0];
 	return (
 		<>
-			<div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3">
-				<MdOutlineLocationOn className="text-green-500 flex-shrink-0" size={20} />
-				<input
-					type="text"
-					placeholder="Pickup Location"
-					value={pickupLocation}
-					onChange={(e) => onPickupChange(e.target.value)}
-					className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-				/>
-				<button
-					onClick={onAddStop}
-					className="flex items-center gap-1.5 bg-[#1a2b5e] text-white text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap hover:bg-[#253576] transition-colors"
-				>
-					<span className="text-base leading-none">+</span> Add Stop
-				</button>
-			</div>
+			<BookingAddressRow
+				value={pickupLocation}
+				onChange={onPickupChange}
+				placeholder="Pickup Location"
+				iconColor="text-green-500"
+				actions={
+					<button
+						onClick={onAddStop}
+						className="flex items-center gap-1.5 bg-[#1a2b5e] text-white text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap hover:bg-[#253576] transition-colors"
+					>
+						<span className="text-base leading-none">+</span> Add Stop
+					</button>
+				}
+			/>
 
 			{stops.map((stop, i) => (
 				<div key={i} className="flex items-center gap-2">
-					<div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3 flex-1">
-						<MdOutlineLocationOn className="text-yellow-500 flex-shrink-0" size={20} />
-						<input
-							type="text"
-							value={stop}
-							onChange={(e) => onUpdateStop(i, e.target.value)}
-							placeholder="Stop address"
-							className="flex-1 text-sm outline-none bg-transparent text-gray-700 placeholder-gray-400"
-						/>
-					</div>
+					<BookingAddressRow
+						className="flex-1"
+						value={stop}
+						onChange={(val) => onUpdateStop(i, val)}
+						placeholder="Stop address"
+						iconColor="text-yellow-500"
+					/>
 					<button
 						onClick={() => onRemoveStop(i)}
 						className="w-11 h-11 flex items-center justify-center bg-red-100 text-red-500 rounded-full flex-shrink-0 hover:bg-red-200 transition-colors"
@@ -65,16 +60,13 @@ export default function HourlyFields({
 			))}
 
 			<div className="flex items-center gap-2">
-				<div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3 flex-1">
-					<MdOutlineLocationOn className="text-gray-400 flex-shrink-0" size={20} />
-					<input
-						type="text"
-						placeholder="Stop Location"
-						value={stopLocations[0] || ''}
-						onChange={(e) => onUpdateStopLocation(0, e.target.value)}
-						className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-					/>
-				</div>
+				<BookingAddressRow
+					className="flex-1"
+					value={stopLocations[0] || ''}
+					onChange={(val) => onUpdateStopLocation(0, val)}
+					placeholder="Stop Location"
+					iconColor="text-gray-400"
+				/>
 				<button className="w-11 h-11 flex items-center justify-center bg-yellow-500 text-white rounded-full flex-shrink-0 hover:bg-yellow-600 transition-colors">
 					<BsCheck2 size={18} />
 				</button>
@@ -91,22 +83,20 @@ export default function HourlyFields({
 				/>
 			</div>
 
-			<div className="flex items-center bg-white rounded-full px-4 py-3 shadow-sm gap-0 md:gap-3">
-				<MdOutlineLocationOn className="text-red-400 flex-shrink-0" size={20} />
-				<input
-					type="text"
-					placeholder="Drop-off Location"
-					value={dropoffLocation}
-					onChange={(e) => onDropoffChange(e.target.value)}
-					className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 text-gray-700"
-				/>
-				<button
-					onClick={onSameAsPickup}
-					className="flex items-center bg-[#1a2b5e] text-white text-xs font-semibold px-2 md:px-4 py-2 rounded-full whitespace-nowrap hover:bg-[#253576] transition-colors"
-				>
-					Same as pickup
-				</button>
-			</div>
+			<BookingAddressRow
+				value={dropoffLocation}
+				onChange={onDropoffChange}
+				placeholder="Drop-off Location"
+				iconColor="text-red-400"
+				actions={
+					<button
+						onClick={onSameAsPickup}
+						className="flex items-center bg-[#1a2b5e] text-white text-xs font-semibold px-2 md:px-4 py-2 rounded-full whitespace-nowrap hover:bg-[#253576] transition-colors"
+					>
+						Same as pickup
+					</button>
+				}
+			/>
 
 			<div className="flex gap-3">
 				<div className="flex items-center bg-white rounded-full px-4 py-4 shadow-sm gap-2 flex-1">

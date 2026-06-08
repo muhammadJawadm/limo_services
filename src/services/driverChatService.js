@@ -1,5 +1,5 @@
 import api, { getApiErrorMessage } from './api'
-import { isApiSuccess, parseApiData, withDataResponse } from './apiRequest'
+import { isApiSuccess, parseApiData, buildDataFailure } from './apiRequest'
 
 export function normalizeDriverChatMessage(message = {}, currentUserId = null) {
 	return {
@@ -19,13 +19,15 @@ export function normalizeDriverChatMessage(message = {}, currentUserId = null) {
 	}
 }
 
+// Response shape: { success, data: { count, data: [...messages] } }
 export async function getDriverChatMessages() {
 	try {
 		const response = await api.get('/api/driver/chat/messages')
 		const data = parseApiData(response)
+		const messages = data.data?.data ?? data.data ?? []
 		return {
 			success: isApiSuccess(data),
-			data: Array.isArray(data.data) ? data.data : [],
+			data: Array.isArray(messages) ? messages : [],
 			raw: data,
 		}
 	} catch (error) {
@@ -38,10 +40,16 @@ export async function getDriverChatMessages() {
 	}
 }
 
+// Response shape: { success, data: { data: { ...message } } }
 export async function sendDriverChatMessage(text) {
-	return withDataResponse(
-		() => api.post('/api/driver/chat/messages', { text }),
-		'Failed to send driver chat message.',
-		{ includeMessage: false },
-	)
+	try {
+		const response = await api.post('/api/driver/chat/messages', { text })
+		const data = parseApiData(response)
+		return {
+			success: isApiSuccess(data),
+			data: data.data?.data ?? data.data ?? null,
+		}
+	} catch (error) {
+		return buildDataFailure(error, 'Failed to send driver chat message.')
+	}
 }

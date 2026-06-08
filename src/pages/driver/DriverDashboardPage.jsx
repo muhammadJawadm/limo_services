@@ -8,14 +8,12 @@ import LogoutModal from '../../components/dashboard/LogoutModal';
 import DriverDetailsModal from '../../components/dashboard/DriverDetailsModal';
 import MessagesModal from '../../components/dashboard/MessagesModal';
 import RideAlertsView from '../../components/dashboard/RideAlertsView';
-import PassengerEditModal from '../../components/dashboard/PassengerEditModal';
-import ReturnTripModal from '../../components/dashboard/ReturnTripModal';
 import DriverProfileDetailsView from '../../components/dashboard/DriverProfileDetailsView';
 import DriverAdminChatView from '../../components/dashboard/DriverAdminChatView';
 
 export default function DriverDashboardPage() {
 	const navigate = useNavigate();
-	const { logout } = useAuthStore();
+	const logout = useAuthStore((s) => s.logout);
 
 	const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard');
 	const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details');
@@ -24,8 +22,6 @@ export default function DriverDashboardPage() {
 	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 	const [isRideDetailsModalOpen, setIsRideDetailsModalOpen] = useState(false);
 	const [isMessagesModalOpen, setIsMessagesModalOpen] = useState(false);
-	const [isPassengerEditModalOpen, setIsPassengerEditModalOpen] = useState(false);
-	const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
 
 	const [selectedRideConfig, setSelectedRideConfig] = useState({
 		hasFlightInfo: false,
@@ -43,11 +39,6 @@ export default function DriverDashboardPage() {
 			rideTab,
 		});
 		setIsRideDetailsModalOpen(true);
-	};
-
-	const handleOpenReturnTrip = (ride) => {
-		setSelectedRide(ride);
-		setIsReturnTripModalOpen(true);
 	};
 
 	const handleOpenMessages = (ride = selectedRide) => {
@@ -83,7 +74,6 @@ export default function DriverDashboardPage() {
 								{activeTopNavTab === 'Ride Details' && (
 									<DriverRidesTable
 										openRideDetails={openRideDetails}
-										onOpenReturnTrip={handleOpenReturnTrip}
 										onOpenMessage={handleOpenMessages}
 									/>
 								)}
@@ -124,17 +114,6 @@ export default function DriverDashboardPage() {
 				isOpen={isMessagesModalOpen}
 				onClose={() => setIsMessagesModalOpen(false)}
 				rideId={selectedRide?.id || selectedRide?._id || selectedRide?.bookingId || null}
-				bookingDetails={selectedRide}
-			/>
-
-			<PassengerEditModal
-				isOpen={isPassengerEditModalOpen}
-				onClose={() => setIsPassengerEditModalOpen(false)}
-			/>
-
-			<ReturnTripModal
-				isOpen={isReturnTripModalOpen}
-				onClose={() => setIsReturnTripModalOpen(false)}
 				bookingDetails={selectedRide}
 			/>
 		</div>

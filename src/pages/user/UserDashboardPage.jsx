@@ -6,12 +6,9 @@ import LogoutModal from '../../components/dashboard/LogoutModal';
 import RideDetailsModal from '../../components/dashboard/RideDetailsModal';
 import MessagesModal from '../../components/dashboard/MessagesModal';
 import RideAlertsView from '../../components/dashboard/RideAlertsView';
-import PassengerView from '../../components/dashboard/PassengerView';
-import PassengerEditModal from '../../components/dashboard/PassengerEditModal';
 import AccountInfoView from '../../components/dashboard/AccountInfoView';
 import AccountEditModal from '../../components/dashboard/AccountEditModal';
 import NewReservationModal from '../../components/dashboard/NewReservationModal';
-import ReturnTripModal from '../../components/dashboard/ReturnTripModal';
 
 import UserSidebar from '../../components/dashboard/UserSidebar';
 import UserTopNav from '../../components/dashboard/UserTopNav';
@@ -19,10 +16,10 @@ import UserRidesTable from '../../components/dashboard/UserRidesTable';
 
 export default function UserDashboardPage() {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
+
   const [activeSidebarTab, setActiveSidebarTab] = useState('Dashboard');
   const [activeTopNavTab, setActiveTopNavTab] = useState('Ride Details');
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -31,12 +28,10 @@ export default function UserDashboardPage() {
   const [isAccountEditModalOpen, setIsAccountEditModalOpen] = useState(false);
   const [accountEditType, setAccountEditType] = useState('passenger');
   const [isNewReservationModalOpen, setIsNewReservationModalOpen] = useState(false);
-  const [isReturnTripModalOpen, setIsReturnTripModalOpen] = useState(false);
   const [selectedRideConfig, setSelectedRideConfig] = useState({ isReturnTrip: false, hasFlightInfo: false });
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
 
-  // Helper functions
   const openRideDetails = (booking, isReturnTrip, hasFlightInfo) => {
     setSelectedBooking(booking);
     setSelectedRideConfig({ isReturnTrip, hasFlightInfo });
@@ -53,7 +48,7 @@ export default function UserDashboardPage() {
       <div className="mx-auto max-w-full lg:flex h-full">
 
         {/* SIDEBAR */}
-        <UserSidebar 
+        <UserSidebar
           activeSidebarTab={activeSidebarTab}
           setActiveSidebarTab={setActiveSidebarTab}
           isMobileMenuOpen={isMobileMenuOpen}
@@ -66,9 +61,9 @@ export default function UserDashboardPage() {
 
           {/* HEADER */}
           <div className="sticky top-0 z-20 bg-white">
-            <UserTopNav 
-              activeSidebarTab={activeSidebarTab} 
-              activeTopNavTab={activeTopNavTab} 
+            <UserTopNav
+              activeSidebarTab={activeSidebarTab}
+              activeTopNavTab={activeTopNavTab}
               setActiveTopNavTab={setActiveTopNavTab}
               onViewProfile={() => {
                 setActiveTopNavTab('Account Info');
@@ -80,15 +75,13 @@ export default function UserDashboardPage() {
             {activeSidebarTab === 'Dashboard' ? (
               <>
                 {activeTopNavTab === 'Ride Details' && (
-                  <UserRidesTable 
+                  <UserRidesTable
                     setIsNewReservationModalOpen={setIsNewReservationModalOpen}
                     openRideDetails={openRideDetails}
-                    setIsReturnTripModalOpen={setIsReturnTripModalOpen}
                     setSelectedBooking={setSelectedBooking}
                     onOpenMessage={handleOpenMessages}
                   />
                 )}
-
 
                 {activeTopNavTab === 'Account Info' && (
                   <div className="px-4 sm:px-6 lg:px-8 pb-6 bg-[#efefef] flex-1">
@@ -141,11 +134,6 @@ export default function UserDashboardPage() {
       <NewReservationModal
         isOpen={isNewReservationModalOpen}
         onClose={() => setIsNewReservationModalOpen(false)}
-      />
-      <ReturnTripModal
-        isOpen={isReturnTripModalOpen}
-        onClose={() => setIsReturnTripModalOpen(false)}
-        bookingDetails={selectedBooking}
       />
     </div>
   );

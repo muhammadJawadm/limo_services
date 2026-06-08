@@ -10,6 +10,10 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
+	if (config.headers?.Authorization) {
+		return config
+	}
+
 	const rawAuth = localStorage.getItem(AUTH_STORAGE_KEY)
 
 	if (!rawAuth) {

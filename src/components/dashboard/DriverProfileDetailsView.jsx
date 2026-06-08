@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import SharedPhoneInput from '../SharedPhoneInput';
 import testpdf from '../../assets/testpdf.pdf';
 import { FaRegEnvelope } from 'react-icons/fa';
@@ -27,11 +27,15 @@ import { mapProfileLocalData } from './driver-profile/mapProfileLocalData';
 import { buildPersonalInfoPayload, getOnboardingSaveEntry } from './driver-profile/profileSaveHandlers';
 
 export default function DriverProfileDetailsView() {
-    const { onboarding, profile, fetchOnboarding, fetchProfile, isOnboardingLoading } = useDriverStore();
+    const onboarding = useDriverStore((s) => s.onboarding);
+    const profile = useDriverStore((s) => s.profile);
+    const fetchOnboarding = useDriverStore((s) => s.fetchOnboarding);
+    const fetchProfile = useDriverStore((s) => s.fetchProfile);
+    const isOnboardingLoading = useDriverStore((s) => s.isOnboardingLoading);
     const [activeTab, setActiveTab] = useState('Personal Info');
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [localData, setLocalData] = useState(null);
+    const [editData, setEditData] = useState(null);
     const [toast, setToast] = useState({ message: '', type: 'success' });
 
     useEffect(() => {
@@ -39,29 +43,29 @@ export default function DriverProfileDetailsView() {
         fetchProfile();
     }, [fetchOnboarding, fetchProfile]);
 
-    useEffect(() => {
-        if (!onboarding) return;
-        setLocalData(mapProfileLocalData(onboarding, profile));
-    }, [onboarding, profile]);
+    const storeData = useMemo(
+        () => (onboarding ? mapProfileLocalData(onboarding, profile) : null),
+        [onboarding, profile],
+    );
 
-    const set = (key, value) => setLocalData((prev) => ({ ...prev, [key]: value }));
+    const localData = editing ? editData : storeData;
+
+    const set = (key, value) => setEditData((prev) => ({ ...prev, [key]: value }));
     const setNested = (group, key, value) =>
-        setLocalData((prev) => ({ ...prev, [group]: { ...prev[group], [key]: value } }));
+        setEditData((prev) => ({ ...prev, [group]: { ...prev[group], [key]: value } }));
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type });
         setTimeout(() => setToast({ message: '', type: 'success' }), 3000);
     };
 
-    const handleEdit = () => setEditing(true);
+    const handleEdit = () => {
+        setEditData(storeData);
+        setEditing(true);
+    };
 
     const handleCancel = () => {
         setEditing(false);
-        // Re-sync from store
-        if (onboarding) {
-            const d = onboarding; 
-            setLocalData((prev) => ({ ...prev })); // trigger re-read via useEffect
-        }
     };
 
     // Build and send the payload for the current tab

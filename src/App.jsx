@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './stores/authStore';
+import ErrorBoundary from './components/ErrorBoundary';
 import HomePage from './pages/user/HomePage';
 import SelectVehiclePage from './pages/user/SelectVehiclePage';
 import AdditionalDetailsPage from './pages/user/AdditionalDetailsPage';
@@ -35,7 +36,8 @@ function SocketBootstrap() {
 
 function RequireAuth({ children, redirectTo, allowedRoles = [] }) {
   const location = useLocation();
-  const { isAuthenticated, role } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const role = useAuthStore((state) => state.role);
 
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} replace state={{ from: location }} />;
@@ -50,6 +52,7 @@ function RequireAuth({ children, redirectTo, allowedRoles = [] }) {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <SocketBootstrap />
       <Toaster
@@ -104,5 +107,6 @@ export default function App() {
         />
       </Routes>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }

@@ -18,6 +18,13 @@ import {
 
 const countOptions = Array.from({ length: 11 }, (_, index) => index);
 
+const vehicleSubtitleByClassification = {
+  sedan: 'Comfortable sedan ride',
+  suv: 'Spacious SUV option',
+  van: 'Roomy van for groups',
+  limo: 'Luxury limo experience',
+};
+
 export default function SelectVehiclePage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,17 +44,10 @@ export default function SelectVehiclePage() {
   const [isUpdatingBooking, setIsUpdatingBooking] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
 
-  const bookingContext = resolveBookingContext(location.state);
+  const bookingContext = useMemo(() => resolveBookingContext(location.state), [location.state]);
   const isHourlyRide = bookingContext.rideType === 'hourly';
-  const bookingId = resolveBookingId(bookingContext);
-  const storedBookingDraft = readBookingDraft();
-
-  const vehicleSubtitleByClassification = {
-    sedan: 'Comfortable sedan ride',
-    suv: 'Spacious SUV option',
-    van: 'Roomy van for groups',
-    limo: 'Luxury limo experience',
-  };
+  const bookingId = useMemo(() => resolveBookingId(bookingContext), [bookingContext]);
+  const storedBookingDraft = useMemo(() => readBookingDraft(), []);
 
   useEffect(() => {
     const loadVehicleCategories = async () => {

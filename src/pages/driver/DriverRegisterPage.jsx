@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiSearch, FiX } from 'react-icons/fi';
-import { LuMapPin } from 'react-icons/lu';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
+import USAddressInput from '../../components/USAddressInput';
 
 export default function DriverRegisterPage() {
   const navigate = useNavigate();
   const [address, setAddress] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(true);
   const [addressError, setAddressError] = useState('');
+
   const handleNext = (e) => {
     e.preventDefault();
 
@@ -23,18 +22,10 @@ export default function DriverRegisterPage() {
     });
   };
 
-  const handleAddressChange = (e) => {
-    setAddress(e.target.value);
+  const handleSelect = (prediction) => {
+    setAddress(prediction.description);
     setAddressError('');
-    setShowSuggestions(e.target.value.length > 0);
   };
-
-  const mockSuggestions = [
-    { id: 1, main: "New York", sub: "NY, USA" },
-    { id: 2, main: "New York State", sub: "USA" },
-    { id: 3, main: "New York Hotel & Casio", sub: "South Las Vegas Boulevard, Las Vegas, NV, USA" },
-    { id: 4, main: "New York Hotel & Casio", sub: "Brodway, New York, NY, USA" },
-  ];
 
   return (
     <div className="min-h-screen bg-[#Fcfcfc] flex items-center justify-center p-4 md:p-6 lg:p-6">
@@ -54,65 +45,19 @@ export default function DriverRegisterPage() {
             </p>
 
             <form onSubmit={handleNext} className="mt-10 space-y-6">
-              <div className="relative">
-                <label className="text-[14px] font-medium text-gray-700 ml-1">Select Address</label>
-                <div className="relative mt-2">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <FiSearch className="text-gray-400" size={18} />
-                  </div>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={handleAddressChange}
-                    onFocus={() => setShowSuggestions(address.length > 0)}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    placeholder="Search Address..."
-                    className={`w-full rounded-full border bg-white py-3.5 pl-11 pr-10 text-[15px] text-gray-700 outline-none focus:border-[#1b2d5d] ${addressError ? 'border-red-300' : 'border-gray-300/80'
-                      }`} />
-                  {address && (
-                    <button
-                      type="button"
-                      onClick={() => { setAddress(''); setShowSuggestions(false); setAddressError(''); }}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-red-500 hover:text-red-700"
-                    >
-                      <FiX size={18} />
-                    </button>
-                  )}
-                </div>
-
-                {addressError && (
-                  <p className="mt-2 text-sm text-red-500">{addressError}</p>
-                )}
-
-                {/* Suggestions Dropdown */}
-                {showSuggestions && (
-                  <div className="absolute z-10 w-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 overflow-y-auto max-h-[260px]">
-                    {mockSuggestions.map((item, index) => (
-                      <div
-                        key={item.id}
-                        onMouseDown={() => {
-                          setAddress(`${item.main}, ${item.sub}`);
-                          setShowSuggestions(false);
-                        }}
-                        className={`flex items-start gap-4 px-5 py-3.5 cursor-pointer hover:bg-gray-50 ${index !== mockSuggestions.length - 1 ? 'border-b border-gray-100' : ''
-                          }`}
-                      >
-                        <div className="mt-0.5 text-gray-400">
-                          <LuMapPin size={18} />
-                        </div>
-
-                        <div className="flex flex-col">
-                          <span className="text-[14px] font-medium text-gray-900">
-                            {item.main}
-                          </span>
-                          <span className="text-[12.5px] text-gray-400 mt-0.5">
-                            {item.sub}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div>
+                <USAddressInput
+                  label="Select Address"
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value);
+                    setAddressError('');
+                  }}
+                  onSelect={handleSelect}
+                  placeholder="Search Address..."
+                  error={addressError}
+                  types={['geocode']}
+                />
               </div>
 
               <div className="pt-2">
