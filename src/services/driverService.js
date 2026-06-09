@@ -82,6 +82,16 @@ export async function submitOnboarding() {
 	return withMessageResponse(() => api.post('/api/driver/onboarding/submit'), 'Failed to submit onboarding.')
 }
 
+export async function patchRequiredDocuments(body) {
+	try {
+		const response = await api.patch('/api/driver/onboarding/required-documents', body)
+		const data = parseApiData(response)
+		return { success: isApiSuccess(data), data: data.data ?? null }
+	} catch (error) {
+		return { success: false, message: getApiErrorMessage(error) || 'Failed to update document.' }
+	}
+}
+
 export async function uploadOnboardingDocument({ file, folder = 'driver_onboarding', docType = '' }) {
 	try {
 		const formData = new FormData()

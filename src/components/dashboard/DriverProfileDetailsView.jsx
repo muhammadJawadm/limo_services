@@ -314,15 +314,15 @@ export default function DriverProfileDetailsView() {
                         <div>
                             <h3 className="text-[18px] text-[#111] font-medium mb-1">Company Documents</h3>
                             <p className="text-[13px] text-gray-400 mb-4">Company documents for {localData.companyName || '—'}:</p>
-                            <DocumentTable docs={COMPANY_DOC_DEFS} docData={localData.docs} />
+                            <DocumentTable docs={COMPANY_DOC_DEFS} docData={localData.docs} onUploadSuccess={fetchOnboarding} />
 
                             <h3 className="text-[18px] text-[#111] font-medium mb-1 mt-8">Chauffeur Documents</h3>
                             <p className="text-[13px] text-gray-400 mb-4">Chauffeur documents for {localData.chauffeurFirstName} {localData.chauffeurLastName}:</p>
-                            <DocumentTable docs={CHAUFFEUR_DOC_DEFS} docData={localData.docs} />
+                            <DocumentTable docs={CHAUFFEUR_DOC_DEFS} docData={localData.docs} onUploadSuccess={fetchOnboarding} />
 
                             <h3 className="text-[18px] text-[#111] font-medium mb-1 mt-8">Vehicle Documents</h3>
                             <p className="text-[13px] text-gray-400 mb-4">Vehicle documents for {localData.vehicleBrand} ({localData.vehicleNumberPlate || '—'}):</p>
-                            <DocumentTable docs={VEHICLE_DOC_DEFS} docData={localData.docs} />
+                            <DocumentTable docs={VEHICLE_DOC_DEFS} docData={localData.docs} onUploadSuccess={fetchOnboarding} />
                         </div>
                     )}
 
