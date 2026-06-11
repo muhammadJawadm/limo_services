@@ -11,6 +11,7 @@ import {
   getDriverRideById,
   updateRideStatus
 } from '../../services/driverService';
+import { getNormalizedChildSeats } from '../../utils/rideDisplay';
 import CancelTripModal from './CancelTripModal';
 
 const safeNameParts = (fullName) => {
@@ -108,7 +109,7 @@ export default function DriverDetailsModal({
   const pickupLocation = details?.routingInformation?.pickupLocation || details?.pickupLocation || 'Pickup location';
   const dropoffLocation = details?.routingInformation?.dropoffLocation || details?.dropoffLocation || 'Drop-off location';
   const stopLocations = details?.routingInformation?.stopLocations || details?.stopLocations || [];
-  const childSeats = details?.childSeats || {};
+  const childSeats = getNormalizedChildSeats(details);
   const charges = details?.chargesAndFees || {};
   const tripPrice = charges?.tripPrice ?? details?.tripPrice ?? 0;
   const childSeatPrice = charges?.childSeatsFee ?? details?.childSeatsFee ?? 0;
@@ -279,20 +280,28 @@ export default function DriverDetailsModal({
                     <div className="text-[#111] font-medium">Pick-up</div>
                     <div className="text-[#666]">{pickupLocation}</div>
 
-                    <div className="text-[#111] font-medium">Stop:</div>
-                    <div className="text-[#666]">{stopLocations[0] || '—'}</div>
-
-                    <div className="text-[#111] font-medium">Stop:</div>
-                    <div className="text-[#888]">{stopLocations[1] || '+ Add Stop'}</div>
+                    {stopLocations.map((stop, idx) => (
+                      <>
+                        <div key={`stop-label-${idx}`} className="text-[#111] font-medium">Stop {idx + 1}:</div>
+                        <div key={`stop-val-${idx}`} className="text-[#666]">{stop || '—'}</div>
+                      </>
+                    ))}
 
                     <div className="text-[#111] font-medium">Drop-off:</div>
                     <div className="text-[#666]">{dropoffLocation}</div>
 
-                    <div className="text-[#111] font-medium">Duration:</div>
-                    <div className="text-[#666]">{details?.hours ? `${details.hours} hours` : '—'}</div>
+                    <div className="text-[#111] font-medium">No. of Pax:</div>
+                    <div className="text-[#666]">{details?.noOfPassengers ?? '—'}</div>
 
                     <div className="text-[#111] font-medium">Luggage:</div>
                     <div className="text-[#666]">{details?.luggage ?? '—'}</div>
+
+                    {details?.type === 'hourly' && (
+                      <>
+                        <div className="text-[#111] font-medium">Duration:</div>
+                        <div className="text-[#666]">{details?.hours ? `${details.hours} hour${Number(details.hours) !== 1 ? 's' : ''}` : '—'}</div>
+                      </>
+                    )}
 
                     <div className="text-[#111] font-medium">Child Seats:</div>
                     <div className="text-[#666]">{childSeats?.infant || 0} Infant, {childSeats?.toddler || 0} Toddler, {childSeats?.booster || 0} Booster</div>

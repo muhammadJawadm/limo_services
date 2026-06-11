@@ -4,20 +4,54 @@ import driverAvatar from '../../assets/driver1.png';
 import driverAvatarFallback from '../../assets/driver1.png';
 import useDriverAdminChat from '../../hooks/useDriverAdminChat';
 
+const COMMON_EMOJIS = ['😊','😂','👍','❤️','🙏','😢','😎','🔥','✅','👌','😍','🤔','😅','🎉','💯','👏','🙌','😁','😆','🥳'];
+
+function formatMsgTime(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+}
+
 export default function DriverAdminChatView() {
   const { messages, isLoading, isSending, error, isConnected, sendMessage } = useDriverAdminChat();
   const [messageText, setMessageText] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const endRef = useRef(null);
+  const emojiPickerRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!showEmojiPicker) return;
+    const handleClickOutside = (e) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEmojiPicker]);
 
   const handleSend = async () => {
     const didSend = await sendMessage(messageText);
     if (didSend) {
       setMessageText('');
     }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (messageText.trim() && !isSending) handleSend();
+    }
+  };
+
+  const insertEmoji = (emoji) => {
+    setMessageText((prev) => prev + emoji);
+    setShowEmojiPicker(false);
   };
 
   return (
@@ -82,10 +116,15 @@ export default function DriverAdminChatView() {
                     />
                   )}
                 </div>
-                <div className={`flex max-w-[82%] flex-col gap-2 ${isOwn ? 'items-end' : ''}`}>
+                <div className={`flex max-w-[82%] flex-col gap-1 ${isOwn ? 'items-end' : ''}`}>
                   <div className={`rounded-2xl px-4 py-2.5 text-sm ${isOwn ? 'rounded-br-sm bg-[#6159e6] text-white' : 'rounded-bl-sm bg-[#ececec] text-[#1a1a1a]'}`}>
                     {message.text}
                   </div>
+                  {message.createdAt && (
+                    <span className="text-[10px] text-gray-400 px-1">
+                      {formatMsgTime(message.createdAt)}
+                    </span>
+                  )}
                 </div>
               </div>
             );
@@ -94,18 +133,36 @@ export default function DriverAdminChatView() {
         </div>
 
         <div className="border-t border-gray-200 bg-[#f8f8f8] px-4 py-4 sm:px-6 sm:py-5">
-          <div className="flex min-h-[98px] w-full overflow-hidden rounded-[18px] border border-gray-200 bg-white shadow-sm focus-within:border-[#1b2d5d] focus-within:ring-1 focus-within:ring-[#1b2d5d]">
-            <div className="pt-3 pl-3 text-gray-500 sm:pt-4 sm:pl-4">
-              <FiPaperclip className="h-5 w-5 cursor-pointer transition hover:text-gray-800" />
-            </div>
+          <div className="relative flex min-h-[98px] w-full overflow-visible rounded-[18px] border border-gray-200 bg-white shadow-sm focus-within:border-[#1b2d5d] focus-within:ring-1 focus-within:ring-[#1b2d5d]">
+            
             <textarea
               placeholder="Send a message..."
               value={messageText}
               onChange={(event) => setMessageText(event.target.value)}
+              onKeyDown={handleKeyDown}
               className="h-[98px] flex-1 resize-none px-3 py-3 text-sm text-[#111111] outline-none placeholder:text-gray-400 sm:px-4 sm:py-4"
             />
             <div className="flex items-end gap-2 pb-3 pr-3 text-gray-500 sm:gap-3 sm:pb-4 sm:pr-4">
-              <FiSmile className="mb-1 h-5 w-5 cursor-pointer transition hover:text-gray-800" />
+              <div className="relative mb-1" ref={emojiPickerRef}>
+                <FiSmile
+                  className="h-5 w-5 cursor-pointer transition hover:text-gray-800"
+                  onClick={() => setShowEmojiPicker((v) => !v)}
+                />
+                {showEmojiPicker && (
+                  <div className="absolute bottom-8 right-0 z-20 flex flex-wrap gap-1 rounded-2xl border border-gray-200 bg-white p-3 shadow-lg w-[220px]">
+                    {COMMON_EMOJIS.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => insertEmoji(emoji)}
+                        className="text-xl leading-none p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button
                 onClick={handleSend}
                 disabled={!messageText.trim() || isSending}

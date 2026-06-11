@@ -112,6 +112,7 @@ export default function DriverOnboardingPage() {
   const location = useLocation();
   const { logout } = useAuthStore();
   const {
+    onboarding,
     onboardingForm,
     updateOnboardingForm,
     fetchOnboarding,
@@ -133,6 +134,7 @@ export default function DriverOnboardingPage() {
   const isLastVisibleStep = currentStepIndex === visibleSteps.length - 1;
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const [stripeOnboarded, setStripeOnboarded] = useState(false);
   const updateDoc = (key, value) => {
     updateOnboardingForm(key, value);
 
@@ -142,8 +144,10 @@ export default function DriverOnboardingPage() {
   };
 
   useEffect(() => {
-    fetchOnboarding();
-  }, [fetchOnboarding]);
+    if (!onboarding) {
+      fetchOnboarding();
+    }
+  }, [onboarding, fetchOnboarding]);
 
   const nextStep = async () => {
     const stepError = validateOnboardingStep(currentStep, onboardingForm);
@@ -195,7 +199,7 @@ export default function DriverOnboardingPage() {
       case 6: return <Step6 formData={onboardingForm} updateDoc={updateDoc} />;
       case 7: return <Step7 />;
       case 8: return <Step8 formData={onboardingForm} updateDoc={updateDoc} />;
-      case 9: return <Step9 />;
+      case 9: return <Step9 onStatusChange={setStripeOnboarded} />;
       case 10: return <Step10 formData={onboardingForm} updateDoc={updateDoc} />;
       default: return <div className="p-10 text-center text-gray-500">More steps coming soon...</div>;
     }
@@ -314,11 +318,16 @@ export default function DriverOnboardingPage() {
                   Previous
                 </button>
               )}
+              {currentStep === 9 && !stripeOnboarded && (
+                <p className="text-[13px] text-amber-600 sm:text-right w-full sm:w-auto">
+                  Complete Stripe payout setup above to continue.
+                </p>
+              )}
               <button
                 onClick={nextStep}
-                disabled={isOnboardingSaving || isOnboardingLoading}
+                disabled={isOnboardingSaving || isOnboardingLoading || (currentStep === 9 && !stripeOnboarded)}
                 className={`px-10 py-3.5 rounded-full text-[15px] font-medium text-white transition-colors w-full sm:w-auto sm:min-w-[160px] flex-1 sm:flex-none ${
-                  isOnboardingSaving || isOnboardingLoading ? 'bg-[#1b2d5d]/70 cursor-not-allowed' : 'bg-[#1b2d5d] hover:bg-[#132042]'
+                  isOnboardingSaving || isOnboardingLoading || (currentStep === 9 && !stripeOnboarded) ? 'bg-[#1b2d5d]/70 cursor-not-allowed' : 'bg-[#1b2d5d] hover:bg-[#132042]'
                 }`}
               >
                 {isOnboardingSaving ? 'Saving...' : isLastVisibleStep ? 'Submit Application' : 'Next'}

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { LuMail, LuLock } from 'react-icons/lu';
-import { FiInfo , FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiInfo, FiEye, FiEyeOff } from 'react-icons/fi';
 import logoImg from '../../assets/navbarlogo1.png';
 import driverSideImg from '../../assets/driverside.png';
 import { useAuthStore } from '../../stores/authStore';
@@ -29,17 +29,17 @@ export default function DriverLoginPage() {
     const result = await loginDriver(form);
 
     if (result?.success) {
-      if(result?.user?.role === 'driver'){
-      if(result?.user?.onboardingCompleted && result?.user?.isVerified) {
-      navigate('/driver/dashboard');
-      }
+      if (result?.user?.role === 'driver') {
+        if (result?.user?.onboardingCompleted && result?.user?.isVerified) {
+          navigate('/driver/dashboard');
+        }
         else {
           navigate('/driver/onboarding');
         }
       }
-else {      
-  navigate('/');
-}
+      else {
+        navigate('/');
+      }
       return;
     }
 
@@ -80,30 +80,30 @@ else {
                 </div>
               </div>
 
-          <div>
-  <label className="text-[14px] font-medium text-[#111] ml-1">Password</label>
-  <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>
-    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-      <LuLock className="text-gray-400" size={18} />
-    </div>
+              <div>
+                <label className="text-[14px] font-medium text-[#111] ml-1">Password</label>
+                <div className={`relative mt-1.5 focus-within:border-[#1b2d5d] rounded-full border ${hasError ? 'border-red-200' : 'border-gray-200'} bg-white transition-colors`}>
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <LuLock className="text-gray-400" size={18} />
+                  </div>
 
-    <input
-      type={showPassword ? 'text' : 'password'}
-      placeholder="*********"
-      value={form.password}
-      onChange={updateField('password')}
-      className="w-full bg-transparent py-3.5 pl-11 pr-12 text-[15px] text-gray-700 outline-none"
-    />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="*********"
+                    value={form.password}
+                    onChange={updateField('password')}
+                    className="w-full bg-transparent py-3.5 pl-11 pr-12 text-[15px] text-gray-700 outline-none"
+                  />
 
-    <button
-      type="button"
-      onClick={() => setShowPassword((prev) => !prev)}
-      className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#1b2d5d] transition-colors"
-    >
-      {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
-    </button>
-  </div>
-</div>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-[#1b2d5d] transition-colors"
+                  >
+                    {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+                  </button>
+                </div>
+              </div>
 
               {hasError && (
                 <div className="flex items-center text-red-500 text-[13px] ml-1">
@@ -128,7 +128,7 @@ else {
                 </button>
               </div>
 
-              <div className="pt-2 text-left">
+              <div className=" text-left">
                 <span className="text-[14px] text-gray-500">
                   I don't have an account.{' '}
                   <Link to="/driver/register" className="font-medium text-[#1b2d5d] hover:underline">

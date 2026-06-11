@@ -148,7 +148,7 @@ export default function TermsPage() {
             </p>
 
             <a
-              href="/contact"
+              href="/Support"
               className="mt-5 inline-flex rounded-full bg-white px-6 py-3 text-[14px] font-semibold text-[#1b2d5d] hover:bg-gray-100 transition-colors"
             >
               Contact Support

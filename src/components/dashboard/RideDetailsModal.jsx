@@ -24,6 +24,17 @@ import {
   getRideStatusMeta,
 } from '../../utils/rideDisplay';
 
+function to24Hour(timeStr) {
+  if (!timeStr) return '';
+  const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return timeStr;
+  let [, h, m, period] = match;
+  h = parseInt(h, 10);
+  if (period.toUpperCase() === 'PM' && h !== 12) h += 12;
+  if (period.toUpperCase() === 'AM' && h === 12) h = 0;
+  return `${String(h).padStart(2, '0')}:${m}`;
+}
+
 export default function RideDetailsModal({
   isOpen,
   onClose,
@@ -52,7 +63,6 @@ export default function RideDetailsModal({
   const childSeats = getNormalizedChildSeats(bookingDetails);
   const charges = getNormalizedCharges(bookingDetails);
   const totalAmount = Number(bookingDetails?.totalAmount ?? 0);
-  const stops = bookingDetails?.stopLocations || [];
   const assignedDriver = bookingDetails?.assignedDriver || null;
 
   const assignedDriverName =
@@ -65,10 +75,12 @@ export default function RideDetailsModal({
   const assignedDriverPhone = assignedDriver?.phone || '—';
   const assignedDriverEmail = assignedDriver?.email || '—';
   const [editableBooking, setEditableBooking] = useState({});
+  const [editableStops, setEditableStops] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const prevBookingIdRef = useRef(null);
   const initialBookingRef = useRef(null);
+  const initialStopsRef = useRef([]);
   const [hasChanges, setHasChanges] = useState(false);
   useEffect(() => {
     const id = bookingDetails?.id || bookingDetails?._id || bookingDetails?.bookingId || null;
@@ -86,9 +98,16 @@ export default function RideDetailsModal({
       }
       : next;
 
+    const initialStops = Array.isArray(bookingDetails?.stopLocations)
+      ? [...bookingDetails.stopLocations]
+      : [];
+    const stateWithTime = { ...finalState, time: to24Hour(finalState.time) };
+
     setTimeout(() => {
-      setEditableBooking(finalState);
-      initialBookingRef.current = finalState;
+      setEditableBooking(stateWithTime);
+      initialBookingRef.current = stateWithTime;
+      setEditableStops(initialStops);
+      initialStopsRef.current = initialStops;
     }, 0);
   }, [bookingDetails, isReturnTrip]);
 
@@ -103,9 +122,11 @@ export default function RideDetailsModal({
       const b = editableBooking[k];
       if ((a || '') !== (b || '')) { changed = true; break; }
     }
-    const t = setTimeout(() => setHasChanges(changed), 0);
+    const stopsChanged =
+      JSON.stringify(editableStops) !== JSON.stringify(initialStopsRef.current || []);
+    const t = setTimeout(() => setHasChanges(changed || stopsChanged), 0);
     return () => clearTimeout(t);
-  }, [editableBooking]);
+  }, [editableBooking, editableStops]);
 
   const bookingId = bookingDetails?.id || bookingDetails?._id || bookingDetails?.bookingId || null;
 
@@ -279,6 +300,7 @@ export default function RideDetailsModal({
       const payload = {
         pickupLocation: editableBooking.pickupLocation,
         dropoffLocation: editableBooking.dropoffLocation,
+        stopLocations: editableStops.filter((s) => s.trim()),
         date: editableBooking.date,
         time: editableBooking.time,
         noOfPassengers: Number(editableBooking.noOfPassengers || 0),
@@ -289,8 +311,8 @@ export default function RideDetailsModal({
       const result = await updateBookingFull(bookingId, payload);
       setIsUpdating(false);
       if (result?.success) {
-        // update initial snapshot so button disables after successful save
         initialBookingRef.current = { ...(initialBookingRef.current || {}), ...payload };
+        initialStopsRef.current = payload.stopLocations;
         setHasChanges(false);
         onClose();
       } else {
@@ -442,9 +464,9 @@ export default function RideDetailsModal({
               <div className="space-y-4 sm:space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
                   <span className="text-[13px] sm:text-[14px] font-medium sm:font-normal text-[#111]">Vehicle Type:</span>
-                  <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-4 py-2 sm:py-1.5 w-full sm:w-[160px] text-[13px] text-[#666] shadow-sm hover:border-gray-300 transition-colors cursor-pointer">
+                  <div className="flex items-center justify-between rounded-xl sm:rounded-full bg-white px-3 sm:px-4 py-2 sm:py-1.5 w-full sm:w-[160px] text-[13px] text-[#666] shadow-sm hover:border-gray-300 transition-colors cursor-pointer">
                     <span>{bookingDetails?.vehicleCategory?.name || 'Vehicle'}</span>
-                    <FiChevronDown />
+                    
                   </div>
                 </div>
 
@@ -466,17 +488,17 @@ export default function RideDetailsModal({
                 <div className="space-y-2 pt-1 sm:pt-0 border-t border-gray-100 sm:border-0 mt-3 sm:mt-0">
                   <span className="text-[13px] sm:text-[14px] text-[#111] font-medium sm:font-normal block mb-2 sm:mb-1">Child Seats:</span>
                   <div className="flex flex-col lg:flex-row ">
-                    <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300">
-                      <span className="truncate mr-1">{childSeats.infant ?? 0} Infant</span>
-                      <FiChevronDown className="shrink-0" />
+                    <div className="flex items-center justify-between rounded-xl sm:rounded-full  bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300">
+                      <span className="truncate mr-1">{editableBooking.infant ?? 0} Infant</span>
+                      {/* <FiChevronDown className="shrink-0" /> */}
                     </div>
-                    <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300">
-                      <span className="truncate mr-1">{childSeats.toddler ?? 0} Toddler</span>
-                      <FiChevronDown className="shrink-0" />
+                    <div className="flex items-center justify-between rounded-xl sm:rounded-full  bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300">
+                      <span className="truncate mr-1">{editableBooking.toddler ?? 0} Toddler</span>
+                      {/* <FiChevronDown className="shrink-0" /> */}
                     </div>
-                    <div className="flex items-center justify-between rounded-xl sm:rounded-full border border-gray-200 bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300 col-span-2 sm:col-span-1">
+                    <div className="flex items-center justify-between rounded-xl sm:rounded-full  bg-white px-3 sm:px-2 py-2 sm:py-1 flex-1 text-[12px] sm:text-[12px] text-[#666] shadow-sm cursor-pointer hover:border-gray-300 col-span-2 sm:col-span-1">
                       <span className="truncate mr-1">{childSeats.booster ?? 0} Booster</span>
-                      <FiChevronDown className="shrink-0" />
+                      {/* <FiChevronDown className="shrink-0" /> */}
                     </div>
                   </div>
                 </div>
@@ -498,17 +520,34 @@ export default function RideDetailsModal({
                   <input value={editableBooking.pickupLocation || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, pickupLocation: e.target.value }))} className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
-                <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
-                  <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Stop 1:</div>
-                  <div className="text-gray-700 sm:text-[#666] leading-relaxed relative pl-4 before:absolute before:left-0 before:top-1.5 before:w-1.5 before:h-1.5 before:bg-yellow-500 before:rounded-full">
-                    {stops[0] || 'No stops'}
+                {editableStops.map((stop, idx) => (
+                  <div key={idx} className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
+                    <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Stop {idx + 1}:</div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={stop}
+                        onChange={(e) => {
+                          const next = [...editableStops];
+                          next[idx] = e.target.value;
+                          setEditableStops(next);
+                        }}
+                        className="flex-1 text-gray-700 sm:text-[#666] bg-white border border-gray-200 rounded-md px-2 py-1"
+                      />
+                      <button
+                        onClick={() => setEditableStops((prev) => prev.filter((_, i) => i !== idx))}
+                        className="text-red-400 hover:text-red-600 text-sm font-bold leading-none"
+                      >✕</button>
+                    </div>
                   </div>
-                </div>
+                ))}
 
                 <div className="flex flex-col sm:contents border-b border-gray-100 sm:border-0 pb-3 sm:pb-0">
-                  <div className="font-semibold sm:font-medium text-[#111] opacity-100 mb-1 sm:mb-0 hidden sm:block">Stop:</div>
-                  <div className="flex items-center justify-start sm:justify-end sm:-mt-6">
-                    <button className="text-[#8c8c8c] hover:text-[#1b2d5d] text-sm font-medium hover:underline transition-colors">+ Add Stop</button>
+                  <div className="hidden sm:block" />
+                  <div className="flex items-center justify-start">
+                    <button
+                      onClick={() => setEditableStops((prev) => [...prev, ''])}
+                      className="text-[#8c8c8c] hover:text-[#1b2d5d] text-sm font-medium hover:underline transition-colors"
+                    >+ Add Stop</button>
                   </div>
                 </div>
 
@@ -522,10 +561,19 @@ export default function RideDetailsModal({
                   <input type="date" value={editableBooking.date || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, date: e.target.value }))} className="text-gray-700 sm:text-[#666] bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
 
-                <div className="flex flex-col sm:contents pt-1 sm:pt-0">
+                <div className={`flex flex-col sm:contents ${bookingDetails?.type === 'hourly' ? 'border-b border-gray-100 sm:border-0 pb-3 sm:pb-0' : 'pt-1 sm:pt-0'}`}>
                   <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Time:</div>
                   <input type="time" value={editableBooking.time || ''} onChange={(e) => setEditableBooking(prev => ({ ...prev, time: e.target.value }))} className="text-gray-700 sm:text-[#666] bg-white border border-gray-200 rounded-md px-2 py-1" />
                 </div>
+
+                {bookingDetails?.type === 'hourly' && (
+                  <div className="flex flex-col sm:contents pt-1 sm:pt-0">
+                    <div className="font-semibold sm:font-medium text-[#111] mb-1 sm:mb-0">Duration:</div>
+                    <div className="text-gray-700 sm:text-[#666] bg-gray-50 border border-gray-200 rounded-md px-2 py-1 w-fit">
+                      {bookingDetails?.hours ? `${bookingDetails.hours} hour${Number(bookingDetails.hours) !== 1 ? 's' : ''}` : '--'}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -694,7 +742,7 @@ export default function RideDetailsModal({
                   ? 'Payment Ready'
                   : 'Create Return Trip'}
             </button>
-          ) : (
+          ) : isUpcoming ? (
             <button
               onClick={handleConfirm}
               disabled={!hasChanges || isUpdating}
@@ -702,7 +750,7 @@ export default function RideDetailsModal({
             >
               {isUpdating ? 'Updating...' : 'Confirm Changes'}
             </button>
-          )}
+          ) : null}
         </div>
 
       </div>

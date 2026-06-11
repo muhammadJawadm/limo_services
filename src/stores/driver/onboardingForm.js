@@ -68,6 +68,12 @@ export const initialOnboardingForm = {
 	showErrors: false,
 }
 
+const notPending = (v) => {
+	if (!v) return ''
+	const s = String(v).trim()
+	return s.toLowerCase() === 'pending' ? '' : s
+}
+
 export const mapOnboardingToFormData = (data) => {
 	if (!data) return initialOnboardingForm
 
@@ -80,15 +86,15 @@ export const mapOnboardingToFormData = (data) => {
 	const weekly = avail.weeklySchedule || {}
 
 	return {
-		companyName: data.companyName || '',
-		companyType: data.companyType || '',
-		country: address.country || '',
-		street: address.street || '',
-		zipCode: address.postalCode || '',
-		city: address.city || '',
-		stateProvince: address.state || '',
-		taxId: data.taxIdentificationNumber || '',
-		businessRegistration: data.businessRegistrationNumber || '',
+		companyName: notPending(data.companyName),
+		companyType: notPending(data.companyType),
+		country: notPending(address.country),
+		street: notPending(address.street),
+		zipCode: notPending(address.postalCode),
+		city: notPending(address.city),
+		stateProvince: notPending(address.state),
+		taxId: notPending(data.taxIdentificationNumber),
+		businessRegistration: notPending(data.businessRegistrationNumber),
 
 		priorExp: typeof fleet.priorLimoExperience === 'boolean' ? (fleet.priorLimoExperience ? 'yes' : 'no') : '',
 		electricVehicles: typeof fleet.electricVehicleFleet === 'boolean' ? (fleet.electricVehicleFleet ? 'yes' : 'no') : '',
@@ -96,27 +102,27 @@ export const mapOnboardingToFormData = (data) => {
 		chauffeurCount: fleet.numberOfChauffeurs != null ? String(fleet.numberOfChauffeurs) : '',
 		firstClassCount: fleet.numberOfFirstClassVehicles != null ? String(fleet.numberOfFirstClassVehicles) : '',
 		businessVansCount: fleet.numberOfBusinessClassVans != null ? String(fleet.numberOfBusinessClassVans) : '',
-		fleetDescription: fleet.businessClassVansDescription || '',
+		fleetDescription: notPending(fleet.businessClassVansDescription),
 
 		sameAsRep: Boolean(chauffeur.useAuthorizedRepresentativeDetails),
-		chauffeurFirstName: chauffeur.firstName || '',
-		chauffeurLastName: chauffeur.lastName || '',
-		chauffeurEmail: chauffeur.email || '',
-		chauffeurPhone: chauffeur.phone || '',
-		driverLicenseId: chauffeur.driverLicenseId || '',
+		chauffeurFirstName: notPending(chauffeur.firstName),
+		chauffeurLastName: notPending(chauffeur.lastName),
+		chauffeurEmail: notPending(chauffeur.email),
+		chauffeurPhone: notPending(chauffeur.phone),
+		driverLicenseId: notPending(chauffeur.driverLicenseId),
 
-		vehicleYear: vehicle.yearOfManufacture || '',
-		vehicleBrand: vehicle.brandAndModel || '',
-		vehicleClass: vehicle.vehicleClass || '',
-		vehicleColor: vehicle.color || '',
+		vehicleYear: notPending(vehicle.yearOfManufacture),
+		vehicleBrand: notPending(vehicle.brandAndModel),
+		vehicleClass: notPending(vehicle.vehicleClass),
+		vehicleColor: notPending(vehicle.color),
 		passengerCount: vehicle.passengerCapacity != null ? String(vehicle.passengerCapacity) : '',
 		luggageCount: vehicle.luggageCapacity != null ? String(vehicle.luggageCapacity) : '',
 		wifi: typeof vehicle.wifi === 'boolean' ? (vehicle.wifi ? 'yes' : 'no') : '',
 		smoking: typeof vehicle.smokingAllowed === 'boolean' ? (vehicle.smokingAllowed ? 'yes' : 'no') : '',
-		numberPlate: vehicle.vehicleNumberPlate || '',
-		vin: vehicle.vehicleVIN || '',
+		numberPlate: notPending(vehicle.vehicleNumberPlate),
+		vin: notPending(vehicle.vehicleVIN),
 
-		contractPlace: contract.place || '',
+		contractPlace: notPending(contract.place),
 		contractAgreed: Boolean(contract.confirmationAgreement),
 
 		cardHolderName: '',

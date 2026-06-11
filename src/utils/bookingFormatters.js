@@ -56,3 +56,15 @@ export const formatBookingTime = (value, fallback = 'Select a time') => {
 
 	return value
 }
+
+export const formatDisplayTime = (value, fallback = '--') => {
+	if (!value) return fallback
+	if (/AM|PM/i.test(value)) return value
+	const match = value.match(/^(\d{1,2}):(\d{2})$/)
+	if (!match) return value
+	let [, h, m] = match
+	h = parseInt(h, 10)
+	const period = h >= 12 ? 'PM' : 'AM'
+	const displayH = h === 0 ? 12 : h > 12 ? h - 12 : h
+	return `${displayH}:${m} ${period}`
+}

@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FiCheck, FiExternalLink } from 'react-icons/fi';
 import whitewallet from '../../../assets/whitewallet.png';
 import { createDriverConnectLink, getDriverConnectStatus } from '../../../services/driverService';
 
-export const Step9 = () => {
+export const Step9 = ({ onStatusChange }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [status, setStatus] = useState({ onboarded: false });
+  const onStatusChangeRef = useRef(onStatusChange);
+  useEffect(() => { onStatusChangeRef.current = onStatusChange; }, [onStatusChange]);
 
   const normalizeStatus = (value) => {
     const source = value?.raw ?? value?.data ?? value ?? {};
@@ -31,11 +33,14 @@ export const Step9 = () => {
     const loadStatus = async () => {
       setIsLoading(true);
       const result = await getDriverConnectStatus();
-      console.log('Driver Connect Status Result:', result);
       if (!isMounted) return;
 
       if (result?.success) {
-        setStatus(normalizeStatus(result));
+        const normalized = normalizeStatus(result);
+        setStatus(normalized);
+        onStatusChangeRef.current?.(normalized.onboarded);
+      } else {
+        onStatusChangeRef.current?.(false);
       }
       setIsLoading(false);
     };

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiMessageSquare, FiLoader } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiMessageSquare, FiLoader, FiRefreshCw } from 'react-icons/fi';
 import blackcaricon from '../../assets/blackcaricon.png';
 import { MdOutlineLocationOn } from 'react-icons/md';
 import { getMyBookings, cancelBooking } from '../../services/bookingService';
 import { useUserStore } from '../../stores/userStore';
-import { formatTableDate } from '../../utils/bookingFormatters';
+import { formatTableDate, formatDisplayTime } from '../../utils/bookingFormatters';
 
 const RIDE_TABS = ['Upcoming Ride', 'Past Rides', 'Cancelled Rides'];
 
@@ -105,7 +105,9 @@ export default function UserRidesTable({
   const [searchTerm, setSearchTerm] = useState('');
   const [bookingError, setBookingError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [cancellingId, setCancellingId] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const { setCurrentBookingTab } = useUserStore();
 
@@ -141,7 +143,13 @@ export default function UserRidesTable({
     return () => {
       isMounted = false;
     };
-  }, [currentTab]);
+  }, [currentTab, refreshKey]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setRefreshKey((k) => k + 1);
+    setTimeout(() => setIsRefreshing(false), 800);
+  };
 
   const handleTabChange = (tab) => {
     if (tab === activeRideTab) return;
@@ -265,6 +273,15 @@ export default function UserRidesTable({
               />
               <FiSearch className="text-gray-500 flex-shrink-0" size={16} />
             </label>
+
+            <button
+              onClick={handleRefresh}
+              disabled={isLoading}
+              title="Refresh rides"
+              className="flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-gray-300 bg-white text-gray-500 hover:text-[#1b2d5d] hover:border-[#1b2d5d] transition-colors disabled:opacity-40"
+            >
+              <FiRefreshCw size={15} className={isRefreshing ? 'animate-spin' : ''} />
+            </button>
           </div>
         </div>
 
@@ -325,7 +342,7 @@ export default function UserRidesTable({
 
                         <td className="px-4 lg:px-5 py-5 leading-6 align-top pt-6 whitespace-nowrap text-gray-800 font-medium">
                           <p>{formatTableDate(row.date)}</p>
-                          <p className="text-gray-500 font-normal">{row.time || '--'}</p>
+                          <p className="text-gray-500 font-normal">{formatDisplayTime(row.time)}</p>
                         </td>
 
                         <td className="px-4 lg:px-5 py-5 align-top pt-6">
@@ -370,51 +387,42 @@ export default function UserRidesTable({
                         )}
 
                         <td className="px-4 lg:px-5 py-5 align-top pt-6">
-                          <div className="flex flex-col sm:flex-row items-center sm:justify-center gap-4 sm:gap-5 whitespace-nowrap text-gray-500 font-medium">
-                            {driverName &&
+                          {activeRideTab === 'Cancelled Rides' ? (
+                            <span className="text-gray-400 text-xs">—</span>
+                          ) : (
+                            <div className="flex flex-col sm:flex-row items-center sm:justify-center gap-4 sm:gap-5 whitespace-nowrap text-gray-500 font-medium">
+                              {driverName && (
+                                <span
+                                  className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
+                                  onClick={() => {
+                                    setSelectedBooking?.(row);
+                                    onOpenMessage?.(row);
+                                  }}
+                                >
+                                  <FiMessageSquare size={16} />
+                                  Message
+                                </span>
+                              )}
                               <span
                                 className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                                onClick={() => {
-                                  setSelectedBooking?.(row);
-                                  onOpenMessage?.(row);
-                                }}
+                                onClick={() => openRideDetails(row, true, Boolean(row.flightNumber))}
                               >
-                                <FiMessageSquare size={16} />
-                                Message
+                                <img
+                                  src={blackcaricon}
+                                  alt="car"
+                                  className="w-[15px] h-[15px] object-contain opacity-70"
+                                />
+                                Return Trip
                               </span>
-                            }
-                            <span
-                              className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                              onClick={() => openRideDetails(row, true, Boolean(row.flightNumber))}
-                            >
-                              <img
-                                src={blackcaricon}
-                                alt="car"
-                                className="w-[15px] h-[15px] object-contain opacity-70"
-                              />
-                              Return Trip
-                            </span>
-
-                            {activeRideTab === 'Upcoming Ride' && (
-                              <span
-                                className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
-                                onClick={() => openRideDetails(row, false, Boolean(row.flightNumber))}
-                              >
-                                <FiEdit size={16} />
-                                View
-                              </span>
-                            )}
-
-                            {activeRideTab !== 'Upcoming Ride' && (
                               <span
                                 className="flex cursor-pointer items-center gap-1.5 hover:text-[#1b2d5d] transition-colors"
                                 onClick={() => openRideDetails(row, false, Boolean(row.flightNumber))}
                               >
-                                <FiEye size={16} />
+                                {activeRideTab === 'Upcoming Ride' ? <FiEdit size={16} /> : <FiEye size={16} />}
                                 View
                               </span>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     );

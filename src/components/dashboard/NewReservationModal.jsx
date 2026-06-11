@@ -36,8 +36,16 @@ export default function NewReservationModal({ isOpen, onClose }) {
 		cardInfo: true,
 	})
 
-	const [stops, setStops] = useState([{ id: 1, value: '' }])
+	const [stops, setStops] = useState([])
 	const [selectedVehicleId, setSelectedVehicleId] = useState(null)
+
+	const [pickupLocation, setPickupLocation] = useState('')
+	const [dropoffLocation, setDropoffLocation] = useState('')
+	const [date, setDate] = useState('')
+	const [time, setTime] = useState('')
+	const [noOfPassengers, setNoOfPassengers] = useState(3)
+	const [luggage, setLuggage] = useState(0)
+	const [hours, setHours] = useState('')
 
 	useEffect(() => {
 		if (!isOpen) {
@@ -74,8 +82,15 @@ export default function NewReservationModal({ isOpen, onClose }) {
 		setPaymentBookingId('')
 		setPaymentBookingDetails(null)
 		setShowPaymentForm(false)
-		setStops([{ id: 1, value: '' }])
+		setStops([])
 		setSpecialInstructions('')
+		setPickupLocation('')
+		setDropoffLocation('')
+		setDate('')
+		setTime('')
+		setNoOfPassengers(3)
+		setLuggage(0)
+		setHours('')
 		if (vehicleCategories.length > 0) {
 			setSelectedVehicleId(vehicleCategories[0].id || vehicleCategories[0]._id)
 		} else {
@@ -100,10 +115,26 @@ export default function NewReservationModal({ isOpen, onClose }) {
 		setStops(stops.filter((stop) => stop.id !== idToRemove))
 	}
 
+	const handleUpdateStop = (id, value) => {
+		setStops((prev) => prev.map((s) => (s.id === id ? { ...s, value } : s)))
+	}
+
 	const handleSaveBooking = async () => {
 		setBookingError('')
 
-		const bookingPayload = buildReservationPayload({ tripType, selectedVehicleId, specialInstructions })
+		const bookingPayload = buildReservationPayload({
+			tripType,
+			selectedVehicleId,
+			specialInstructions,
+			pickupLocation,
+			dropoffLocation,
+			stopLocations: stops.map((s) => s.value).filter(Boolean),
+			date,
+			time,
+			noOfPassengers,
+			luggage,
+			hours,
+		})
 
 		if (!bookingPayload.pickupLocation || !bookingPayload.dropoffLocation || !bookingPayload.date || !bookingPayload.time || !bookingPayload.vehicleCategoryId) {
 			setBookingError('Please fill in all required fields')
@@ -176,6 +207,21 @@ export default function NewReservationModal({ isOpen, onClose }) {
 									stops={stops}
 									onAddStop={handleAddStop}
 									onRemoveStop={handleRemoveStop}
+									onUpdateStop={handleUpdateStop}
+									pickupLocation={pickupLocation}
+									onPickupChange={setPickupLocation}
+									dropoffLocation={dropoffLocation}
+									onDropoffChange={setDropoffLocation}
+									date={date}
+									onDateChange={setDate}
+									time={time}
+									onTimeChange={setTime}
+									noOfPassengers={noOfPassengers}
+									onPassengersChange={setNoOfPassengers}
+									luggage={luggage}
+									onLuggageChange={setLuggage}
+									hours={hours}
+									onHoursChange={setHours}
 								/>
 								<AdditionalInfoSection
 									isOpen={openSections.additionalInfo}

@@ -1,9 +1,22 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useDriverStore } from '../../../stores/driverStore';
 
 const DocRow = ({ name, expiryValue, onExpiryChange, status, fileUrl, onSelectFile, isUploading, error }) => {
   const inputRef = useRef(null);
-  const handleClick = () => inputRef.current?.click();
+  const [expiryError, setExpiryError] = useState(false);
+
+  const handleClick = () => {
+    if (!expiryValue) {
+      setExpiryError(true);
+      return;
+    }
+    inputRef.current?.click();
+  };
+
+  const handleExpiryChange = (val) => {
+    onExpiryChange(val);
+    if (val) setExpiryError(false);
+  };
 
   const showUploaded  = status === 'Uploaded';
   const showUploading = status === 'Uploading';
@@ -15,9 +28,12 @@ const DocRow = ({ name, expiryValue, onExpiryChange, status, fileUrl, onSelectFi
         <input
           type="date"
           value={expiryValue}
-          onChange={(e) => onExpiryChange(e.target.value)}
-          className="w-full rounded-md border border-gray-200 px-2 py-1 text-[13px] text-gray-600 focus:border-[#1b2d5d] focus:outline-none"
+          onChange={(e) => handleExpiryChange(e.target.value)}
+          className={`w-full rounded-md border px-2 py-1 text-[13px] text-gray-600 focus:outline-none focus:border-[#1b2d5d] ${expiryError ? 'border-red-400' : 'border-gray-200'}`}
         />
+        {expiryError && (
+          <p className="mt-1 text-[11px] text-red-500">Expiry date is required before uploading.</p>
+        )}
       </div>
       <div className="w-24 shrink-0 flex items-center gap-2">
         <div className={`w-1.5 h-1.5 rounded-full ${showUploaded ? 'bg-green-500' : showUploading ? 'bg-amber-500' : 'bg-red-500'}`} />

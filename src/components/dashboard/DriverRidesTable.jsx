@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FiCheckCircle, FiEye, FiLoader, FiXCircle, FiMessageSquare } from 'react-icons/fi';
+import { FiCheckCircle, FiEye, FiLoader, FiXCircle, FiMessageSquare, FiSearch, FiRefreshCw } from 'react-icons/fi';
 import { MdOutlineLocationOn } from 'react-icons/md';
 import { useDriverStore } from '../../stores/driverStore';
 import { acceptDriverRide, declineDriverRide } from '../../services/driverService';
+import { formatDisplayTime } from '../../utils/bookingFormatters';
 
 const RIDE_TABS = [
 	{ label: 'Upcoming Ride', apiTab: 'upcoming' },
@@ -61,8 +62,10 @@ function RoutingInfo({ pickup, dropoff, stop }) {
 export default function DriverRidesTable({ openRideDetails, onOpenMessage }) {
 	const [activeRideTab, setActiveRideTab] = useState('Upcoming Ride');
 	const [localLoading, setLocalLoading] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [confirmingRideId, setConfirmingRideId] = useState(null);
 	const [decliningRideId, setDecliningRideId] = useState(null);
+	const [searchTerm, setSearchTerm] = useState('');
 
 	const rides = useDriverStore((s) => s.rides);
 	const isLoading = useDriverStore((s) => s.isLoading);
@@ -76,7 +79,30 @@ export default function DriverRidesTable({ openRideDetails, onOpenMessage }) {
 
 	const isUpcomingTab = activeRideTab === 'Upcoming Ride';
 	const isTableLoading = localLoading || isLoading;
-	const displayRides = isTableLoading ? [] : (Array.isArray(rides) ? rides : []);
+
+	const filteredRides = useMemo(() => {
+		const source = isTableLoading ? [] : (Array.isArray(rides) ? rides : []);
+		const s = searchTerm.trim().toLowerCase();
+		if (!s) return source;
+		return source.filter((ride) => {
+			const text = [
+				ride.confNumber,
+				ride.pickupLocation,
+				ride.dropoffLocation,
+				ride.date,
+				ride.time,
+				ride.rideStatus,
+				ride.totalAmount,
+			].filter(Boolean).join(' ').toLowerCase();
+			return text.includes(s);
+		});
+	}, [rides, isTableLoading, searchTerm]);
+
+	const handleRefresh = async () => {
+		setIsRefreshing(true);
+		await reloadCurrentTab();
+		setIsRefreshing(false);
+	};
 
 	useEffect(() => {
 		let isMounted = true;
@@ -198,6 +224,27 @@ export default function DriverRidesTable({ openRideDetails, onOpenMessage }) {
 							</button>
 						))}
 					</div>
+
+					<div className="flex flex-row items-center gap-2 sm:gap-3 w-full lg:w-auto">
+						<label className="flex flex-1 lg:flex-none items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 sm:px-5 sm:py-2.5 focus-within:border-gray-400 transition-colors">
+							<input
+								type="text"
+								placeholder="Search"
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+								className="w-full min-w-[50px] lg:w-[130px] border-none text-xs sm:text-[15px] text-gray-700 placeholder-gray-400 outline-none bg-transparent"
+							/>
+							<FiSearch className="text-gray-500 flex-shrink-0" size={16} />
+						</label>
+						<button
+							onClick={handleRefresh}
+							disabled={isTableLoading}
+							title="Refresh rides"
+							className="flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-gray-300 bg-white text-gray-500 hover:text-[#1b2d5d] hover:border-[#1b2d5d] transition-colors disabled:opacity-40"
+						>
+							<FiRefreshCw size={15} className={isRefreshing ? 'animate-spin' : ''} />
+						</button>
+					</div>
 				</div>
 
 				<div className="overflow-x-auto rounded-xl bg-white shadow-sm border border-gray-200">
@@ -223,14 +270,14 @@ export default function DriverRidesTable({ openRideDetails, onOpenMessage }) {
 
 							<tbody>
 							
-								{displayRides.length === 0 ? (
+								{filteredRides.length === 0 ? (
 									<tr>
 										<td colSpan={6} className="py-12 text-center text-gray-400 text-[15px]">
 											No {activeRideTab.toLowerCase()} found.
 										</td>
 									</tr>
 								) : (
-									displayRides.map((ride, idx) => {
+									filteredRides.map((ride, idx) => {
 										const rideId = ride.id ?? ride._id;
 										const rideStatus = String(ride.rideStatus || '').toLowerCase();
 
@@ -280,7 +327,7 @@ export default function DriverRidesTable({ openRideDetails, onOpenMessage }) {
 
 												<td className="px-2 py-5 leading-7">
 													<p>{dateStr}</p>
-													<p>{ride.time ?? '—'}</p>
+													<p>{formatDisplayTime(ride.time)}</p>
 												</td>
 
 												<td className="px-2 py-5">
