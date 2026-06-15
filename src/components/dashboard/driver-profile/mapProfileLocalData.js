@@ -47,7 +47,6 @@ export function mapProfileLocalData(onboarding, profile) {
     passengerCapacity: vehicle.passengerCapacity ?? '',
     luggageCapacity: vehicle.luggageCapacity ?? '',
     wifi: vehicle.wifi,
-    smokingAllowed: vehicle.smokingAllowed,
     vehicleNumberPlate: vehicle.vehicleNumberPlate || '',
     vehicleVIN: vehicle.vehicleVIN || '',
     contractPlace: contract.place || '',

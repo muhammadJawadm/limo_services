@@ -1,7 +1,5 @@
 import { InputField, SelectField } from '../FormElements';
 
-const vehicleBrands = ['Mercedes-Benz S-Class', 'BMW 7 Series', 'Audi A8'];
-const vehicleClasses = ['Business Class', 'First Class', 'Standard'];
 
 const isMissing = (value) => value === undefined || value === null || String(value).trim() === '';
 
@@ -26,17 +24,17 @@ export const Step4 = ({ formData, updateDoc }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-12">
         <div>
-          <SelectField label="Vehicle Year of Manufacture (YoM)" options={['2020', '2021', '2022', '2023', '2024']} value={formData.vehicleYear} onChange={(e) => updateDoc('vehicleYear', e.target.value)} />
+          <InputField label="Vehicle Year of Manufacture (YoM)" placeholder="e.g. 2022" value={formData.vehicleYear} onChange={(e) => updateDoc('vehicleYear', e.target.value)} />
           <FieldError show={showErrors && isMissing(formData.vehicleYear)} />
         </div>
 
         <div>
-          <SelectField label="Vehicle Brand & Model" options={vehicleBrands} value={formData.vehicleBrand} onChange={(e) => updateDoc('vehicleBrand', e.target.value)} />
+          <InputField label="Vehicle Brand & Model" placeholder="e.g. Mercedes-Benz S-Class" value={formData.vehicleBrand} onChange={(e) => updateDoc('vehicleBrand', e.target.value)} />
           <FieldError show={showErrors && isMissing(formData.vehicleBrand)} />
         </div>
 
         <div>
-          <SelectField label="Vehicle Class" options={vehicleClasses} value={formData.vehicleClass} onChange={(e) => updateDoc('vehicleClass', e.target.value)} />
+          <InputField label="Vehicle Class" placeholder="e.g. Business Class" value={formData.vehicleClass} onChange={(e) => updateDoc('vehicleClass', e.target.value)} />
           <FieldError show={showErrors && isMissing(formData.vehicleClass)} />
         </div>
 
@@ -58,11 +56,6 @@ export const Step4 = ({ formData, updateDoc }) => {
         <div>
           <InputField label="Wi-Fi" placeholder="Available" value={formData.wifi} onChange={(e) => updateDoc('wifi', e.target.value)} />
           <FieldError show={showErrors && isMissing(formData.wifi)} />
-        </div>
-
-        <div>
-          <InputField label="Smoking" placeholder="Allowed" value={formData.smoking} onChange={(e) => updateDoc('smoking', e.target.value)} />
-          <FieldError show={showErrors && isMissing(formData.smoking)} />
         </div>
 
         <div>

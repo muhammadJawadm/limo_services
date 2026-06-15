@@ -1,6 +1,4 @@
 export default function ReservationFooter({
-	isReturnTrip,
-	onReturnTripToggle,
 	showPaymentForm,
 	isBooking,
 	bookingError,
@@ -19,32 +17,10 @@ export default function ReservationFooter({
 				<div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 					<div className="flex flex-col gap-3 sm:gap-0 sm:flex-row sm:items-center xl:gap-6">
 						<div className="flex items-center justify-between sm:justify-start gap-4">
-							<div className="flex items-center gap-3 cursor-pointer group" onClick={onReturnTripToggle}>
-								<div className="flex h-6 w-6 sm:h-[26px] sm:w-[26px] items-center justify-center rounded-full border-[1.5px] border-gray-400 group-hover:border-[#111] transition-colors overflow-hidden p-0.5 sm:p-[3px] bg-white">
-									{isReturnTrip && <div className="h-full w-full bg-[#1b2d5d] rounded-full"></div>}
-								</div>
-								<span className="text-[16px] sm:text-[20px] font-semibold text-[#111] whitespace-nowrap">Return Trip</span>
-							</div>
+							
 						</div>
 
-						{isReturnTrip && (
-							<div className="flex flex-col sm:flex-row flex-wrap sm:items-center gap-2 sm:gap-4 text-[#666] text-[14px] sm:text-[15px] font-medium sm:ml-6 xl:ml-0 lg:border-l lg:pl-6 border-gray-300">
-								<span className="flex items-center gap-2.5">
-									<div className="bg-blue-50/80 text-[#1b2d5d] p-1.5 rounded-md border border-[#1b2d5d]/10">
-										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-									</div>
-									<span className="text-[#333]">Pickup:</span>
-									<span className="font-semibold text-[#111]">$450.00</span>
-								</span>
-								<span className="flex items-center gap-2.5">
-									<div className="bg-blue-50/80 text-[#1b2d5d] p-1.5 rounded-md border border-[#1b2d5d]/10">
-										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 8 9 12 5"></polyline><polyline points="12 19 8 15 12 19"></polyline><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-									</div>
-									<span className="text-[#333]">Return:</span>
-									<span className="font-semibold text-[#111]">$450.00</span>
-								</span>
-							</div>
-						)}
+				
 					</div>
 
 					<div className="flex items-center justify-between gap-3 w-full sm:w-[350px] lg:w-[400px]">

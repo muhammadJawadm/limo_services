@@ -14,7 +14,6 @@ import PaymentInfoSection from './reservation/PaymentInfoSection'
 import ReservationFooter from './reservation/ReservationFooter'
 
 export default function NewReservationModal({ isOpen, onClose }) {
-	const [isReturnTrip, setIsReturnTrip] = useState(false)
 	const [tripType, setTripType] = useState('ptop')
 	const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
 	const [vehicleCategories, setVehicleCategories] = useState([])
@@ -74,7 +73,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
 	if (!isOpen) return null
 
 	const resetReservationState = () => {
-		setIsReturnTrip(false)
+		// setIsReturnTrip(false)
 		setTripType('ptop')
 		setIsSuccessModalOpen(false)
 		setBookingError('')
@@ -263,8 +262,7 @@ export default function NewReservationModal({ isOpen, onClose }) {
 					</div>
 
 					<ReservationFooter
-						isReturnTrip={isReturnTrip}
-						onReturnTripToggle={() => setIsReturnTrip(!isReturnTrip)}
+						
 						showPaymentForm={showPaymentForm}
 						isBooking={isBooking}
 						bookingError={bookingError}

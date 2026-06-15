@@ -298,8 +298,7 @@ export default function DriverProfileDetailsView() {
                                     editing={editing} onChange={(v) => set('luggageCapacity', v)} type="number" />
                                 <RadioGroup label="Wi-Fi Available?" value={localData.wifi} editing={editing}
                                     onChange={(v) => set('wifi', v === 'yes')} />
-                                <RadioGroup label="Smoking Allowed?" value={localData.smokingAllowed} editing={editing}
-                                    onChange={(v) => set('smokingAllowed', v === 'yes')} />
+                                
                                 <Field label="License Number Plate" value={localData.vehicleNumberPlate} editing={editing}
                                     onChange={(v) => set('vehicleNumberPlate', v)} />
                                 <Field label="Vehicle VIN" value={localData.vehicleVIN} editing={editing}

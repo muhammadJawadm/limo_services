@@ -14,7 +14,6 @@ export default function DriverVehicleSection({ formData, updateDoc, isEditing, y
 				<InputField label="Passenger Capacity" type="number" placeholder="4" value={formData.vehiclePassengerCapacity} onChange={(e) => updateDoc('vehiclePassengerCapacity', e.target.value)} readOnly={!isEditing} />
 				<InputField label="Luggage Capacity" type="number" placeholder="3" value={formData.vehicleLuggageCapacity} onChange={(e) => updateDoc('vehicleLuggageCapacity', e.target.value)} readOnly={!isEditing} />
 				<SelectField label="WiFi" options={yesNoOptions} value={formData.vehicleWifi} onChange={(e) => updateDoc('vehicleWifi', e.target.value)} disabled={!isEditing} />
-				<SelectField label="Smoking Allowed" options={yesNoOptions} value={formData.vehicleSmokingAllowed} onChange={(e) => updateDoc('vehicleSmokingAllowed', e.target.value)} disabled={!isEditing} />
 				<InputField label="Vehicle Number Plate" placeholder="NYC-1234" value={formData.vehicleNumberPlate} onChange={(e) => updateDoc('vehicleNumberPlate', e.target.value)} readOnly={!isEditing} />
 				<InputField label="Vehicle VIN" placeholder="1HGCM82633A004352" value={formData.vehicleVIN} onChange={(e) => updateDoc('vehicleVIN', e.target.value)} readOnly={!isEditing} />
 			</div>

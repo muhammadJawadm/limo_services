@@ -58,7 +58,6 @@ export function getOnboardingSaveEntry(activeTab, localData) {
         passengerCapacity: Number(localData.passengerCapacity) || null,
         luggageCapacity: Number(localData.luggageCapacity) || null,
         wifi: Boolean(localData.wifi),
-        smokingAllowed: Boolean(localData.smokingAllowed),
         vehicleNumberPlate: localData.vehicleNumberPlate,
         vehicleVIN: localData.vehicleVIN,
       },

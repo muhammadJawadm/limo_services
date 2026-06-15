@@ -86,7 +86,6 @@ const validateOnboardingStep = (step, form) => {
       'passengerCount',
       'luggageCount',
       'wifi',
-      'smoking',
       'numberPlate',
       'vin',
     ];

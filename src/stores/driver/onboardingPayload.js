@@ -54,7 +54,6 @@ export const buildStepPayload = (stepNumber, formData) => {
 				passengerCapacity: toNumber(formData.passengerCount),
 				luggageCapacity: toNumber(formData.luggageCount),
 				wifi: normalizeBoolean(formData.wifi),
-				smokingAllowed: normalizeBoolean(formData.smoking),
 				vehicleNumberPlate: formData.numberPlate || '',
 				vehicleVIN: formData.vin || '',
 			}

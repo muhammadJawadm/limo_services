@@ -23,6 +23,7 @@ export default function PaymentInfoSection({
 					<PaymentFormPanel
 						bookingId={paymentBookingId}
 						bookingDetails={paymentBookingDetails}
+						clientSecret={paymentClientSecret}
 						onProceed={onPaymentSuccess}
 					/>
 				</Elements>

@@ -44,7 +44,6 @@ export function mapApiToDriverProfileForm(data) {
 		vehiclePassengerCapacity: String(vehicle.passengerCapacity ?? onboarding.vehiclePassengerCapacity ?? ''),
 		vehicleLuggageCapacity: String(vehicle.luggageCapacity ?? onboarding.vehicleLuggageCapacity ?? ''),
 		vehicleWifi: boolToYesNo(vehicle.wifi ?? onboarding.vehicleWifi),
-		vehicleSmokingAllowed: boolToYesNo(vehicle.smokingAllowed ?? onboarding.vehicleSmokingAllowed),
 		vehicleNumberPlate: vehicle.vehicleNumberPlate || onboarding.vehicleNumberPlate || '',
 		vehicleVIN: vehicle.vehicleVIN || onboarding.vehicleVIN || '',
 	}
@@ -98,7 +97,6 @@ export function buildDriverOnboardingPayload(formData) {
 			passengerCapacity: Number(formData.vehiclePassengerCapacity) || 0,
 			luggageCapacity: Number(formData.vehicleLuggageCapacity) || 0,
 			wifi: yesNoToBool(formData.vehicleWifi),
-			smokingAllowed: yesNoToBool(formData.vehicleSmokingAllowed),
 			vehicleNumberPlate: formData.vehicleNumberPlate,
 			vehicleVIN: formData.vehicleVIN,
 		},

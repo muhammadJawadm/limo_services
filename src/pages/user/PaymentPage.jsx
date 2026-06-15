@@ -137,6 +137,7 @@ export default function PaymentPage() {
               <PaymentFormPanel
                 bookingId={bookingId}
                 bookingDetails={bookingDetails}
+                clientSecret={clientSecret}
                 onProceed={handleProceed}
               />
             </Elements>

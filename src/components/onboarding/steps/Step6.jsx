@@ -88,7 +88,7 @@ const companyDocs = [
   { key: 'w9Form',                 name: 'W-9 Form' },
   { key: 'articleOfIncorporation', name: 'Articles of Incorporation, articles of organization, or business registration.' },
   { key: 'einCertificate',         name: 'Federal Tax ID / EIN Certificate' },
-  { key: 'cityPermit',             name: 'City of Houston – Vehicle for Hire Permit' },
+  { key: 'cityPermit',             name: 'Vehicle for Hire Permit' },
   { key: 'voidCheck',              name: 'Copy of void check for payment detail confirmation' },
 ];
 
@@ -98,10 +98,10 @@ const chauffeurDocs = [
 ];
 
 const vehicleDocs = [
-  { key: 'limoLicenseDecal',     name: 'Houston Limousine License Window Decal' },
-  { key: 'liabilityInsurance',   name: 'Certificate of Liability Insurance (min. $1M CSL Sedan/SUV, $1.5M CSL Sprinter)' },
-  { key: 'vehicleRegistration',  name: 'Texas Premium Sedan Vehicle Registration Paper and Sticker' },
-  { key: 'cityPermittedSticker', name: 'City of Houston Permitted Vehicle Window Sticker' },
+  { key: 'limoLicenseDecal',     name: 'Limousine License Window Decal' },
+  { key: 'liabilityInsurance',   name: 'Certificate of Liability Insurance' },
+  { key: 'vehicleRegistration',  name: 'Premium Sedan Vehicle Registration Paper and Sticker' },
+  { key: 'cityPermittedSticker', name: 'Permitted Vehicle Window Sticker' },
   { key: 'licensePlatePhoto',    name: 'Photo of the whole vehicle showing the license plate' },
   { key: 'airportPermit',        name: 'Airport Permit' },
 ];

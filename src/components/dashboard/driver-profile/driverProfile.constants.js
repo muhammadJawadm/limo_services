@@ -33,7 +33,6 @@ export const INITIAL_DRIVER_PROFILE_FORM = {
 	vehiclePassengerCapacity: '',
 	vehicleLuggageCapacity: '',
 	vehicleWifi: '',
-	vehicleSmokingAllowed: '',
 	vehicleNumberPlate: '',
 	vehicleVIN: '',
 }

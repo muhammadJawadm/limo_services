@@ -1,10 +1,32 @@
 import { useState } from 'react';
 import { BsCreditCard, BsShieldCheck, BsInfoCircle, BsCheck2 } from 'react-icons/bs';
-import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { CardNumberElement, CardExpiryElement, CardCvcElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import wallet from '../../assets/wallet.png';
 import { confirmPayment } from '../../services/paymentService';
 
-export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed }) {
+const STRIPE_STYLE = {
+  style: {
+    base: {
+      fontSize: '15px',
+      color: '#111111',
+      fontFamily: 'inherit',
+      fontSmoothing: 'antialiased',
+      '::placeholder': { color: '#9ca3af' },
+    },
+    invalid: { color: '#ef4444', iconColor: '#ef4444' },
+  },
+};
+
+const StripeField = ({ label, children }) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-[12px] font-medium text-gray-500">{label}</label>
+    <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 focus-within:border-[#1a2b5e] focus-within:ring-1 focus-within:ring-[#1a2b5e] transition-all">
+      {children}
+    </div>
+  </div>
+);
+
+export default function PaymentFormPanel({ bookingId, bookingDetails, clientSecret, onProceed }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitError, setSubmitError] = useState('');
@@ -25,12 +47,9 @@ export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed 
       return;
     }
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/payment-success`,
-      },
-      redirect: 'if_required',
+    const cardNumberElement = elements.getElement(CardNumberElement);
+    const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: { card: cardNumberElement },
     });
 
     if (error) {
@@ -40,20 +59,15 @@ export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed 
     }
 
     if (paymentIntent?.status === 'succeeded') {
-      console.log('Payment succeeded with PaymentIntent:', paymentIntent);
-      
-
       const confirmResult = await confirmPayment(bookingId, paymentIntent.id, {
-       bookerDetails: bookingDetails?.bookerDetails,
+        bookerDetails: bookingDetails?.bookerDetails,
       });
       if (!confirmResult?.success) {
-        console.error('Error confirming payment:', confirmResult);
         setSubmitError(confirmResult?.message || 'Failed to confirm payment.');
         setIsSubmitting(false);
         return;
       }
       setIsSubmitting(false);
-      // Pass booking details with payout status
       onProceed({ ...bookingDetails, payout: confirmResult.payout });
       return;
     }
@@ -74,23 +88,32 @@ export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed 
         </div>
 
         {/* Debit Card option (selected) */}
-        <div className="border-2 border-[#1a2b5e] rounded-xl px-4 py-3 flex  gap-3 mb-5 bg-blue-50/30">
+        <div className="border-2 border-[#1a2b5e] rounded-xl px-4 py-3 flex gap-3 mb-5 bg-blue-50/30">
           <div className="w-9 h-9 bg-[#1a2b5e] rounded-lg flex items-center justify-center flex-shrink-0">
             <BsCreditCard size={17} className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-900">Debit Card</p>
-            <p className="text-xs text-gray-400">Pay directly form your bank</p>
+            <p className="text-sm font-semibold text-gray-900">Debit / Credit Card</p>
+            <p className="text-xs text-gray-400">Pay securely with your card</p>
           </div>
           <div className="w-6 h-6 rounded-full bg-[#1a2b5e] flex items-center justify-center flex-shrink-0">
             <BsCheck2 size={12} className="text-white" />
           </div>
         </div>
 
-        {/* Stripe Payment Element */}
-        <div className="flex flex-col gap-3 mb-5">
-          <div className="rounded-xl border border-gray-200/80 bg-white p-4">
-            <PaymentElement />
+        {/* Split card fields */}
+        <div className="flex flex-col gap-4 mb-5">
+          <StripeField label="Card Number">
+            <CardNumberElement options={STRIPE_STYLE} />
+          </StripeField>
+
+          <div className="grid grid-cols-2 gap-4">
+            <StripeField label="Expiry Date">
+              <CardExpiryElement options={STRIPE_STYLE} />
+            </StripeField>
+            <StripeField label="CVC">
+              <CardCvcElement options={STRIPE_STYLE} />
+            </StripeField>
           </div>
         </div>
 
@@ -103,7 +126,7 @@ export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed 
             <img src={wallet} alt="Wallet" className="text-white" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-900">Credit card</p>
+            <p className="text-sm font-semibold text-gray-900">Debit / Credit Card</p>
             <p className="text-xs text-gray-400 mt-0.5">Save your info for faster booking</p>
             <div className="flex items-center gap-1 mt-1 bg-gray-200 px-2 py-1 rounded-lg w-full xl:w-[60%]">
               <BsInfoCircle size={11} className="text-[#1a2b5e] flex-shrink-0" />
@@ -128,9 +151,9 @@ export default function PaymentFormPanel({ bookingId, bookingDetails, onProceed 
         </div>
 
         {/* Proceed to checkout */}
-        {submitError ? (
+        {submitError && (
           <p className="text-sm text-red-500 mb-3">{submitError}</p>
-        ) : null}
+        )}
         <div className="flex justify-end">
           <button
             onClick={handleProceed}

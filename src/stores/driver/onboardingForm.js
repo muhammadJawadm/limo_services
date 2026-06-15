@@ -31,7 +31,6 @@ export const initialOnboardingForm = {
 	passengerCount: '',
 	luggageCount: '',
 	wifi: '',
-	smoking: '',
 	numberPlate: '',
 	vin: '',
 	contractPlace: '',
@@ -118,7 +117,6 @@ export const mapOnboardingToFormData = (data) => {
 		passengerCount: vehicle.passengerCapacity != null ? String(vehicle.passengerCapacity) : '',
 		luggageCount: vehicle.luggageCapacity != null ? String(vehicle.luggageCapacity) : '',
 		wifi: typeof vehicle.wifi === 'boolean' ? (vehicle.wifi ? 'yes' : 'no') : '',
-		smoking: typeof vehicle.smokingAllowed === 'boolean' ? (vehicle.smokingAllowed ? 'yes' : 'no') : '',
 		numberPlate: notPending(vehicle.vehicleNumberPlate),
 		vin: notPending(vehicle.vehicleVIN),
 
