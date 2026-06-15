@@ -5,7 +5,7 @@ import driverAvatarFallback from '../../assets/driver1.png';
 import useRideChat from '../../hooks/useRideChat';
 
 export default function MessagesModal({ isOpen, onClose, rideId, bookingDetails }) {
-  console.log('MessagesModal Props:', { isOpen, rideId, bookingDetails });
+ 
   const { role, messages, isLoading, error, isConnected, sendMessage } = useRideChat(rideId);
   const [messageText, setMessageText] = useState('');
   const endRef = useRef(null);

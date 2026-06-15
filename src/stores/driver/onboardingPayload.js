@@ -74,10 +74,11 @@ export const buildStepPayload = (stepNumber, formData) => {
 			}
 
 		case 9:
-			return {
-				stripeOnboarded: Boolean(formData.stripeOnboarded),
-				stripeAccountId: formData.stripeAccountId || '',
-			}
+			// Stripe Connect status is managed exclusively via /api/payments/driver/connect
+			// and /api/payments/driver/connect/status. Writing stripeOnboarded from the
+			// onboarding form would always send false (field is never in formData) and wipe
+			// the value set by the Stripe webhook. Skip the save for this step entirely.
+			return null
 
 		case 10: {
 			const avail = formData.availability || {}
