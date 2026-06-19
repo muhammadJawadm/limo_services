@@ -1,11 +1,14 @@
 import { LuCalendarDays, LuClock3 } from 'react-icons/lu';
 import { MdOutlineLocationOn, MdCircle } from 'react-icons/md';
 import { TbArrowRight } from 'react-icons/tb';
+import { BsReceipt } from 'react-icons/bs';
 import RouteMap from '../RouteMap';
 import arowswap from "../../assets/arrow-swap.png";
 import { formatBookingDate, formatBookingTime } from '../../utils/bookingFormatters';
 
-export default function TripDetailsPanel({ stops, isHourlyRide, bookingDetails }) {
+const fmt = (v) => `$${Number(v ?? 0).toFixed(2)}`;
+
+export default function TripDetailsPanel({ stops, isHourlyRide, bookingDetails, fareBreakdown, isFetchingPrice }) {
   const displayDate = formatBookingDate(bookingDetails?.date);
   const displayTime = formatBookingTime(bookingDetails?.time);
   const displayHours = bookingDetails?.hours ? `${bookingDetails.hours} hours` : 'Point to point';
@@ -78,6 +81,68 @@ export default function TripDetailsPanel({ stops, isHourlyRide, bookingDetails }
           </div>
         </div>
       </div>
+
+      {/* Price Summary Card — shown as soon as a vehicle is auto-selected or clicked */}
+      {(fareBreakdown || isFetchingPrice) && (
+        <div className="bg-white/60 rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <BsReceipt size={15} className="text-[#1a2b5e]" />
+            <span className="text-sm font-bold text-gray-800">Price Summary</span>
+          </div>
+
+          {isFetchingPrice ? (
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <div className="w-7 h-7 border-[3px] border-[#1a2b5e] border-t-transparent rounded-full animate-spin" />
+              <span className="text-xl font-bold text-gray-400">Updating...</span>
+            </div>
+          ) : fareBreakdown && (
+            <div className="flex flex-col gap-2.5">
+              {fareBreakdown.baseFare > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Base Fare</span>
+                  <span className="text-gray-700 font-medium">{fmt(fareBreakdown.baseFare)}</span>
+                </div>
+              )}
+              {fareBreakdown.mileageCharge > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Mileage Charge</span>
+                  <span className="text-gray-700 font-medium">{fmt(fareBreakdown.mileageCharge)}</span>
+                </div>
+              )}
+              {fareBreakdown.hourlyCharge > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Hourly Charge</span>
+                  <span className="text-gray-700 font-medium">{fmt(fareBreakdown.hourlyCharge)}</span>
+                </div>
+              )}
+              {fareBreakdown.subtotal > 0 && (
+                <div className="flex justify-between text-sm border-t border-dashed border-gray-200 pt-2.5">
+                  <span className="text-gray-500">Subtotal</span>
+                  <span className="text-gray-700 font-medium">{fmt(fareBreakdown.subtotal)}</span>
+                </div>
+              )}
+              {fareBreakdown.tollCharges > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Toll Charges</span>
+                  <span className="text-gray-700 font-medium">{fmt(fareBreakdown.tollCharges)}</span>
+                </div>
+              )}
+              {fareBreakdown.taxAmount > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">
+                    Tax{fareBreakdown.taxRate ? ` (${fareBreakdown.taxRate}%)` : ''}
+                  </span>
+                  <span className="text-gray-700 font-medium">{fmt(fareBreakdown.taxAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center border-t border-gray-200 pt-3 mt-1">
+                <span className="text-sm font-bold text-gray-900">Total</span>
+                <span className="text-base font-bold text-[#1a2b5e]">{fmt(fareBreakdown.total)}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

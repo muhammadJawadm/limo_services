@@ -12,7 +12,8 @@ export default function TripSummaryPanel({ isHourlyRide, setShowDeleteConfirm, b
   const tripPrice = Number(bookingDetails?.tripPrice ?? bookingDetails?.vehicleCategory?.baseFare ?? 0);
   const childSeatFee = Number(bookingDetails?.childSeatsFee ?? 0);
   const tollsFee = Number(bookingDetails?.tollCharges ?? 0);
-  const totalPrice = Number(bookingDetails?.totalAmount ?? tripPrice + childSeatFee + tollsFee);
+  const taxFee = Number(bookingDetails?.taxAmount ?? 0);
+  const totalPrice = Number(bookingDetails?.totalAmount ?? tripPrice + childSeatFee + tollsFee + taxFee);
 
   const childSeatsCount = useMemo(() => {
     const seats = bookingDetails?.childSeats;
@@ -138,6 +139,12 @@ export default function TripSummaryPanel({ isHourlyRide, setShowDeleteConfirm, b
         <div className="flex items-center justify-between py-3 border-b border-gray-100">
           <span className="text-sm text-gray-700">Toll Charges</span>
           <span className="text-md  text-gray-400">${tollsFee.toFixed(2)}</span>
+        </div>
+
+        {/* Tax */}
+        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <span className="text-sm text-gray-700">Tax(8.25%)</span>
+          <span className="text-md  text-gray-400">${taxFee.toFixed(2)}</span>
         </div>
 
         {/* Total */}

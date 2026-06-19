@@ -589,13 +589,13 @@ export default function RideDetailsModal({
                   <span className="font-semibold text-[15px] sm:text-base text-[#111]">${Number(charges.tripPrice ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center group">
-                  <span className="text-[#666] font-medium sm:font-normal">Child</span>
-                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">${Number(charges.childSeatsFee ?? 0).toFixed(2)}</span>
+                  <span className="text-[#666] font-medium sm:font-normal">Tax (8.25%)</span>
+                  <span className="font-semibold text-[15px] sm:text-base text-[#111]">${Number(charges.taxAmount ?? 0).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between items-center border-b border-gray-100 pb-4 sm:pb-4 group">
+                {/* <div className="flex justify-between items-center border-b border-gray-100 pb-4 sm:pb-4 group">
                   <span className="text-[#666] font-medium sm:font-normal">Others:</span>
                   <span className="font-semibold text-[15px] sm:text-base text-[#111]">${Number(charges.otherFees ?? 0).toFixed(2)}</span>
-                </div>
+                </div> */}
                 <div className="flex justify-between items-center pt-2 sm:pt-3 text-[#b0b0b0]">
                   <span className="text-gray-700 font-semibold sm:font-normal">Payment</span>
                   <span className="text-[22px] sm:text-2xl font-bold text-[#1b2d5d]">${Number(totalAmount).toFixed(2)}</span>

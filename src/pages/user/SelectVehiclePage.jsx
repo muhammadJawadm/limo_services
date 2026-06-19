@@ -43,6 +43,7 @@ export default function SelectVehiclePage() {
   const [bookingError, setBookingError] = useState('');
   const [isUpdatingBooking, setIsUpdatingBooking] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
+  const [fareBreakdown, setFareBreakdown] = useState(null);
 
   const bookingContext = useMemo(() => resolveBookingContext(location.state), [location.state]);
   const isHourlyRide = bookingContext.rideType === 'hourly';
@@ -75,49 +76,47 @@ export default function SelectVehiclePage() {
 
       setVehicleOptions(mappedVehicles);
 
-      if (!selectedId && mappedVehicles.length > 0) {
-        setSelectedId(mappedVehicles[0].id);
+      if (mappedVehicles.length === 0 || !bookingId) return;
+
+      // Prefer the vehicle stored in the session draft; fall back to the first vehicle
+      const initialVehicleId = storedBookingDraft?.vehicleCategoryId || mappedVehicles[0].id;
+      const initPassengers = Number(storedBookingDraft?.noOfPassengers ?? 1);
+      const initLuggage = Number(storedBookingDraft?.luggage ?? 1);
+
+      setSelectedId(initialVehicleId);
+      setPassengerCount(initPassengers);
+      setLuggageCount(initLuggage);
+
+      // Auto-fetch price for the initially selected vehicle
+      setIsUpdatingBooking(true);
+      const priceResult = await updateBookingStep2(bookingId, {
+        vehicleCategoryId: initialVehicleId,
+        noOfPassengers: initPassengers,
+        luggage: initLuggage,
+      });
+      setIsUpdatingBooking(false);
+
+      if (priceResult?.success) {
+        setBookingDetails(priceResult?.data ?? null);
+        setFareBreakdown(priceResult?.raw?.fareBreakdown ?? null);
+        persistBookingSession({ bookingDraft: priceResult?.data ?? null });
       }
     };
 
     loadVehicleCategories();
+    // storedBookingDraft and bookingId are memos computed once — safe in [] effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Restore child seat choices from session on mount (separate from vehicle/price init)
   useEffect(() => {
-    if (!bookingDetails && storedBookingDraft) {
-      setBookingDetails(storedBookingDraft);
-
-      setPassengerCount(Number(storedBookingDraft?.noOfPassengers ?? 1));
-      setLuggageCount(Number(storedBookingDraft?.luggage ?? 1));
-
-      setChildSeats(Boolean(storedBookingDraft?.childSeatRequired));
-      setInfant(
-        Number(
-          storedBookingDraft?.childSeats?.infant ??
-            storedBookingDraft?.childSeatInfant ??
-            0
-        )
-      );
-      setToddler(
-        Number(
-          storedBookingDraft?.childSeats?.toddler ??
-            storedBookingDraft?.childSeatToddler ??
-            0
-        )
-      );
-      setBooster(
-        Number(
-          storedBookingDraft?.childSeats?.booster ??
-            storedBookingDraft?.childSeatBooster ??
-            0
-        )
-      );
-
-      if (storedBookingDraft?.vehicleCategoryId) {
-        setSelectedId(storedBookingDraft.vehicleCategoryId);
-      }
-    }
-  }, [bookingDetails, storedBookingDraft]);
+    if (!storedBookingDraft) return;
+    setChildSeats(Boolean(storedBookingDraft.childSeatRequired));
+    setInfant(Number(storedBookingDraft.childSeats?.infant ?? storedBookingDraft.childSeatInfant ?? 0));
+    setToddler(Number(storedBookingDraft.childSeats?.toddler ?? storedBookingDraft.childSeatToddler ?? 0));
+    setBooster(Number(storedBookingDraft.childSeats?.booster ?? storedBookingDraft.childSeatBooster ?? 0));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const stopsForPanel = useMemo(() => {
     if (!bookingDetails) {
@@ -202,6 +201,7 @@ export default function SelectVehiclePage() {
     }
 
     setBookingDetails(result?.data ?? null);
+    setFareBreakdown(result?.raw?.fareBreakdown ?? null);
     persistBookingSession({ bookingDraft: result?.data ?? null });
     setIsUpdatingBooking(false);
 
@@ -288,6 +288,8 @@ export default function SelectVehiclePage() {
           stops={stopsForPanel}
           isHourlyRide={isHourlyRide}
           bookingDetails={bookingDetails}
+          fareBreakdown={fareBreakdown}
+          isFetchingPrice={isUpdatingBooking}
         />
 
         <div className="w-full md:w-[55%] flex flex-col gap-3">

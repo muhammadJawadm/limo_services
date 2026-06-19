@@ -47,6 +47,7 @@ export default function DriverDetailsModal({
         const result = await getDriverRideById(bookingDetails.id);
         if (result?.success && result?.data) {
           setFullBookingDetails(result.data);
+          console.log('Fetched full booking details:', result.data);
         }
       } catch (error) {
         console.error('Failed to fetch full booking details:', error);
@@ -112,9 +113,9 @@ export default function DriverDetailsModal({
   const childSeats = getNormalizedChildSeats(details);
   const charges = details?.chargesAndFees || {};
   const tripPrice = charges?.tripPrice ?? details?.tripPrice ?? 0;
-  const childSeatPrice = charges?.childSeatsFee ?? details?.childSeatsFee ?? 0;
   const tollCharges = charges?.tollCharges ?? details?.tollCharges ?? details?.tolls ?? 0;
   const otherFees = charges?.otherFees ?? details?.otherFees ?? 0;
+  const taxAmount = charges?.taxAmount ?? details?.taxAmount ?? 0;
   const paymentTotal = details?.totalAmount ?? charges?.totalAmount ?? 0;
   const tripNotes = details?.specialInstructions || details?.notes || '—';
   const tripDate = details?.date ? new Date(details.date).toLocaleDateString() : '—';
@@ -263,7 +264,7 @@ export default function DriverDetailsModal({
                   <div className="h-px bg-gray-200 w-full mb-4"></div>
                   <div className="flex justify-between items-center">
                     <span className="text-[#666]">Driver Payout</span>
-                    <span className="text-[20px] font-bold text-[#111]">${Number(paymentTotal-30 || 0).toFixed(2)}</span>
+                    <span className="text-[20px] font-bold text-[#111]">${Number(paymentTotal-taxAmount-30 || 0).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

@@ -36,6 +36,7 @@ export function getNormalizedCharges(bookingDetails) {
 			tripPrice: bookingDetails?.tripPrice ?? 0,
 			childSeatsFee: bookingDetails?.childSeatsFee ?? 0,
 			otherFees: bookingDetails?.otherFees ?? 0,
+			taxAmount: bookingDetails?.taxAmount ?? 0,
 		}
 	)
 }

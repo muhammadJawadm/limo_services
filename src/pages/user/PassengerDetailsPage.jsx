@@ -67,7 +67,7 @@ export default function PassengerDetailsPage() {
         </h1>
 
         <button
-          onClick={() => navigate('/additional-details')}
+          onClick={() => navigate('/select-vehicle')}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-[#1a2b5e] font-medium transition-colors"
         >
           <FiChevronLeft size={18} /> Back
