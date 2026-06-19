@@ -47,7 +47,6 @@ export default function DriverDetailsModal({
         const result = await getDriverRideById(bookingDetails.id);
         if (result?.success && result?.data) {
           setFullBookingDetails(result.data);
-          console.log('Fetched full booking details:', result.data);
         }
       } catch (error) {
         console.error('Failed to fetch full booking details:', error);
